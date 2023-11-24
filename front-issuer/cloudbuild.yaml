@@ -2,8 +2,10 @@ steps:
   - name: "gcr.io/kaniko-project/executor:latest"
     args:
       - --destination=gcr.io/$PROJECT_ID/hackathon-sepro:$COMMIT_SHA
+      - --context=/workspace/front-issuer/
       - --cache=true
       - --cache-ttl=263520h
+    dir: "front-issuer"
 
   # Deploy container image to Cloud Run
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:slim"
@@ -15,7 +17,7 @@ steps:
       - "--image"
       - "gcr.io/$PROJECT_ID/hackathon-sepro:$COMMIT_SHA"
       - "--memory"
-      - "256Mi"
+      - "128Mi"
       - "--allow-unauthenticated "
       - "--region"
       - "southamerica-east1"
