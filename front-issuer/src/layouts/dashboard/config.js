@@ -28,15 +28,6 @@ export const items = [
     )
   },
   {
-    title: 'Companies',
-    path: '/companies',
-    icon: (
-      <SvgIcon fontSize="small">
-        <ShoppingBagIcon />
-      </SvgIcon>
-    )
-  },
-  {
     title: 'Account',
     path: '/account',
     icon: (
@@ -55,29 +46,11 @@ export const items = [
     )
   },
   {
-    title: 'Login',
-    path: '/auth/login',
+    title: 'Mint BRLY',
+    path: '/mint-brly',
     icon: (
       <SvgIcon fontSize="small">
-        <LockClosedIcon />
-      </SvgIcon>
-    )
-  },
-  {
-    title: 'Register',
-    path: '/auth/register',
-    icon: (
-      <SvgIcon fontSize="small">
-        <UserPlusIcon />
-      </SvgIcon>
-    )
-  },
-  {
-    title: 'Error',
-    path: '/404',
-    icon: (
-      <SvgIcon fontSize="small">
-        <XCircleIcon />
+        <CogIcon />
       </SvgIcon>
     )
   }
