@@ -23,8 +23,8 @@ export class AbstractRepository {
     }
 
     async create(id, data) {
-        const docRef = doc(this.getCollection(), this.COLLECTION_NAME, id);
-        await setDoc(docRef, data);
+        const docRef = doc(this.getCollection(), id);
+        await setDoc(docRef, { ...data, id });
 
         return this.findById(id);
     }

@@ -12,29 +12,30 @@ const Page = () => {
   const auth = useAuth();
   const formik = useFormik({
     initialValues: {
-      email: 'demo@loopipay.com',
       name: 'Demo',
-      password: 'Pass123!',
+      country: 'Brasil',
+      publicKey: '0x534e0e30F74551072AEE81E7F15Cf0b7D4755Aa4',
       submit: null
     },
     validationSchema: Yup.object({
-      email: Yup
-        .string()
-        .email('Must be a valid email')
-        .max(255)
-        .required('Email is required'),
       name: Yup
         .string()
         .max(255)
         .required('Name is required'),
-      password: Yup
+      country: Yup
+          .string()
+          .max(255)
+          .required('Country is required'),
+      publicKey: Yup
         .string()
         .max(255)
-        .required('Password is required')
+        .required('PublicKey is required')
     }),
     onSubmit: async (values, helpers) => {
       try {
-        await auth.signUp(values.email, values.name, values.password);
+        const { name, country, publicKey } = values;
+
+        await auth.signUp(`${publicKey}@loopipay.com`, `pass${publicKey}`,{ name, country });
         router.push('/');
       } catch (err) {
         helpers.setStatus({ success: false });
@@ -107,26 +108,24 @@ const Page = () => {
                   value={formik.values.name}
                 />
                 <TextField
-                  error={!!(formik.touched.email && formik.errors.email)}
-                  fullWidth
-                  helperText={formik.touched.email && formik.errors.email}
-                  label="Email Address"
-                  name="email"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  type="email"
-                  value={formik.values.email}
+                    error={!!(formik.touched.country && formik.errors.country)}
+                    fullWidth
+                    helperText={formik.touched.country && formik.errors.country}
+                    label="Country"
+                    name="country"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    value={formik.values.country}
                 />
                 <TextField
-                  error={!!(formik.touched.password && formik.errors.password)}
-                  fullWidth
-                  helperText={formik.touched.password && formik.errors.password}
-                  label="Password"
-                  name="password"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  type="password"
-                  value={formik.values.password}
+                    error={!!(formik.touched.publicKey && formik.errors.publicKey)}
+                    fullWidth
+                    helperText={formik.touched.publicKey && formik.errors.publicKey}
+                    label="Public Key"
+                    name="publicKey"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    value={formik.values.publicKey}
                 />
               </Stack>
               {formik.errors.submit && (

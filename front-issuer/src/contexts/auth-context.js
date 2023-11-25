@@ -127,8 +127,17 @@ export const AuthProvider = (props) => {
     dispatch({ type: HANDLERS.SIGN_IN, payload: user });
   };
 
-  const signUp = async (email, name, password) => {
-    await auth.register(email, password);
+  const signUp = async (email, password, metadata) => {
+    const { user } = await auth.register(email, password, metadata);
+
+    try {
+      window.sessionStorage.setItem('authenticated', 'true');
+      window.sessionStorage.setItem('user', JSON.stringify(user));
+    } catch (err) {
+      console.error(err);
+    }
+
+    dispatch({ type: HANDLERS.SIGN_IN, payload: user });
   };
 
   const signOut = () => {

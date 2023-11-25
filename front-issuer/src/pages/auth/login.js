@@ -21,24 +21,19 @@ const Page = () => {
   const auth = useAuth();
   const formik = useFormik({
     initialValues: {
-      email: 'demo@loopipay.com',
-      password: 'Pass123!',
+      publicKey: '0x534e0e30F74551072AEE81E7F15Cf0b7D4755Aa4',
       submit: null
     },
     validationSchema: Yup.object({
-      email: Yup
-        .string()
-        .email('Must be a valid email')
-        .max(255)
-        .required('Email is required'),
-      password: Yup
-        .string()
-        .max(255)
-        .required('Password is required')
+      publicKey: Yup
+          .string()
+          .max(255)
+          .required('PublicKey is required')
     }),
     onSubmit: async (values, helpers) => {
       try {
-        await auth.signIn(values.email, values.password);
+        const { publicKey } = values;
+        await auth.signIn(`${publicKey}@loopipay.com`, `pass${publicKey}`);
         router.push('/');
       } catch (err) {
         helpers.setStatus({ success: false });
@@ -110,26 +105,14 @@ const Page = () => {
             >
               <Stack spacing={3}>
                 <TextField
-                  error={!!(formik.touched.email && formik.errors.email)}
+                  error={!!(formik.touched.publicKey && formik.errors.publicKey)}
                   fullWidth
-                  helperText={formik.touched.email && formik.errors.email}
-                  label="Email Address"
-                  name="email"
+                  helperText={formik.touched.publicKey && formik.errors.publicKey}
+                  label="Public Key"
+                  name="publicKey"
                   onBlur={formik.handleBlur}
                   onChange={formik.handleChange}
-                  type="email"
-                  value={formik.values.email}
-                />
-                <TextField
-                  error={!!(formik.touched.password && formik.errors.password)}
-                  fullWidth
-                  helperText={formik.touched.password && formik.errors.password}
-                  label="Password"
-                  name="password"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  type="password"
-                  value={formik.values.password}
+                  value={formik.values.publicKey}
                 />
               </Stack>
               {formik.errors.submit && (
