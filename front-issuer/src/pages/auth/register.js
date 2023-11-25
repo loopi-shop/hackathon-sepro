@@ -12,9 +12,9 @@ const Page = () => {
   const auth = useAuth();
   const formik = useFormik({
     initialValues: {
-      email: '',
-      name: '',
-      password: '',
+      email: 'demo@loopipay.com',
+      name: 'Demo',
+      password: 'Pass123!',
       submit: null
     },
     validationSchema: Yup.object({

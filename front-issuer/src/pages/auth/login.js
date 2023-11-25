@@ -19,11 +19,10 @@ import { Layout as AuthLayout } from 'src/layouts/auth/layout';
 const Page = () => {
   const router = useRouter();
   const auth = useAuth();
-  const [method, setMethod] = useState('email');
   const formik = useFormik({
     initialValues: {
-      email: 'demo@devias.io',
-      password: 'Password123!',
+      email: 'demo@loopipay.com',
+      password: 'Pass123!',
       submit: null
     },
     validationSchema: Yup.object({
@@ -49,17 +48,10 @@ const Page = () => {
     }
   });
 
-  const handleMethodChange = useCallback(
-    (event, value) => {
-      setMethod(value);
-    },
-    []
-  );
-
   const handleSkip = useCallback(
     () => {
-      auth.skip();
-      router.push('/');
+      auth.skip()
+          .then(() => router.push('/'));
     },
     [auth, router]
   );
