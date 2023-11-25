@@ -57,7 +57,6 @@ const reducer = (state, action) => (
 );
 
 // The role of this context is to propagate authentication state through the App tree.
-
 export const AuthContext = createContext({ undefined });
 
 export const AuthProvider = (props) => {
@@ -81,29 +80,18 @@ export const AuthProvider = (props) => {
       console.error(err);
     }
 
-    if (isAuthenticated) {
-      const user = {
-        id: '5e86809283e28b96d2d38537',
-        avatar: '/assets/avatars/avatar-anika-visser.png',
-        name: 'Anika Visser',
-        email: 'anika.visser@devias.io'
-      };
+    const payload = isAuthenticated
+        ? JSON.parse(window.sessionStorage.getItem('user'))
+        : undefined;
 
-      dispatch({
-        type: HANDLERS.INITIALIZE,
-        payload: user
-      });
-    } else {
-      dispatch({
-        type: HANDLERS.INITIALIZE
-      });
-    }
+    dispatch({
+      type: HANDLERS.INITIALIZE,
+      payload,
+    });
   };
 
   useEffect(
-    () => {
-      initialize();
-    },
+      () => { initialize(); },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
@@ -113,14 +101,12 @@ export const AuthProvider = (props) => {
 
     try {
       window.sessionStorage.setItem('authenticated', 'true');
+      window.sessionStorage.setItem('user', JSON.stringify(user));
     } catch (err) {
       console.error(err);
     }
 
-    dispatch({
-      type: HANDLERS.SIGN_IN,
-      payload: user
-    });
+    dispatch({ type: HANDLERS.SIGN_IN, payload: user });
   };
 
   const signIn = async (email, password) => {
@@ -128,14 +114,12 @@ export const AuthProvider = (props) => {
 
     try {
       window.sessionStorage.setItem('authenticated', 'true');
+      window.sessionStorage.setItem('user', JSON.stringify(user));
     } catch (err) {
       console.error(err);
     }
 
-    dispatch({
-      type: HANDLERS.SIGN_IN,
-      payload: user
-    });
+    dispatch({ type: HANDLERS.SIGN_IN, payload: user });
   };
 
   const signUp = async (email, name, password) => {
@@ -149,9 +133,7 @@ export const AuthProvider = (props) => {
       console.error(err);
     }
 
-    dispatch({
-      type: HANDLERS.SIGN_OUT
-    });
+    dispatch({ type: HANDLERS.SIGN_OUT });
   };
 
   return (

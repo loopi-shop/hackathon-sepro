@@ -1,4 +1,4 @@
-import { doc, setDoc, getDoc, collection, getDocs, query, where, updateDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, collection, getDocs, query, updateDoc } from "firebase/firestore";
 import { database } from "../utils/firebase";
 
 export class AbstractRepository {
