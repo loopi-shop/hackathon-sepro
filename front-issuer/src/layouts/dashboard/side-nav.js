@@ -15,11 +15,18 @@ import { Logo } from 'src/components/logo';
 import { Scrollbar } from 'src/components/scrollbar';
 import { items } from './config';
 import { SideNavItem } from './side-nav-item';
+import {useAuth} from "../../hooks/use-auth";
 
 export const SideNav = (props) => {
   const { open, onClose } = props;
   const pathname = usePathname();
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
+  const { user } = useAuth();
+
+  // Only returns items filtered by user role
+  const filteredItems = items.filter((item) => {
+      return !item.roles || (user?.role && item.roles.includes(user?.role));
+  });
 
   const content = (
     <Scrollbar
@@ -104,7 +111,7 @@ export const SideNav = (props) => {
               m: 0
             }}
           >
-            {items.map((item) => {
+            {filteredItems.map((item) => {
               const active = item.path ? (pathname === item.path) : false;
 
               return (

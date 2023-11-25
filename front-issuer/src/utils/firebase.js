@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from 'firebase/firestore';
 import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import {RoleEnum} from "../contexts/auth-context";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -31,9 +32,11 @@ const auth = {
     signIn: async (email, password) => {
         const userCredentials = await signInWithEmailAndPassword(authApp, email, password);
         const user = userCredentials.user;
-        user.metadata.role = email === 'admin@loopipay.com' ? 'admin' : 'common';
 
-        return { user, userCredentials };
+        const cleanUser = JSON.parse(JSON.stringify(user));
+        cleanUser.role = email === 'admin@loopipay.com' ? RoleEnum.ADMIN : RoleEnum.COMMON;
+
+        return { user: cleanUser, userCredentials };
     },
     signOut: async () => {
         await signOut(authApp);
