@@ -1,6 +1,8 @@
 import { Layout as DashboardLayout } from '../layouts/dashboard/layout';
 
-const Page = () => (<h1>Tá....</h1>);
+const Page = () => {
+  return <h1>Tá....</h1>
+};
 
 Page.getLayout = (page) => (
   <DashboardLayout>

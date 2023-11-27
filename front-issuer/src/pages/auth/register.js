@@ -35,7 +35,7 @@ const Page = () => {
       try {
         const { name, country, publicKey } = values;
 
-        await auth.signUp(`${publicKey}@loopipay.com`, `pass${publicKey}`,{ name, country });
+        await auth.signUp(`${publicKey}@loopipay.com`, `pass${publicKey}`,{ name, country, publicKey });
         router.push('/');
       } catch (err) {
         helpers.setStatus({ success: false });

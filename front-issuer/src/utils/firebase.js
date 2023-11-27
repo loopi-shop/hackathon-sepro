@@ -2,7 +2,6 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from 'firebase/firestore';
 import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import {RoleEnum} from "../contexts/auth-context";
 import usersRepository from "../repositories/users.repository";
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -27,28 +26,13 @@ const auth = {
     authApp: authApp,
     register: async (email, password, metadata) => {
         const userCredentials = await createUserWithEmailAndPassword(authApp, email, password);
-        const user = userCredentials.user;
 
-        const cleanUser = {
-            ...JSON.parse(JSON.stringify(user)),
-            role: email === 'admin@loopipay.com' ? RoleEnum.ADMIN : RoleEnum.COMMON,
-            metadata,
-        };
-
-        delete cleanUser.stsTokenManager;
-
-        await usersRepository.create(cleanUser.uid, cleanUser)
-
-        return { user: cleanUser, userCredentials };
+        return { user: await usersRepository.createFromAuth(userCredentials.user, metadata), userCredentials };
     },
     signIn: async (email, password) => {
         const userCredentials = await signInWithEmailAndPassword(authApp, email, password);
-        const user = userCredentials.user;
 
-        const cleanUser = JSON.parse(JSON.stringify(user));
-        cleanUser.role = email === 'admin@loopipay.com' ? RoleEnum.ADMIN : RoleEnum.COMMON;
-
-        return { user: cleanUser, userCredentials };
+        return { user: await usersRepository.updateLoginAt(userCredentials.user.uid), userCredentials };
     },
     signOut: async () => {
         await signOut(authApp);

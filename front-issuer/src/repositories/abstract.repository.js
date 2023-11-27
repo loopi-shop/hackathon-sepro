@@ -30,7 +30,7 @@ export class AbstractRepository {
     }
 
     async update(id, data) {
-        const docRef = doc(this.getCollection(), this.COLLECTION_NAME, id);
+        const docRef = doc(this.getCollection(), id);
         await updateDoc(docRef, data);
 
         return this.findById(id);
