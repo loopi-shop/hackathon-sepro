@@ -10,7 +10,6 @@ import {
 } from '@mui/material';
 
 const user = {
-  avatar: '/assets/avatars/avatar-anika-visser.png',
   city: 'Los Angeles',
   country: 'USA',
   jobTitle: 'Senior Developer',
@@ -29,7 +28,6 @@ export const AccountProfile = () => (
         }}
       >
         <Avatar
-          src={user.avatar}
           sx={{
             height: 80,
             mb: 2,
