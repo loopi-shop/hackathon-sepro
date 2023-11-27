@@ -21,8 +21,6 @@ import { addDays, format } from 'date-fns';
 import WalletIcon from '@heroicons/react/24/solid/WalletIcon';
 import BanknotesIcon from '@heroicons/react/24/solid/BanknotesIcon';
 
-const MIN_VALUE = '1000.000000'; // BRLY
-
 const tableHeaders = [
   {
     key: 'symbol',
@@ -50,7 +48,6 @@ const tableHeaders = [
     key: 'minimumValue',
     description: 'Valor mínimo (BRLY)',
     roles: [RoleEnum.COMMON, RoleEnum.ADMIN],
-    format: () => MIN_VALUE,
   },
   {
     key: 'yield',
@@ -70,6 +67,7 @@ export const TPFTable = (props) => {
     rowsPerPage = 0,
     selected = [],
     isLoading = false,
+    handleOpenBuy,
   } = props;
 
   const { hasRole, user } = useAuth();
@@ -88,6 +86,7 @@ export const TPFTable = (props) => {
 
   const buy = (tpf) => {
     console.info('Comprando Titulo:', tpf);
+    handleOpenBuy(tpf);
   }
 
   const rows = useMemo(() => {
@@ -165,4 +164,5 @@ TPFTable.propTypes = {
   rowsPerPage: PropTypes.number,
   selected: PropTypes.array,
   isLoading: PropTypes.bool,
+  handleOpenBuy: PropTypes.func,
 };

@@ -5,6 +5,7 @@ import { Box, Button, Container, Stack, SvgIcon, Typography } from '@mui/materia
 import { useSelection } from 'src/hooks/use-selection';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { TPFTable } from 'src/sections/tpf/tpf-table';
+import { TPFBuy } from 'src/sections/tpf/tpf-buy';
 import { applyPagination } from 'src/utils/apply-pagination';
 import { useTPF } from 'src/hooks/use-tpf';
 
@@ -48,6 +49,17 @@ const Page = () => {
     []
   );
 
+  const [buyTPF, setBuyTPF] = useState(undefined);
+  const [isOpenBuy, setOpenBuy] = useState(false);
+  const handleOpenBuy = (buyTPF) => {
+    setOpenBuy(true);
+    setBuyTPF(buyTPF);
+  }
+  const handleCloseBuy = () => {
+    setOpenBuy(false);
+    setBuyTPF(undefined);
+  }
+
   return (
     <>
       <Head>
@@ -55,6 +67,11 @@ const Page = () => {
           TPF | Lista de títulos
         </title>
       </Head>
+      <TPFBuy
+        open={isOpenBuy}
+        handleClose={handleCloseBuy}
+        tpf={buyTPF}
+      />
       <Box
         component="main"
         sx={{
@@ -103,6 +120,7 @@ const Page = () => {
               rowsPerPage={rowsPerPage}
               selected={tpfsSelection.selected}
               isLoading={tpfs?.isLoading}
+              handleOpenBuy={handleOpenBuy}
             />
           </Stack>
         </Container>

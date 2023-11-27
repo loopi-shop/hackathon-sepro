@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useReducer } from 'react';
 import PropTypes from 'prop-types';
 import investmentsRepository from 'src/repositories/investments.repository';
 import { useAuth } from 'src/hooks/use-auth';
+import { Interface, JsonRpcProvider } from 'ethers';
 
 const HANDLERS = {
   LIST: 'LIST',
@@ -50,6 +51,10 @@ export const TPFContext = createContext({
    * @param {Omit<import("src/repositories/investments.repository").TPF, "id">} tpf 
    */
   create: async (tpf) => { },
+  /**
+   * @returns {Promise<{ data: string, to: string, nonce: number, value: string }>}
+   */
+  invest: async ({ amount, receiver, contractAddress }) => { },
 });
 
 export const TPFProvider = (props) => {
@@ -86,6 +91,20 @@ export const TPFProvider = (props) => {
     });
   }
 
+  const invest = async ({ amount, receiver, contractAddress }) => {
+    const abi = "function deposit(uint256 assets, address receiver, uint256 timestamp) returns bool";
+    const timestamp = Date.now() / 1000;
+    const data = new Interface(abi).encodeFunctionData("deposit", [amount, receiver, timestamp]);
+    const provider = new JsonRpcProvider(RPC_URL);
+    const nonce = await provider.getTransactionCount(receiver).then((curNonce) => curNonce ?? 0);
+    return {
+      data,
+      value: "0",
+      to: contractAddress,
+      nonce: nonce,
+    }
+  }
+
   useEffect(
     () => {
       if (isAuthenticated) list();
@@ -99,6 +118,7 @@ export const TPFProvider = (props) => {
         ...state,
         list,
         create,
+        invest,
       }}
     >
       {children}

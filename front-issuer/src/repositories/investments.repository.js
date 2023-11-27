@@ -11,10 +11,13 @@ import { AbstractRepository } from "./abstract.repository";
  * @property {string} asset Address of BRLY
  * @property {number} yield Integer with **X** decimals
  * @property {number} maxAssets Max tokens issued
+ * @property {string} minimumValue Min tokens
  * @property {string} _identityRegistry address
  * @property {string} _compliance address
  * @property {string} _onchainId address
  */
+
+const MIN_VALUE = '1000.000000'; // BRLY
 
 class InvestmentsRepository extends AbstractRepository {
   COLLECTION_NAME = 'investments';
@@ -29,6 +32,7 @@ class InvestmentsRepository extends AbstractRepository {
      */
     const tpfPrepared = {
       ...tpf,
+      minimumValue: tpf?.minimumValue ?? MIN_VALUE,
       id: tpf.symbol,
     }
     const output = await super.create(tpfPrepared.id, tpfPrepared);
@@ -45,6 +49,7 @@ class InvestmentsRepository extends AbstractRepository {
       _identityRegistry: output._identityRegistry,
       _compliance: output._compliance,
       _onchainId: output._onchainId,
+      minimumValue: output.minimumValue,
     }
   }
 
@@ -63,6 +68,7 @@ class InvestmentsRepository extends AbstractRepository {
       _identityRegistry: tpf._identityRegistry,
       _compliance: tpf._compliance,
       _onchainId: tpf._onchainId,
+      minimumValue: tpf.minimumValue ?? MIN_VALUE,
     }));
   }
 }
