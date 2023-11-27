@@ -43,23 +43,26 @@ export const Layout = withAuthGuard((props) => {
     [openNav]
   );
 
-  useEffect(
-    () => {
-      handlePathnameChange();
-    },
+  useEffect(() => { handlePathnameChange(); },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [pathname]
   );
 
   if(pageConfig.roles && !pageConfig.roles?.includes(user?.role)) {
-      console.log(`Forbidden access to ${pathname}, redirecting`, {user, pageConfig});
-      router
-          .replace({
-              pathname: '/404',
-              query: router.asPath !== '/' ? { continueUrl: router.asPath } : undefined
-          })
+    if(!user) {
+      router.replace('/auth/login')
           .catch(console.error);
       return <></>;
+    }
+
+    console.log(`Forbidden access to ${pathname}, redirecting`, {user, pageConfig});
+    router
+      .replace({
+        pathname: '/404',
+        query: router.asPath !== '/' ? { continueUrl: router.asPath } : undefined
+      })
+      .catch(console.error);
+    return <></>;
   }
 
   return (
