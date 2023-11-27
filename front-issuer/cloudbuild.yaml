@@ -1,7 +1,7 @@
 steps:
   - name: "gcr.io/kaniko-project/executor:latest"
     args:
-      - --destination=gcr.io/$PROJECT_ID/hackathon-sepro-issuer:$COMMIT_SHA
+      - --destination=gcr.io/$PROJECT_ID/hackathon-sepro:$COMMIT_SHA
       - --context=/workspace/front-issuer/
       - --cache=true
       - --cache-ttl=263520h
@@ -13,9 +13,9 @@ steps:
     args:
       - "run"
       - "deploy"
-      - "hackathon-sepro-issuer"
+      - "hackathon-sepro"
       - "--image"
-      - "gcr.io/$PROJECT_ID/hackathon-sepro-issuer:$COMMIT_SHA"
+      - "gcr.io/$PROJECT_ID/hackathon-sepro:$COMMIT_SHA"
       - "--memory"
       - "256Mi"
       - "--allow-unauthenticated"
