@@ -8,6 +8,7 @@ import { AuthConsumer, AuthProvider } from 'src/contexts/auth-context';
 import { useNProgress } from 'src/hooks/use-nprogress';
 import { createTheme } from 'src/theme';
 import { createEmotionCache } from 'src/utils/create-emotion-cache';
+import { MetaMaskProvider } from '@metamask/sdk-react';
 import 'simplebar-react/dist/simplebar.min.css';
 
 const clientSideEmotionCache = createEmotionCache();
@@ -22,6 +23,7 @@ const App = (props) => {
   const getLayout = Component.getLayout ?? ((page) => page);
 
   const theme = createTheme();
+  console.log(typeof window !== "undefined" && window);
 
   return (
     <CacheProvider value={emotionCache}>
@@ -35,18 +37,26 @@ const App = (props) => {
         />
       </Head>
       <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <AuthProvider>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <AuthConsumer>
-              {
-                (auth) => auth.isLoading
-                  ? <SplashScreen />
-                  : getLayout(<Component {...pageProps} />)
-              }
-            </AuthConsumer>
-          </ThemeProvider>
-        </AuthProvider>
+        <MetaMaskProvider debug={false} sdkOptions={{
+          checkInstallationImmediately: false,
+          dappMetadata: {
+            name: "Hackaton Sepro",
+            url: typeof window !== "undefined" ? window.location.host : 'http://localhost:3000',
+          }
+        }}>
+          <AuthProvider>
+            <ThemeProvider theme={theme}>
+              <CssBaseline />
+              <AuthConsumer>
+                {
+                  (auth) => auth.isLoading
+                    ? <SplashScreen />
+                    : getLayout(<Component {...pageProps} />)
+                }
+              </AuthConsumer>
+            </ThemeProvider>
+          </AuthProvider>
+        </MetaMaskProvider>
       </LocalizationProvider>
     </CacheProvider>
   );

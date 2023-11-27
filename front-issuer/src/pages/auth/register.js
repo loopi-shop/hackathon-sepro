@@ -3,18 +3,22 @@ import NextLink from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { Box, Button, Link, Stack, TextField, Typography } from '@mui/material';
+import {Box, Button, Icon, Link, Stack, TextField, Typography} from '@mui/material';
 import { useAuth } from 'src/hooks/use-auth';
 import { Layout as AuthLayout } from 'src/layouts/auth/layout';
+import {useState} from "react";
+import {useSDK} from "@metamask/sdk-react";
 
 const Page = () => {
   const router = useRouter();
   const auth = useAuth();
+  const [account, setAccount] = useState('');
+  const { sdk, connected, chainId } = useSDK();
+
   const formik = useFormik({
     initialValues: {
       name: 'Demo',
       country: 'Brasil',
-      publicKey: '0x534e0e30F74551072AEE81E7F15Cf0b7D4755Aa4',
       submit: null
     },
     validationSchema: Yup.object({
@@ -26,24 +30,34 @@ const Page = () => {
           .string()
           .max(255)
           .required('Country is required'),
-      publicKey: Yup
-        .string()
-        .max(255)
-        .required('PublicKey is required')
     }),
     onSubmit: async (values, helpers) => {
       try {
-        const { name, country, publicKey } = values;
-
+        const { name, country } = values;
+        const publicKey = account;
         await auth.signUp(`${publicKey}@loopipay.com`, `pass${publicKey}`,{ name, country, publicKey });
         router.push('/');
       } catch (err) {
+        const errorMessage = ['auth/email-already-in-use'].includes(err.code)
+            ? 'User with public key already exists'
+            : err.message;
+
         helpers.setStatus({ success: false });
-        helpers.setErrors({ submit: err.message });
+        helpers.setErrors({ submit: errorMessage });
         helpers.setSubmitting(false);
       }
     }
   });
+
+  const connect = async () => {
+    try {
+      const accounts = await sdk?.connect();
+      console.log(accounts, chainId);
+      setAccount(accounts?.[0]);
+    } catch(err) {
+      console.warn(`failed to connect..`, err);
+    }
+  };
 
   return (
     <>
@@ -117,16 +131,16 @@ const Page = () => {
                     onChange={formik.handleChange}
                     value={formik.values.country}
                 />
-                <TextField
-                    error={!!(formik.touched.publicKey && formik.errors.publicKey)}
+                <Button
                     fullWidth
-                    helperText={formik.touched.publicKey && formik.errors.publicKey}
-                    label="Public Key"
-                    name="publicKey"
-                    onBlur={formik.handleBlur}
-                    onChange={formik.handleChange}
-                    value={formik.values.publicKey}
-                />
+                    size="large"
+                    onClick={connect}
+                >
+                  <Icon sx={{mr: 2, width: '40px', height: '40px'}}>
+                    <img alt={'Logo metamask'} src={'/assets/logos/logo-metamask.svg'} />
+                  </Icon>
+                  {connected && account ? `Connected as: ${account}` : 'Connect With Metamask'}
+                </Button>
               </Stack>
               {formik.errors.submit && (
                 <Typography
@@ -138,6 +152,7 @@ const Page = () => {
                 </Typography>
               )}
               <Button
+                disabled={!connected || !account}
                 fullWidth
                 size="large"
                 sx={{ mt: 3 }}

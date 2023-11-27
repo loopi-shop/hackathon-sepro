@@ -1,47 +1,24 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import Head from 'next/head';
 import NextLink from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
 import {
-  Alert,
-  Box,
-  Button,
-  Link,
-  Stack,
-  TextField,
-  Typography
+    Box,
+    Button, Icon,
+    Link,
+    Stack,
+    Typography
 } from '@mui/material';
 import { useAuth } from 'src/hooks/use-auth';
 import { Layout as AuthLayout } from 'src/layouts/auth/layout';
+import { useSDK } from '@metamask/sdk-react';
 
 const Page = () => {
   const router = useRouter();
   const auth = useAuth();
-  const formik = useFormik({
-    initialValues: {
-      publicKey: '0x534e0e30F74551072AEE81E7F15Cf0b7D4755Aa4',
-      submit: null
-    },
-    validationSchema: Yup.object({
-      publicKey: Yup
-          .string()
-          .max(255)
-          .required('PublicKey is required')
-    }),
-    onSubmit: async (values, helpers) => {
-      try {
-        const { publicKey } = values;
-        await auth.signIn(`${publicKey}@loopipay.com`, `pass${publicKey}`);
-        router.push('/');
-      } catch (err) {
-        helpers.setStatus({ success: false });
-        helpers.setErrors({ submit: err.message });
-        helpers.setSubmitting(false);
-      }
-    }
-  });
+  const [account, setAccount] = useState('');
+  const [errors, setErrors] = useState([]);
+  const { sdk, connected, chainId } = useSDK();
 
   const handleSkip = useCallback(
     () => {
@@ -50,6 +27,31 @@ const Page = () => {
     },
     [auth, router]
   );
+
+  const connect = async () => {
+    try {
+      const accounts = await sdk?.connect();
+      console.log(accounts, chainId);
+      setAccount(accounts?.[0]);
+
+      const publicKey = accounts?.[0];
+      await auth.signIn(`${publicKey}@loopipay.com`, `pass${publicKey}`)
+        .catch(error => {
+          console.error('Fail on Login', error);
+          console.log(JSON.stringify(error))
+
+          const errorMessage = ['auth/invalid-email','auth/invalid-login-credentials'].includes(error.code)
+            ? 'User Not found'
+            : error;
+
+          setErrors([errorMessage]);
+          throw error;
+        });
+        router.push('/');
+    } catch(err) {
+      console.warn(`failed to connect..`, err);
+    }
+  };
 
   return (
     <>
@@ -99,58 +101,31 @@ const Page = () => {
                 </Link>
               </Typography>
             </Stack>
-            <form
-              noValidate
-              onSubmit={formik.handleSubmit}
-            >
-              <Stack spacing={3}>
-                <TextField
-                  error={!!(formik.touched.publicKey && formik.errors.publicKey)}
-                  fullWidth
-                  helperText={formik.touched.publicKey && formik.errors.publicKey}
-                  label="Public Key"
-                  name="publicKey"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  value={formik.values.publicKey}
-                />
-              </Stack>
-              {formik.errors.submit && (
-                <Typography
-                  color="error"
-                  sx={{ mt: 3 }}
-                  variant="body2"
-                >
-                  {formik.errors.submit}
-                </Typography>
-              )}
-              <Button
+            <Button
                 fullWidth
                 size="large"
+                onClick={connect}
+            >
+              <Icon sx={{mr: 2, width: '40px', height: '40px'}}>
+                <img alt={'Logo metamask'} src={'/assets/logos/logo-metamask.svg'} />
+              </Icon>
+              {connected && account ? `Connected as: ${account}` : 'Connect With Metamask'}
+            </Button>
+            <Typography
+                color="error"
                 sx={{ mt: 3 }}
-                type="submit"
-                variant="contained"
-              >
-                Continue
-              </Button>
-              <Button
+                variant="body2"
+            >
+              {errors[0]?.toString()}
+            </Typography>
+            <Button
                 fullWidth
                 size="large"
                 sx={{ mt: 3 }}
                 onClick={handleSkip}
-              >
-                Login as admin
-              </Button>
-              <Alert
-                color="primary"
-                severity="info"
-                sx={{ mt: 3 }}
-              >
-                <div>
-                  You can use <b>demo@devias.io</b> and password <b>Password123!</b>
-                </div>
-              </Alert>
-            </form>
+            >
+              Login as admin
+            </Button>
           </div>
         </Box>
       </Box>
