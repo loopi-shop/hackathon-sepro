@@ -9,6 +9,7 @@ import { useNProgress } from 'src/hooks/use-nprogress';
 import { createTheme } from 'src/theme';
 import { createEmotionCache } from 'src/utils/create-emotion-cache';
 import { TPFProvider } from 'src/contexts/tpf-context';
+import { MetaMaskProvider } from '@metamask/sdk-react';
 import 'simplebar-react/dist/simplebar.min.css';
 
 const clientSideEmotionCache = createEmotionCache();
@@ -36,20 +37,28 @@ const App = (props) => {
         />
       </Head>
       <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <AuthProvider>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <TPFProvider>
-              <AuthConsumer>
-                {
-                  (auth) => auth.isLoading
-                    ? <SplashScreen />
-                    : getLayout(<Component {...pageProps} />)
-                }
-              </AuthConsumer>
-            </TPFProvider>
-          </ThemeProvider>
-        </AuthProvider>
+        <MetaMaskProvider debug={false} sdkOptions={{
+          checkInstallationImmediately: false,
+          dappMetadata: {
+            name: "Hackaton Sepro",
+            url: typeof window !== "undefined" ? window.location.host : 'http://localhost:3000',
+          }
+        }}>
+          <AuthProvider>
+            <ThemeProvider theme={theme}>
+              <CssBaseline />
+              <TPFProvider>
+                <AuthConsumer>
+                  {
+                    (auth) => auth.isLoading
+                      ? <SplashScreen />
+                      : getLayout(<Component {...pageProps} />)
+                  }
+                </AuthConsumer>
+              </TPFProvider>
+            </ThemeProvider>
+          </AuthProvider>
+        </MetaMaskProvider>
       </LocalizationProvider>
     </CacheProvider>
   );
