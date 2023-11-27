@@ -4,6 +4,9 @@ import { styled } from '@mui/material/styles';
 import { withAuthGuard } from 'src/hocs/with-auth-guard';
 import { SideNav } from './side-nav';
 import { TopNav } from './top-nav';
+import {items} from "./config";
+import {useAuth} from "../../hooks/use-auth";
+import {useRouter} from "next/router";
 
 const SIDE_NAV_WIDTH = 280;
 
@@ -26,7 +29,10 @@ const LayoutContainer = styled('div')({
 export const Layout = withAuthGuard((props) => {
   const { children } = props;
   const pathname = usePathname();
+  const router = useRouter();
   const [openNav, setOpenNav] = useState(false);
+  const { user } = useAuth();
+  const pageConfig = items.find(item => item.path === pathname);
 
   const handlePathnameChange = useCallback(
     () => {
@@ -44,6 +50,17 @@ export const Layout = withAuthGuard((props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [pathname]
   );
+
+  if(pageConfig.roles && !pageConfig.roles?.includes(user?.role)) {
+      console.log(`Forbidden access to ${pathname}, redirecting`, {user, pageConfig});
+      router
+          .replace({
+              pathname: '/404',
+              query: router.asPath !== '/' ? { continueUrl: router.asPath } : undefined
+          })
+          .catch(console.error);
+      return <></>;
+  }
 
   return (
     <>
