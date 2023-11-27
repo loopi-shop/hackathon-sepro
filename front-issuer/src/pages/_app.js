@@ -8,6 +8,7 @@ import { AuthConsumer, AuthProvider } from 'src/contexts/auth-context';
 import { useNProgress } from 'src/hooks/use-nprogress';
 import { createTheme } from 'src/theme';
 import { createEmotionCache } from 'src/utils/create-emotion-cache';
+import { TPFProvider } from 'src/contexts/tpf-context';
 import { MetaMaskProvider } from '@metamask/sdk-react';
 import 'simplebar-react/dist/simplebar.min.css';
 
@@ -23,13 +24,12 @@ const App = (props) => {
   const getLayout = Component.getLayout ?? ((page) => page);
 
   const theme = createTheme();
-  console.log(typeof window !== "undefined" && window);
 
   return (
     <CacheProvider value={emotionCache}>
       <Head>
         <title>
-          Devias Kit
+          Título Público Federal
         </title>
         <meta
           name="viewport"
@@ -47,13 +47,15 @@ const App = (props) => {
           <AuthProvider>
             <ThemeProvider theme={theme}>
               <CssBaseline />
-              <AuthConsumer>
-                {
-                  (auth) => auth.isLoading
-                    ? <SplashScreen />
-                    : getLayout(<Component {...pageProps} />)
-                }
-              </AuthConsumer>
+              <TPFProvider>
+                <AuthConsumer>
+                  {
+                    (auth) => auth.isLoading
+                      ? <SplashScreen />
+                      : getLayout(<Component {...pageProps} />)
+                  }
+                </AuthConsumer>
+              </TPFProvider>
             </ThemeProvider>
           </AuthProvider>
         </MetaMaskProvider>

@@ -1,16 +1,27 @@
-import { createContext, useContext, useEffect, useReducer, useRef } from 'react';
+import { createContext, useContext, useEffect, useReducer } from 'react';
 import PropTypes from 'prop-types';
-import { delay } from 'src/utils/delay';
+import investmentsRepository from 'src/repositories/investments.repository';
 import { useAuth } from 'src/hooks/use-auth';
 
 const HANDLERS = {
   LIST: 'LIST',
+  CREATE: 'CREATE',
 };
 
 const initialState = {
   tpfs: {
     isLoading: false,
-    data: []
+    /**
+     * @type {import("src/repositories/investments.repository").TPF[]}
+     */
+    data: [],
+  },
+  tpf: {
+    isLoading: false,
+    /**
+     * @type {import("src/repositories/investments.repository").TPF}
+     */
+    data: null,
   }
 };
 
@@ -34,7 +45,11 @@ const reducer = (state, action) => (
 
 export const TPFContext = createContext({
   ...initialState,
-  list: async () => { }
+  list: async () => { },
+  /**
+   * @param {Omit<import("src/repositories/investments.repository").TPF, "id">} tpf 
+   */
+  create: async (tpf) => { },
 });
 
 export const TPFProvider = (props) => {
@@ -42,38 +57,32 @@ export const TPFProvider = (props) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { isAuthenticated } = useAuth();
 
+  const create = async (tpf) => {
+    dispatch({
+      type: HANDLERS.CREATE,
+      isLoading: true,
+      payload: null,
+    });
+    const created = await investmentsRepository.create(tpf);
+    dispatch({
+      type: HANDLERS.CREATE,
+      isLoading: false,
+      payload: created,
+    });
+  }
+
   const list = async () => {
-    // Delay to simulate firebase interaction
     dispatch({
       type: HANDLERS.LIST,
       isLoading: true,
       payload: [],
     });
-    await delay(5000);
-    const data = [
-      {
-        id: 'Titulo1',
-        acronym: 'Título 1',
-        expirationDate: '10/10/2021',
-        totalIssued: '100.000,00',
-        minimumValue: '1.000,00',
-        profitability: '10%',
-        settle: 'Liquidar título'
-      },
-      {
-        id: 'Titulo2',
-        acronym: 'Título 2',
-        expirationDate: '10/12/2021',
-        totalIssued: '1.000.000,00',
-        minimumValue: '10.000,00',
-        profitability: '20%',
-        settle: 'Liquidar título'
-      },
-    ];
+    const investments = await investmentsRepository.list();
+
     dispatch({
       type: HANDLERS.LIST,
       isLoading: false,
-      payload: data
+      payload: investments
     });
   }
 
@@ -89,6 +98,7 @@ export const TPFProvider = (props) => {
       value={{
         ...state,
         list,
+        create,
       }}
     >
       {children}

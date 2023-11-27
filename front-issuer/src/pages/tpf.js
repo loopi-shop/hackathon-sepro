@@ -8,7 +8,6 @@ import { TPFTable } from 'src/sections/tpf/tpf-table';
 import { applyPagination } from 'src/utils/apply-pagination';
 import { useTPF } from 'src/hooks/use-tpf';
 
-
 const useTPFs = (page, rowsPerPage, data) => {
   return useMemo(
     () => {
@@ -21,7 +20,7 @@ const useTPFs = (page, rowsPerPage, data) => {
 const useTPFIds = (tpfs) => {
   return useMemo(
     () => {
-      return tpfs.map((tpf) => tpf.id);
+      return tpfs.map((tpf) => tpf.acronym);
     },
     [tpfs]
   );

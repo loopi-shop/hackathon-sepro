@@ -2,43 +2,48 @@ import { doc, setDoc, getDoc, collection, getDocs, query, updateDoc } from "fire
 import { database } from "../utils/firebase";
 
 export class AbstractRepository {
-    COLLECTION_NAME = '';
+  COLLECTION_NAME = '';
 
-    getCollection() {
-        if(this.COLLECTION_NAME === '') {
-            throw Error('Repository not configured');
-        }
+  firebaseTimeStampToDate(value) {
+    if (!value?.seconds) return null;
+    return new Date(value.seconds * 1000);
+  }
 
-        if(!this.collection) {
-            this.collection = collection(database, this.COLLECTION_NAME);
-        }
-
-        return this.collection;
+  getCollection() {
+    if (this.COLLECTION_NAME === '') {
+      throw Error('Repository not configured');
     }
 
-    async findById(id) {
-        const docRef = doc(this.getCollection(), id);
-        const docSnap = await getDoc(docRef);
-        return docSnap.exists() ? docSnap.data() : undefined;
+    if (!this.collection) {
+      this.collection = collection(database, this.COLLECTION_NAME);
     }
 
-    async create(id, data) {
-        const docRef = doc(this.getCollection(), id);
-        await setDoc(docRef, { ...data, id });
+    return this.collection;
+  }
 
-        return this.findById(id);
-    }
+  async findById(id) {
+    const docRef = doc(this.getCollection(), id);
+    const docSnap = await getDoc(docRef);
+    return docSnap.exists() ? docSnap.data() : undefined;
+  }
 
-    async update(id, data) {
-        const docRef = doc(this.getCollection(), id);
-        await updateDoc(docRef, data);
+  async create(id, data) {
+    const docRef = doc(this.getCollection(), id);
+    await setDoc(docRef, { ...data, id });
 
-        return this.findById(id);
-    }
+    return this.findById(id);
+  }
 
-    async list() {
-        const q = query(this.getCollection());
-        const docs = await getDocs(q);
-        return docs.docs.map(docs => docs.data());
-    }
+  async update(id, data) {
+    const docRef = doc(this.getCollection(), id);
+    await updateDoc(docRef, data);
+
+    return this.findById(id);
+  }
+
+  async list() {
+    const q = query(this.getCollection());
+    const docs = await getDocs(q);
+    return docs.docs.map(docs => docs.data());
+  }
 }

@@ -2,13 +2,7 @@ import { useCallback, useState } from 'react';
 import Head from 'next/head';
 import NextLink from 'next/link';
 import { useRouter } from 'next/navigation';
-import {
-    Box,
-    Button, Icon,
-    Link,
-    Stack,
-    Typography
-} from '@mui/material';
+import { Box, Button, Icon, Link, Stack, Typography } from '@mui/material';
 import { useAuth } from 'src/hooks/use-auth';
 import { Layout as AuthLayout } from 'src/layouts/auth/layout';
 import { useSDK } from '@metamask/sdk-react';

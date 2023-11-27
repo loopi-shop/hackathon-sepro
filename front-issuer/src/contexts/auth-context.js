@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useReducer, useRef } from 'react';
 import PropTypes from 'prop-types';
-import {auth} from "../utils/firebase";
+import { auth } from "../utils/firebase";
 
 export const RoleEnum = {
   ADMIN: 'admin',
@@ -86,8 +86,8 @@ export const AuthProvider = (props) => {
     }
 
     const payload = isAuthenticated
-        ? JSON.parse(window.sessionStorage.getItem('user'))
-        : undefined;
+      ? JSON.parse(window.sessionStorage.getItem('user'))
+      : undefined;
 
     dispatch({
       type: HANDLERS.INITIALIZE,
@@ -96,7 +96,7 @@ export const AuthProvider = (props) => {
   };
 
   useEffect(
-      () => { initialize(); },
+    () => { initialize(); },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
@@ -150,6 +150,13 @@ export const AuthProvider = (props) => {
     dispatch({ type: HANDLERS.SIGN_OUT });
   };
 
+  /**
+   * @param {[]} roles 
+   */
+  const hasRole = (roles) => {
+    return roles.includes(state?.user?.role ?? RoleEnum.COMMON);
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -157,7 +164,8 @@ export const AuthProvider = (props) => {
         skip,
         signIn,
         signUp,
-        signOut
+        signOut,
+        hasRole,
       }}
     >
       {children}
