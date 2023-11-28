@@ -9,7 +9,7 @@ import { AbstractRepository } from "./abstract.repository";
  * @property {number} decimals
  * @property {Date} startTimestamp CreatedAt
  * @property {number} durationDays
- * @property {string} asset Address of BRLY
+ * @property {string} asset Address of BRLX
  * @property {number} yield Integer with **X** decimals
  * @property {number} maxAssets Max tokens issued
  * @property {string} minimumValue Min tokens
@@ -18,7 +18,7 @@ import { AbstractRepository } from "./abstract.repository";
  * @property {string} _onchainId address
  */
 
-const MIN_VALUE = '1000.000000'; // BRLY
+const MIN_VALUE = '1000.000000'; // BRLX
 
 class InvestmentsRepository extends AbstractRepository {
   COLLECTION_NAME = 'investments';

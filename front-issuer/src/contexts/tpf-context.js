@@ -1,8 +1,109 @@
-import { createContext, useContext, useEffect, useReducer } from 'react';
+import { createContext, useContext, useEffect, useReducer, useRef } from 'react';
 import PropTypes from 'prop-types';
 import investmentsRepository from 'src/repositories/investments.repository';
 import { useAuth } from 'src/hooks/use-auth';
 import { Interface, JsonRpcProvider } from 'ethers';
+import BigNumber from 'bignumber.js';
+
+const TPF_ABI = [
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "assets",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "receiver",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "deposit",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "currentTimestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "getPrice",
+    "outputs": [
+      {
+        "internalType": "UD60x18",
+        "name": "result",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "spender",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "approve",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "spender",
+        "type": "address"
+      }
+    ],
+    "name": "allowance",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+]
+const TPFContractInterface = new Interface(TPF_ABI);
 
 const HANDLERS = {
   LIST: 'LIST',
@@ -54,13 +155,26 @@ export const TPFContext = createContext({
   /**
    * @returns {Promise<{ data: string, to: string, nonce: number, value: string }>}
    */
-  invest: async ({ amount, receiver, contractAddress }) => { },
+  invest: async ({ amount, receiver, contractAddress, timestamp }) => { },
+  /**
+   * @returns {Promise<number>}
+   */
+  getPrice: async ({ contractAddress, timestamp }) => { },
+  /**
+   * @returns {Promise<{ data: string, to: string, nonce: number, value: string }>}
+   */
+  approve: async ({ amount, contractAddress, asset }) => { },
+  /**
+   * @returns {Promise<any>}
+   */
+  waitTransaction: async ({ txHash }) => { },
 });
 
 export const TPFProvider = (props) => {
   const { children } = props;
   const [state, dispatch] = useReducer(reducer, initialState);
   const { isAuthenticated } = useAuth();
+  const providerRef = useRef(new JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL, 80001));
 
   const create = async (tpf) => {
     dispatch({
@@ -91,18 +205,62 @@ export const TPFProvider = (props) => {
     });
   }
 
-  const invest = async ({ amount, receiver, contractAddress }) => {
-    const abi = "function deposit(uint256 assets, address receiver, uint256 timestamp) returns bool";
-    const timestamp = Date.now() / 1000;
-    const data = new Interface(abi).encodeFunctionData("deposit", [amount, receiver, timestamp]);
-    const provider = new JsonRpcProvider(RPC_URL);
-    const nonce = await provider.getTransactionCount(receiver).then((curNonce) => curNonce ?? 0);
+  const approve = async ({ amount, from, contractAddress, asset }) => {
+    const data = TPFContractInterface.encodeFunctionData("approve", [contractAddress, amount]);
+    const tx = {
+      data,
+      value: "0",
+      to: asset,
+      from: from,
+    };
+    const [nonce, gasPrice, gasEstimated] = await Promise.all([
+      providerRef.current.getTransactionCount(from).then((curNonce) => curNonce ?? 0),
+      providerRef.current.send("eth_gasPrice", []),
+      providerRef.current.estimateGas(tx)
+    ]);
+
     return {
+      ...tx,
+      nonce: `0x${new BigNumber(nonce).toString(16)}`,
+      gasPrice: gasPrice,
+      gasLimit: `0x${new BigNumber(gasEstimated).multipliedBy(1.50).toString(16)}`,
+    }
+  }
+
+  const invest = async ({ amount, receiver, contractAddress, timestamp }) => {
+    console.log(`amount:`, amount);
+    const data = TPFContractInterface.encodeFunctionData("deposit", [amount, receiver, parseInt(timestamp)]);
+    const tx = {
       data,
       value: "0",
       to: contractAddress,
-      nonce: nonce,
+      from: receiver,
+    };
+    const [nonce, gasPrice] = await Promise.all([
+      providerRef.current.getTransactionCount(receiver).then((curNonce) => curNonce ?? 0),
+      providerRef.current.send("eth_gasPrice", []),
+    ]);
+
+    return {
+      ...tx,
+      nonce: `0x${new BigNumber(nonce).toString(16)}`,
+      gasPrice: gasPrice,
     }
+  }
+
+  const getPrice = async ({ contractAddress, timestamp }) => {
+    const data = TPFContractInterface.encodeFunctionData('getPrice', [parseInt(timestamp)]);
+    const response = await providerRef.current.call({
+      to: contractAddress,
+      data,
+      value: 0,
+    });
+    return new BigNumber(response).toNumber();
+  }
+
+  const waitTransaction = async ({ txHash }) => {
+    console.info(`waiting transaction...`);
+    return providerRef.current.waitForTransaction(txHash);
   }
 
   useEffect(
@@ -119,6 +277,9 @@ export const TPFProvider = (props) => {
         list,
         create,
         invest,
+        getPrice,
+        approve,
+        waitTransaction,
       }}
     >
       {children}

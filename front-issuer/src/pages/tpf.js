@@ -1,6 +1,7 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Head from 'next/head';
 import ArrowPathIcon from '@heroicons/react/24/solid/ArrowPathIcon';
+import _ from 'lodash';
 import { Box, Button, Container, Stack, SvgIcon, Typography } from '@mui/material';
 import { useSelection } from 'src/hooks/use-selection';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
@@ -30,7 +31,8 @@ const useTPFIds = (tpfs) => {
 const Page = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const { list, tpfs } = useTPF();
+  const [unitPriceList, setUnitPriceList] = useState([]);
+  const { list, tpfs, getPrice } = useTPF();
   const tpfsPaginated = useTPFs(page, rowsPerPage, tpfs?.data ?? []);
   const tpfIds = useTPFIds(tpfsPaginated);
   const tpfsSelection = useSelection(tpfIds);
@@ -52,13 +54,42 @@ const Page = () => {
   const [buyTPF, setBuyTPF] = useState(undefined);
   const [isOpenBuy, setOpenBuy] = useState(false);
   const handleOpenBuy = (buyTPF) => {
-    setOpenBuy(true);
     setBuyTPF(buyTPF);
+    setOpenBuy(true);
   }
   const handleCloseBuy = () => {
     setOpenBuy(false);
     setBuyTPF(undefined);
   }
+
+  const loadUnitPriceList = async () => {
+    if (!tpfs.isLoading && tpfs?.data?.length > 0) {
+      const chunks = _.chunk(tpfs?.data ?? [], rowsPerPage);
+      const timestamp = Date.now() / 1000;
+      let tempPrices = [];
+      for (let index = 0; index < chunks.length; index++) {
+        const tpfChunk = chunks[index];
+        const pricesSettled = await Promise.allSettled(tpfChunk.map((tpf) => getPrice({
+          contractAddress: tpf.contractAddress,
+          timestamp,
+        }).then((price) => ({
+          symbol: tpf.symbol,
+          price,
+        }))));
+        tempPrices = pricesSettled
+          .reduce((acc, cur) => {
+            if (cur.status !== 'fulfilled') return acc;
+            return acc.concat(cur.value);
+          }, tempPrices);
+      }
+      setUnitPriceList(tempPrices);
+    }
+  }
+
+  useEffect(() => {
+    loadUnitPriceList()
+  }, [tpfs])
+
 
   return (
     <>
@@ -67,11 +98,11 @@ const Page = () => {
           TPF | Lista de títulos
         </title>
       </Head>
-      <TPFBuy
+      {isOpenBuy && <TPFBuy
         open={isOpenBuy}
         handleClose={handleCloseBuy}
         tpf={buyTPF}
-      />
+      />}
       <Box
         component="main"
         sx={{
@@ -121,6 +152,7 @@ const Page = () => {
               selected={tpfsSelection.selected}
               isLoading={tpfs?.isLoading}
               handleOpenBuy={handleOpenBuy}
+              unitPriceList={unitPriceList}
             />
           </Stack>
         </Container>

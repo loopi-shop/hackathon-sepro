@@ -11,6 +11,7 @@ import {
   TablePagination,
   TableRow,
   Tooltip,
+  Skeleton,
 } from '@mui/material';
 import { Scrollbar } from 'src/components/scrollbar';
 import { TableRowsLoader } from 'src/components/table-rows-loader';
@@ -38,7 +39,7 @@ const tableHeaders = [
   },
   {
     key: 'maxAssets',
-    description: 'Total Emitido (BRLY)',
+    description: 'Total Emitido (BRLX)',
     roles: [RoleEnum.ADMIN],
     format: ({ rowData, value }) => {
       return (value / 10 ** rowData.decimals).toFixed(rowData.decimals);
@@ -46,7 +47,7 @@ const tableHeaders = [
   },
   {
     key: 'minimumValue',
-    description: 'Valor mínimo (BRLY)',
+    description: 'Valor mínimo (BRLX)',
     roles: [RoleEnum.COMMON, RoleEnum.ADMIN],
   },
   {
@@ -55,12 +56,18 @@ const tableHeaders = [
     roles: [RoleEnum.COMMON, RoleEnum.ADMIN],
     format: ({ value }) => (value / 100).toFixed(2),
   },
+  {
+    key: 'unitPrice',
+    description: 'Preço Unitário',
+    roles: [RoleEnum.COMMON, RoleEnum.ADMIN],
+  },
 ];
 
 export const TPFTable = (props) => {
   const {
     count = 0,
     items = [],
+    unitPriceList = [],
     onPageChange = () => { },
     onRowsPerPageChange,
     page = 0,
@@ -89,6 +96,20 @@ export const TPFTable = (props) => {
     handleOpenBuy(tpf);
   }
 
+  const getUnitPriceCell = ({ rowData, key }) => {
+    const unitPrice = unitPriceList.find((up) => up.symbol === rowData.symbol)?.price;
+    if (!unitPrice) return (
+      <TableCell component="th" scope="row" key={key}>
+        <Skeleton animation="wave" variant="text" />
+      </TableCell>
+    );
+    return (
+      <TableCell key={key}>
+        {(unitPrice / 10 ** rowData.decimals).toFixed(rowData.decimals)}
+      </TableCell>
+    );
+  }
+
   const rows = useMemo(() => {
     return items.map((tpf) => {
       return (
@@ -97,9 +118,11 @@ export const TPFTable = (props) => {
           key={tpf.symbol}
         >
           {headers.map(({ key, format }) => (
-            <TableCell key={key}>
-              {format ? format({ rowData: tpf, value: tpf[key] }) : tpf[key]}
-            </TableCell>
+            key !== 'unitPrice' ?
+              <TableCell key={key}>
+                {format ? format({ rowData: tpf, value: tpf[key] }) : tpf[key]}
+              </TableCell>
+              : getUnitPriceCell({ rowData: tpf, key })
           ))}
           <TableCell>
             <Tooltip title={isAdmin ? "Liquidar" : "Comprar"}>
@@ -113,7 +136,7 @@ export const TPFTable = (props) => {
         </TableRow>
       );
     })
-  }, [headers, selected, items])
+  }, [headers, selected, items, unitPriceList])
 
   return (
     <Card>
@@ -154,6 +177,7 @@ export const TPFTable = (props) => {
 TPFTable.propTypes = {
   count: PropTypes.number,
   items: PropTypes.array,
+  unitPriceList: PropTypes.array,
   onDeselectAll: PropTypes.func,
   onDeselectOne: PropTypes.func,
   onPageChange: PropTypes.func,
