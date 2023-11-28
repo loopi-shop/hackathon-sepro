@@ -5,6 +5,7 @@ import { AbstractRepository } from "./abstract.repository";
  * @property {string} id
  * @property {string} symbol
  * @property {string} name
+ * @property {string} contractAddress
  * @property {number} decimals
  * @property {Date} startTimestamp CreatedAt
  * @property {number} durationDays
@@ -50,6 +51,7 @@ class InvestmentsRepository extends AbstractRepository {
       _compliance: output._compliance,
       _onchainId: output._onchainId,
       minimumValue: output.minimumValue,
+      contractAddress: output.contractAddress,
     }
   }
 
@@ -69,6 +71,7 @@ class InvestmentsRepository extends AbstractRepository {
       _compliance: tpf._compliance,
       _onchainId: tpf._onchainId,
       minimumValue: tpf.minimumValue ?? MIN_VALUE,
+      contractAddress: tpf.contractAddress,
     }));
   }
 }

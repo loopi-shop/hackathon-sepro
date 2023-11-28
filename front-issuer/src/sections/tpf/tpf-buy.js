@@ -4,6 +4,8 @@ import { Button, TextField, Stack, Dialog, DialogContent, DialogContentText, Dia
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useSDK } from "@metamask/sdk-react";
+import { useTPF } from 'src/hooks/use-tpf';
+import { addDays, format } from 'date-fns';
 
 const Transition = forwardRef(function Transition(
   props,
@@ -19,7 +21,8 @@ export const TPFBuy = (props) => {
     tpf = {}
   } = props;
 
-  const { connected } = useSDK();
+  const { sdk, connected, chainId, account } = useSDK();
+  const { invest } = useTPF();
   const formik = useFormik({
     initialValues: {
       amount: 1000,
@@ -32,7 +35,11 @@ export const TPFBuy = (props) => {
     }),
     onSubmit: async (values, helpers) => {
       // call
-      // tpf - invest
+      invest({
+        amount: values.amount,
+        receiver: account,
+        contractAddress: tpf.contractAddress,
+      }).then(console.info);
       // metamask - sendTransaction
     }
   });
@@ -41,12 +48,10 @@ export const TPFBuy = (props) => {
     if (tpf?.minimumValue) formik.setValues({ amount: tpf.minimumValue });
   }, tpf);
 
-  const [account, setAccount] = useState('');
   const connect = async () => {
     try {
       const accounts = await sdk?.connect();
       console.log(accounts, chainId);
-      setAccount(accounts?.[0]);
     } catch (err) {
       console.error(`failed to connect..`, err);
     }
@@ -55,6 +60,11 @@ export const TPFBuy = (props) => {
   useEffect(() => {
     if (!connected) connect();
   }, [connected])
+
+  const getExpirationDate = () => {
+    const expirationDate = addDays(tpf.startTimestamp, tpf.durationDays);
+    return format(expirationDate, 'dd/MM/yyyy');
+  }
 
   return (
     <Dialog
@@ -67,6 +77,8 @@ export const TPFBuy = (props) => {
         <DialogContentText>
           <p><strong>Símbolo:</strong> {tpf.symbol}</p>
           <p><strong>Nome:</strong> {tpf.name}</p>
+          <p><strong>Endereço do Contrato:</strong> {tpf.contractAddress}</p>
+          <p><strong>Data de Vencimento:</strong> {getExpirationDate}</p>
           <p><strong>Rentabilidade:</strong> {(tpf.yield / 100).toFixed(2)}%</p>
           <p><strong>Valor Mínimo</strong>: {tpf.minimumValue}</p>
         </DialogContentText>
