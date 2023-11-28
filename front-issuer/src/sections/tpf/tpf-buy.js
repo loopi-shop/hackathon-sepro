@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Button, TextField, Stack, Dialog, DialogContent, DialogContentText, DialogTitle, Slide, Icon, Skeleton } from '@mui/material';
+import { Button, TextField, Stack, Dialog, DialogContent, DialogContentText, DialogTitle, Slide, Icon, Skeleton, Typography } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useSDK } from "@metamask/sdk-react";
