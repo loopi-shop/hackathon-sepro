@@ -9,10 +9,6 @@ export const AccountPopover = (props) => {
   const router = useRouter();
   const auth = useAuth();
 
-  if(!auth.user) {
-    return <></>;
-  }
-
   const handleSignOut = useCallback(
     () => {
       onClose?.();
@@ -21,6 +17,10 @@ export const AccountPopover = (props) => {
     },
     [onClose, auth, router]
   );
+
+  if(!auth.user) {
+    return <></>;
+  }
 
   return (
     <Popover
