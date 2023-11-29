@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Button, TextField, Stack, Dialog, DialogContent, DialogContentText, DialogTitle, Slide, Icon, Skeleton, Typography } from '@mui/material';
+import { Box, Button, TextField, Stack, Dialog, DialogContent, DialogContentText, DialogTitle, Slide, Icon, Skeleton, Typography, CircularProgress } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useSDK } from "@metamask/sdk-react";
@@ -8,6 +8,7 @@ import { useTPF } from 'src/hooks/use-tpf';
 import { addDays, format } from 'date-fns';
 import BigNumber from 'bignumber.js';
 import { NumericFormat } from 'react-number-format';
+import { useSnackbar } from 'notistack';
 
 const Transition = forwardRef(function Transition(
   props,
@@ -23,8 +24,12 @@ export const TPFBuy = (props) => {
     tpf = {}
   } = props;
 
+  const { enqueueSnackbar } = useSnackbar();
+
   const { sdk, connected, chainId, account } = useSDK();
   const { invest, getPrice, approve, waitTransaction } = useTPF();
+  const [isLoadingSubmit, setIsLoadingSubmit] = useState(false);
+  const [submitProgress, setSubmitProgress] = useState(10);
   const formik = useFormik({
     initialValues: {
       amount: 1000,
@@ -36,34 +41,62 @@ export const TPFBuy = (props) => {
         .required('Valor mínimo é obrigatório'),
     }),
     onSubmit: async (values) => {
+      setIsLoadingSubmit(true);
       const amount = parseInt(new BigNumber(values.amount).shiftedBy(tpf.decimals).toNumber());
-      const txAllowance = await approve({
-        amount,
-        from: account,
-        contractAddress: tpf.contractAddress,
-        asset: tpf.asset,
-      })
-      const txHash = await sdk.getProvider().request({
-        method: 'eth_sendTransaction',
-        params: [txAllowance]
-      })
-        .catch((error) => console.error(`eth_sendTransaction:approve:Error: `, error))
-      console.info(`eth_sendTransaction:approve `, txHash);
-      await waitTransaction({ txHash });
+      try {
+        const txAllowance = await approve({
+          amount,
+          from: account,
+          contractAddress: tpf.contractAddress,
+          asset: tpf.asset,
+        });
+        setSubmitProgress(20);
+        const txHash = await sdk.getProvider().request({
+          method: 'eth_sendTransaction',
+          params: [txAllowance]
+        });
+        setSubmitProgress(40);
+        console.info(`eth_sendTransaction:approve `, txHash);
+        enqueueSnackbar(`Aguardando a confirmação da transação ${txHash}`, {
+          variant: "info",
+          autoHideDuration: 10000,
+        });
+        await waitTransaction({ txHash });
+        setSubmitProgress(50);
+      } catch (error) {
+        console.error(`approve:`, error);
+        enqueueSnackbar(`Erro para aprovar a transferencia de token do contrato ${tpf.contractAddress} para o contrato ${tpf.asset}`, {
+          variant: "error"
+        });
+        setIsLoadingSubmit(false);
+        return;
+      }
 
-      const tx = await invest({
-        amount,
-        receiver: account,
-        contractAddress: tpf.contractAddress,
-        timestamp: Date.now() / 1000,
-      });
-      console.debug(`tx:`, tx);
-      await sdk.getProvider().request({
-        method: 'eth_sendTransaction',
-        params: [tx]
-      })
-        .then((v) => console.info(`eth_sendTransaction:deposit `, v))
-        .catch((error) => console.error(`eth_sendTransaction:deposit:Error: `, error))
+      try {
+        const tx = await invest({
+          amount,
+          receiver: account,
+          contractAddress: tpf.contractAddress,
+          timestamp: Date.now() / 1000,
+        });
+        setSubmitProgress(75);
+        console.debug(`tx:`, tx);
+        const txHash = await sdk.getProvider().request({
+          method: 'eth_sendTransaction',
+          params: [tx]
+        });
+        setSubmitProgress(100);
+        enqueueSnackbar(`Transação de investimento: ${txHash}`, {
+          variant: "info",
+          autoHideDuration: 10000,
+        });
+      } catch (error) {
+        console.error(`deposit:`, error);
+        enqueueSnackbar(`Erro para concretizar o investimento no contrato ${tpf.contractAddress}`, {
+          variant: "error"
+        });
+      }
+      setIsLoadingSubmit(false);
     }
   });
 
@@ -200,34 +233,46 @@ export const TPFBuy = (props) => {
               {formik.errors.submit}
             </Typography>
           )}
-          <Button
-            disabled={unitPrice === null || unitPrice === undefined}
-            fullWidth
-            size="large"
-            sx={{ mt: 1 }}
-            type="button"
-            variant="contained"
-            color="secondary"
-            onClick={simulate}
-          >
-            Simular
-          </Button>
-          {
-            !simulated ? <Skeleton animation="wave" variant="text" sx={{ mt: 1 }} />
-              : <DialogContentText sx={{ mt: 1 }} textAlign="center">
+          {isLoadingSubmit ? (
+            <>
+              <DialogContentText sx={{ mt: 1 }} textAlign="center">
                 <strong>Quantidade a receber:</strong> {lastSimulatedValue.toFormat(tpf.decimals)}
               </DialogContentText>
-          }
-          <Button
-            disabled={!connected || !account || !simulated}
-            fullWidth
-            size="large"
-            sx={{ mt: 1 }}
-            type="submit"
-            variant="contained"
-          >
-            Comprar
-          </Button>
+              <Box sx={{ display: 'flex', mt: 3, justifyContent: 'center' }}>
+                <CircularProgress variant="determinate" value={submitProgress} />
+                Carregando...
+              </Box>
+            </>
+          ) : (<>
+            <Button
+              disabled={unitPrice === null || unitPrice === undefined}
+              fullWidth
+              size="large"
+              sx={{ mt: 1 }}
+              type="button"
+              variant="contained"
+              color="secondary"
+              onClick={simulate}
+            >
+              Simular
+            </Button>
+            {
+              !simulated ? <Skeleton animation="wave" variant="text" sx={{ mt: 1 }} />
+                : <DialogContentText sx={{ mt: 1 }} textAlign="center">
+                  <strong>Quantidade a receber:</strong> {lastSimulatedValue.toFormat(tpf.decimals)}
+                </DialogContentText>
+            }
+            <Button
+              disabled={!connected || !account || !simulated}
+              fullWidth
+              size="large"
+              sx={{ mt: 1 }}
+              type="submit"
+              variant="contained"
+            >
+              Comprar
+            </Button>
+          </>)}
         </form>
       </DialogContent>
     </Dialog>
