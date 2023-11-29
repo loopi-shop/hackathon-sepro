@@ -14,6 +14,7 @@ COPY package-lock.json ./
 COPY package.json ./
 COPY public ./public
 COPY src ./src
+COPY .env ./
 RUN npm run build
 RUN npm prune --production
 
@@ -21,6 +22,7 @@ FROM node:18.17.1-alpine as runner
 WORKDIR /app
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
+COPY .env ./
 COPY package.json ./
 RUN ls
 RUN cat package.json
