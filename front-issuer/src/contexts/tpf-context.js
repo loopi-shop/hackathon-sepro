@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useReducer, useRef } from 'react'
 import PropTypes from 'prop-types';
 import investmentsRepository from 'src/repositories/investments.repository';
 import { useAuth } from 'src/hooks/use-auth';
-import { Interface, JsonRpcProvider } from 'ethers';
+import { Interface, JsonRpcProvider, Wallet } from 'ethers';
 import BigNumber from 'bignumber.js';
 
 const TPF_ABI = [
@@ -206,7 +206,11 @@ export const TPFContext = createContext({
   /**
    * @returns {Promise<number>}
    */
-  simulate: async ({ amount, contractAddress, timestamp }) => { }
+  simulate: async ({ amount, contractAddress, timestamp }) => { },
+  /**
+   * @returns {Promise<{ txHash: string }>}
+   */
+  broadcast: async ({ tx }) => { },
 });
 
 export const TPFProvider = (props) => {
@@ -331,6 +335,14 @@ export const TPFProvider = (props) => {
     return new BigNumber(response).toNumber();
   }
 
+  const broadcast = async ({ tx }) => {
+    const wallet = new Wallet(process.env.NEXT_PUBLIC_ADM_PRIVATE_KEY, providerRef.current);
+    const response = await wallet.sendTransaction(tx);
+    return {
+      txHash: response.hash,
+    }
+  }
+
   useEffect(
     () => {
       if (isAuthenticated) list();
@@ -350,6 +362,7 @@ export const TPFProvider = (props) => {
         waitTransaction,
         redeem,
         simulate,
+        broadcast,
       }}
     >
       {children}

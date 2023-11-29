@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import {
   Box,
@@ -12,6 +13,7 @@ import {
   TableRow,
   Tooltip,
   Skeleton,
+  CircularProgress,
 } from '@mui/material';
 import { Scrollbar } from 'src/components/scrollbar';
 import { TableRowsLoader } from 'src/components/table-rows-loader';
@@ -22,6 +24,7 @@ import { addDays, format } from 'date-fns';
 import WalletIcon from '@heroicons/react/24/solid/WalletIcon';
 import BanknotesIcon from '@heroicons/react/24/solid/BanknotesIcon';
 import { useTPF } from 'src/hooks/use-tpf';
+import { useSnackbar } from 'notistack';
 
 const tableHeaders = [
   {
@@ -79,7 +82,8 @@ export const TPFTable = (props) => {
   } = props;
 
   const { hasRole, user } = useAuth();
-  const { redeem } = useTPF();
+  const { redeem, broadcast } = useTPF();
+  const { enqueueSnackbar } = useSnackbar();
 
   const isAdmin = useMemo(() => {
     return hasRole([RoleEnum.ADMIN]);
@@ -89,9 +93,39 @@ export const TPFTable = (props) => {
     return tableHeaders.filter((value) => hasRole(value.roles))
   }, [user])
 
-  const settle = (tpf) => {
-    console.info('Liquidando Titulo:', tpf);
-    redeem({ contractAddress: tpf.contractAddress, from: user.publicKey });
+  const [settleLoading, setSettleLoading] = useState({});
+  const settle = async (tpf) => {
+    setSettleLoading((old) => {
+      const newState = {
+        ...old,
+        [tpf.symbol]: true,
+      }
+      return newState;
+    });
+    try {
+      console.info('Liquidando Titulo:', tpf);
+      const tx = await redeem({ contractAddress: tpf.contractAddress, from: user.publicKey });
+      console.log(`tx:redeem:`, tx);
+      const { txHash } = await broadcast({ tx });
+      enqueueSnackbar(`Transação de liquidação: ${txHash}`, {
+        variant: "info",
+        autoHideDuration: 10000,
+      });
+    } catch (error) {
+      console.error(`redeem:`, error);
+      enqueueSnackbar(` Erro para liquidar o token: ${tpf.symbol}`, {
+        variant: "error",
+        autoHideDuration: 10000,
+      });
+    } finally {
+      setSettleLoading((old) => {
+        const newState = {
+          ...old,
+          [tpf.symbol]: false,
+        }
+        return newState;
+      });
+    }
   }
 
   const buy = (tpf) => {
@@ -128,18 +162,21 @@ export const TPFTable = (props) => {
               : getUnitPriceCell({ rowData: tpf, key })
           ))}
           <TableCell>
-            <Tooltip title={isAdmin ? "Liquidar" : "Comprar"}>
-              <IconButton onClick={() => isAdmin ? settle(tpf) : buy(tpf)}>
-                <SvgIcon fontSize="small">
-                  {isAdmin ? <BanknotesIcon /> : <WalletIcon />}
-                </SvgIcon>
-              </IconButton>
-            </Tooltip>
+            {
+              settleLoading[tpf.symbol] ? <CircularProgress />
+                : (<Tooltip title={isAdmin ? "Liquidar" : "Comprar"}>
+                  <IconButton onClick={() => isAdmin ? settle(tpf) : buy(tpf)}>
+                    <SvgIcon fontSize="small">
+                      {isAdmin ? <BanknotesIcon /> : <WalletIcon />}
+                    </SvgIcon>
+                  </IconButton>
+                </Tooltip>)
+            }
           </TableCell>
         </TableRow>
       );
     })
-  }, [headers, selected, items, unitPriceList])
+  }, [headers, selected, items, unitPriceList, settleLoading])
 
   return (
     <Card>
