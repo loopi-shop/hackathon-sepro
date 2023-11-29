@@ -9,6 +9,10 @@ export const AccountPopover = (props) => {
   const router = useRouter();
   const auth = useAuth();
 
+  if(!auth.user) {
+    return <></>;
+  }
+
   const handleSignOut = useCallback(
     () => {
       onClose?.();
@@ -27,14 +31,9 @@ export const AccountPopover = (props) => {
       }}
       onClose={onClose}
       open={open}
-      PaperProps={{ sx: { width: 200 } }}
+      PaperProps={{ sx: { width: 400 } }}
     >
-      <Box
-        sx={{
-          py: 1.5,
-          px: 2
-        }}
-      >
+      <Box sx={{ py: 1.5, px: 2 }} >
         <Typography variant="overline">
           Account
         </Typography>
@@ -43,6 +42,12 @@ export const AccountPopover = (props) => {
           variant="body2"
         >
           {auth.user.name}
+        </Typography>
+        <Typography
+          color="text.secondary"
+          variant="body2"
+        >
+          {auth.user.publicKey}
         </Typography>
       </Box>
       <Divider />

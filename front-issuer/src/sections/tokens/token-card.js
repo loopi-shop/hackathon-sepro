@@ -1,13 +1,20 @@
 import { Avatar, Box, Button, Card, CardActions, CardContent, Divider, Link, Typography } from '@mui/material';
 import { ethers } from "ethers";
 import { useState } from 'react';
+import {useAuth} from "../../hooks/use-auth";
+import {RoleEnum} from "../../contexts/auth-context";
 
 export const TokenCard = ({ token, account }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuth();
+
   const mintBRLX = async () => {
-    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = user.role === RoleEnum.ADMIN
+      ? new ethers.Wallet(process.env.NEXT_PUBLIC_ADM_PRIVATE_KEY, new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL))
+      : await (new ethers.BrowserProvider(window.ethereum)).getSigner();
+
     const abi = 'function mint(address, uint256)';
-    const erc20Contract = new ethers.Contract('0xbeb1984c961c786d52c5112f72276958c738699d', [abi], await provider.getSigner());
+    const erc20Contract = new ethers.Contract(process.env.NEXT_PUBLIC_BRLX_CONTRACT, [abi], signer);
     setIsLoading(true);
 
     const transaction = await erc20Contract.mint(account, 1000 * 10 ** 6)

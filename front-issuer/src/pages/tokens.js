@@ -4,22 +4,30 @@ import { ethers } from "ethers";
 import { Box, Container, Grid, Stack, Typography } from '@mui/material';
 import Head from 'next/head';
 import { TokenCard } from '../sections/tokens/token-card';
+import {useAuth} from "../hooks/use-auth";
+import {RoleEnum} from "../contexts/auth-context";
 
 const Page = () => {
   const [account, setAccount] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [tokens, setTokens] = useState([]);
+  const { user } = useAuth();
 
   /* Load Account */
   useEffect(() => {
     if(isLoading || account) return;
     setIsLoading(true);
-    window.ethereum
-      .request({ method: 'eth_requestAccounts' })
-      .then(accounts => {
-        setAccount(accounts[0])
-        setIsLoading(false);
-      })
+    if(user.role === RoleEnum.ADMIN) {
+      setAccount(user.publicKey);
+      setIsLoading(false);
+    } else {
+      window.ethereum
+        .request({ method: 'eth_requestAccounts' })
+        .then(accounts => {
+          setAccount(accounts[0])
+          setIsLoading(false);
+        })
+    }
   });
 
   /* Load balances */
@@ -29,10 +37,10 @@ const Page = () => {
     }
 
     setIsLoading(true);
-    const provider = new ethers.JsonRpcProvider('https://rpc-mumbai.maticvigil.com');
+    const provider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL);
 
     const abi = 'function balanceOf(address) view returns (uint256)';
-    const erc20Contract = new ethers.Contract('0xbeb1984c961c786d52c5112f72276958c738699d', [abi], provider);
+    const erc20Contract = new ethers.Contract(process.env.NEXT_PUBLIC_BRLX_CONTRACT, [abi], provider);
 
     Promise.all([
       provider.getBalance(account),
@@ -53,7 +61,7 @@ const Page = () => {
     <>
       <Head>
         <title>
-          Mint BRLX - TEST | Devias Kit
+          Token List | Devias Kit
         </title>
       </Head>
       <Box component="main"
