@@ -174,7 +174,7 @@ export const TPFProvider = (props) => {
   const { children } = props;
   const [state, dispatch] = useReducer(reducer, initialState);
   const { isAuthenticated } = useAuth();
-  const providerRef = useRef(new JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL, 80001));
+  const providerRef = useRef(new JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL, Number(process.env.NEXT_PUBLIC_CHAIN_ID)));
 
   const create = async (tpf) => {
     dispatch({
@@ -228,7 +228,6 @@ export const TPFProvider = (props) => {
   }
 
   const invest = async ({ amount, receiver, contractAddress, timestamp }) => {
-    console.log(`amount:`, amount);
     const data = TPFContractInterface.encodeFunctionData("deposit", [amount, receiver, parseInt(timestamp)]);
     const tx = {
       data,
