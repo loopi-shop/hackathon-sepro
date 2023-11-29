@@ -73,13 +73,14 @@ const Page = () => {
                 container
                 spacing={3}
               >
-                { tokens.map(token =>
+                { tokens.map((token, index) =>
                   <Grid
                     xs={12}
                     md={6}
                     lg={6}
+                    key={index}
                   >
-                    <TokenCard token={token} account={account} />
+                    <TokenCard token={token} account={account} key={index} />
                   </Grid>
                 )}
               </Grid>
