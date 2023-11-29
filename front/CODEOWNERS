@@ -1,0 +1,12 @@
+.editorconfig @oliveira.rafael @marcosalves3
+.gitattributes @oliveira.rafael @marcosalves3
+.gitignore @oliveira.rafael @marcosalves3
+.gitlab-ci.yml @oliveira.rafael @marcosalves3 @tiagoalexandreos @tiago.freire
+.npmrc @oliveira.rafael @marcosalves3 @tiagoalexandreos
+CODE_OF_CONDUCT.md @oliveira.rafael @marcosalves3
+CODEOWNERS @oliveira.rafael @marcosalves3
+CONTRIBUTING.md @oliveira.rafael @marcosalves3
+LICENSE @oliveira.rafael @marcosalves3
+package.json @oliveira.rafael @marcosalves3 @tiagoalexandreos @tiago.freire
+README.md @oliveira.rafael @marcosalves3
+SECURITY.md @oliveira.rafael @marcosalves3

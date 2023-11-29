@@ -1,0 +1,103 @@
+include:
+  - template: Jobs/Dependency-Scanning.gitlab-ci.yml
+
+image: node:18-alpine
+
+cache:
+  paths:
+    - node_modules/
+
+stages:
+  - Qualidade
+  - Dependências
+  - test
+  - Pages
+  - Release
+
+Markdown:
+  stage: Qualidade
+  artifacts:
+    when: always
+    paths:
+      - report-markdownlint.txt
+    expire_in: 1 week
+    expose_as: "Markdownlint Report"
+  before_script:
+    - apk --no-cache add
+    - npm i -g markdownlint-cli
+  script:
+    - markdownlint '**/*.md' -o report-markdownlint.txt
+  only:
+    - main
+    - next
+    - merge_requests
+    - /\d.(\d|x).(\d|x)(-alpha)?$/
+    - /alpha$/
+
+Commits:
+  stage: Qualidade
+  artifacts:
+    when: always
+    paths:
+      - report-commitlint.txt
+    expire_in: 1 week
+    expose_as: "Commitlint Report"
+  before_script:
+    - apk --no-cache add git
+    - npm i -g @govbr-ds/commit-config commitlint-gitlab-ci
+  script:
+    - commitlint-gitlab-ci -x @govbr-ds/commit-config > report-commitlint.txt
+  only:
+    - main
+    - next
+    - merge_requests
+    - /\d.(\d|x).(\d|x)(-alpha)?$/
+    - /alpha$/
+
+Instalar dependências:
+  stage: Dependências
+  script:
+    - apk --no-cache add git
+    - npm i
+  artifacts:
+    paths:
+      - node_modules
+    expire_in: 1 hour
+  only:
+    - main
+    - next
+    - merge_requests
+    - /\d.(\d|x).(\d|x)(-alpha)?$/
+    - /alpha$/
+
+pages:
+  stage: Pages
+  needs: ["Instalar dependências"]
+  artifacts:
+    paths:
+      - public
+    expire_in: 1 day
+    expose_as: "Quickstart React Build"
+  script:
+    - npm run build
+    - rm -rf public
+    - mkdir -p public
+    - mv build/* public
+  only:
+    - main
+
+Semantic Release:
+  stage: Release
+  environment:
+    name: production
+  when: manual
+  needs: ["pages"]
+  before_script:
+    - apk --no-cache add git zip
+  script:
+    - npx semantic-release
+  only:
+    - main
+    - next
+    - /\d.(\d|x).(\d|x)(-alpha)?$/
+    - /alpha$/
