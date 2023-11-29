@@ -11,6 +11,7 @@ import { createEmotionCache } from 'src/utils/create-emotion-cache';
 import { TPFProvider } from 'src/contexts/tpf-context';
 import { MetaMaskProvider } from '@metamask/sdk-react';
 import 'simplebar-react/dist/simplebar.min.css';
+import { SnackbarProvider } from 'notistack';
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -37,28 +38,30 @@ const App = (props) => {
         />
       </Head>
       <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <MetaMaskProvider debug={false} sdkOptions={{
-          checkInstallationImmediately: false,
-          dappMetadata: {
-            name: "Hackaton Sepro",
-            url: typeof window !== "undefined" ? window.location.host : 'http://localhost:3000',
-          }
-        }}>
-          <AuthProvider>
-            <ThemeProvider theme={theme}>
-              <CssBaseline />
-              <TPFProvider>
-                <AuthConsumer>
-                  {
-                    (auth) => auth.isLoading
-                      ? <SplashScreen />
-                      : getLayout(<Component {...pageProps} />)
-                  }
-                </AuthConsumer>
-              </TPFProvider>
-            </ThemeProvider>
-          </AuthProvider>
-        </MetaMaskProvider>
+        <SnackbarProvider maxSnack={10}>
+          <MetaMaskProvider debug={false} sdkOptions={{
+            checkInstallationImmediately: false,
+            dappMetadata: {
+              name: "Hackaton Sepro",
+              url: typeof window !== "undefined" ? window.location.host : 'http://localhost:3000',
+            }
+          }}>
+            <AuthProvider>
+              <ThemeProvider theme={theme}>
+                <CssBaseline />
+                <TPFProvider>
+                  <AuthConsumer>
+                    {
+                      (auth) => auth.isLoading
+                        ? <SplashScreen />
+                        : getLayout(<Component {...pageProps} />)
+                    }
+                  </AuthConsumer>
+                </TPFProvider>
+              </ThemeProvider>
+            </AuthProvider>
+          </MetaMaskProvider>
+        </SnackbarProvider>
       </LocalizationProvider>
     </CacheProvider>
   );
