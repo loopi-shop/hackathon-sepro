@@ -21,6 +21,7 @@ import { useAuth } from 'src/hooks/use-auth';
 import { addDays, format } from 'date-fns';
 import WalletIcon from '@heroicons/react/24/solid/WalletIcon';
 import BanknotesIcon from '@heroicons/react/24/solid/BanknotesIcon';
+import { useTPF } from 'src/hooks/use-tpf';
 
 const tableHeaders = [
   {
@@ -78,6 +79,7 @@ export const TPFTable = (props) => {
   } = props;
 
   const { hasRole, user } = useAuth();
+  const { redeem } = useTPF();
 
   const isAdmin = useMemo(() => {
     return hasRole([RoleEnum.ADMIN]);
@@ -89,6 +91,7 @@ export const TPFTable = (props) => {
 
   const settle = (tpf) => {
     console.info('Liquidando Titulo:', tpf);
+    redeem({ contractAddress: tpf.contractAddress, from: user.publicKey });
   }
 
   const buy = (tpf) => {
