@@ -5,15 +5,10 @@ import { Box, Container, Grid, Stack, Typography } from '@mui/material';
 import Head from 'next/head';
 import { TokenCard } from '../sections/tokens/token-card';
 
-const tokens = [
-  { name: 'Matic', quantity: '2.100', linkGetMore: 'https://mumbaifaucet.com/' },
-  { name: 'BRLX - Test', quantity: '20.100', isToMint: true },
-]
-
 const Page = () => {
-  const [account, setAccount] = useState('');
+  const [account, setAccount] = useState();
   const [isLoading, setIsLoading] = useState(false);
-  // const [tokens, setTokens] = useState([]);
+  const [tokens, setTokens] = useState([]);
 
   /* Load Account */
   useEffect(() => {
@@ -22,35 +17,37 @@ const Page = () => {
     window.ethereum
       .request({ method: 'eth_requestAccounts' })
       .then(accounts => {
-        console.log('accounts',accounts);
         setAccount(accounts[0])
         setIsLoading(false);
       })
   });
 
-  const getBalance = () => {
+  /* Load balances */
+  useEffect(() => {
+    if(isLoading || !account || tokens.length) {
+      return;
+    }
+
+    setIsLoading(true);
     const provider = new ethers.JsonRpcProvider('https://rpc-mumbai.maticvigil.com');
 
-    const balanceERC20Abi = {
-      "constant": true,
-      "inputs": [
-        {
-          "name": "_owner",
-          "type": "address"
-        }
-      ],
-      "name": "balanceOf",
-      "outputs": [
-        {
-          "name": "balance",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "type": "function"
-    };
+    const abi = 'function balanceOf(address) view returns (uint256)';
+    const erc20Contract = new ethers.Contract('0xbeb1984c961c786d52c5112f72276958c738699d', [abi], provider);
 
-  }
+    Promise.all([
+      provider.getBalance(account),
+      erc20Contract.balanceOf(account),
+    ]).then(([nativeBalance, erc20Balance]) => {
+      setTokens([
+        { name: 'Matic', quantity: nativeBalance, decimals: 18, linkGetMore: 'https://mumbaifaucet.com/' },
+        { name: 'BRLX - Test', quantity: erc20Balance, decimals: 6, isToMint: true },
+      ])
+      setIsLoading(false);
+    }).catch(err => {
+      console.error(err);
+      throw err;
+    });
+  });
 
   return (
     <>

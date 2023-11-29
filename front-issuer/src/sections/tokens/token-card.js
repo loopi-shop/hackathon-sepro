@@ -1,17 +1,35 @@
-import {
-  Avatar,
-  Box,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Divider, Link,
-  Typography
-} from '@mui/material';
+import { Avatar, Box, Button, Card, CardActions, CardContent, Divider, Link, Typography } from '@mui/material';
+import { ethers } from "ethers";
+import { useState } from 'react';
 
-export const TokenCard = ({ token }) => {
-  const onClick = () => {
+export const TokenCard = ({ token, account }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const mintBRLX = async () => {
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const abi = 'function mint(address, uint256)';
+    const erc20Contract = new ethers.Contract('0xbeb1984c961c786d52c5112f72276958c738699d', [abi], await provider.getSigner());
+    setIsLoading(true);
 
+    const transaction = await erc20Contract.mint(account, 1000 * 10 ** 6)
+      .catch(err => {
+        console.error(err);
+        throw err;
+      });
+    await transaction.wait(5);
+    setIsLoading(false);
+    window.location.reload();
+  }
+
+  const formatTokenQuantity = (quantity, decimals) => {
+    if (quantity === 0n) {
+      return '0.0';
+    }
+
+    quantity = quantity.toString();
+    decimals = decimals.toString();
+
+    const offset = quantity.length - decimals;
+    return `${quantity.slice(0, offset)}.${quantity.slice(offset)}`;
   }
 
   return (
@@ -41,7 +59,7 @@ export const TokenCard = ({ token }) => {
             color="text.secondary"
             variant="body2"
           >
-            Balance: {token.quantity}
+            Balance: {formatTokenQuantity(token.quantity, token.decimals)}
           </Typography>
         </Box>
       </CardContent>
@@ -53,7 +71,7 @@ export const TokenCard = ({ token }) => {
               <Button
                 fullWidth
                 variant="text"
-                onClick={onClick}
+                onClick={mintBRLX}
               >
                 Mint +1000
               </Button>
