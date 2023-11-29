@@ -27,7 +27,7 @@ export const TPFBuy = (props) => {
   const { enqueueSnackbar } = useSnackbar();
 
   const { sdk, connected, chainId, account } = useSDK();
-  const { invest, getPrice, approve, waitTransaction } = useTPF();
+  const { invest, getPrice, approve, waitTransaction, simulate: preview } = useTPF();
   const [isLoadingSubmit, setIsLoadingSubmit] = useState(false);
   const [submitProgress, setSubmitProgress] = useState(10);
   const formik = useFormik({
@@ -152,13 +152,15 @@ export const TPFBuy = (props) => {
   const [lastSimulatedValue, setLastSimulatedValue] = useState(new BigNumber(0));
   const [simulated, setSimulated] = useState(false)
   const simulate = () => {
-    if (unitPrice) {
-      const price = new BigNumber(unitPrice).shiftedBy(-tpf.decimals);
-      const amount = new BigNumber(formik.values.amount);
-      const quantity = amount.dividedBy(price);
-      setLastSimulatedValue(quantity)
-    }
-    setSimulated(true);
+    const amount = new BigNumber(formik.values.amount).shiftedBy(tpf.decimals);
+    preview({
+      amount: amount.toNumber(),
+      contractAddress: tpf.contractAddress,
+      timestamp: Date.now() / 1000,
+    }).then((quantity) => {
+      setLastSimulatedValue(new BigNumber(quantity).shiftedBy(-tpf.decimals))
+      setSimulated(true);
+    });
   }
 
   const clearSimulated = () => {

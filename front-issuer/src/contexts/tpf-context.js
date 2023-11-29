@@ -102,6 +102,37 @@ const TPF_ABI = [
     "stateMutability": "view",
     "type": "function"
   },
+  {
+    "inputs": [],
+    "name": "redeemAll",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "assets",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "previewDeposit",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
 ]
 const TPFContractInterface = new Interface(TPF_ABI);
 
@@ -168,6 +199,14 @@ export const TPFContext = createContext({
    * @returns {Promise<any>}
    */
   waitTransaction: async ({ txHash }) => { },
+  /**
+   * @returns {Promise<{ data: string, to: string, nonce: number, value: string }>}
+   */
+  redeem: async ({ contractAddress, from }) => { },
+  /**
+   * @returns {Promise<number>}
+   */
+  simulate: async ({ amount, contractAddress, timestamp }) => { }
 });
 
 export const TPFProvider = (props) => {
@@ -262,6 +301,36 @@ export const TPFProvider = (props) => {
     return providerRef.current.waitForTransaction(txHash);
   }
 
+  const redeem = async ({ contractAddress, from }) => {
+    const data = TPFContractInterface.encodeFunctionData("redeemAll", []);
+    const tx = {
+      data,
+      value: "0",
+      to: contractAddress,
+      from: from,
+    };
+    const [nonce, gasPrice] = await Promise.all([
+      providerRef.current.getTransactionCount(from).then((curNonce) => curNonce ?? 0),
+      providerRef.current.send("eth_gasPrice", []),
+    ]);
+
+    return {
+      ...tx,
+      nonce: `0x${new BigNumber(nonce).toString(16)}`,
+      gasPrice: gasPrice,
+    }
+  }
+
+  const simulate = async ({ amount, contractAddress, timestamp }) => {
+    const data = TPFContractInterface.encodeFunctionData("previewDeposit", [amount, parseInt(timestamp)]);
+    const response = await providerRef.current.call({
+      to: contractAddress,
+      data,
+      value: 0,
+    });
+    return new BigNumber(response).toNumber();
+  }
+
   useEffect(
     () => {
       if (isAuthenticated) list();
@@ -279,6 +348,8 @@ export const TPFProvider = (props) => {
         getPrice,
         approve,
         waitTransaction,
+        redeem,
+        simulate,
       }}
     >
       {children}
