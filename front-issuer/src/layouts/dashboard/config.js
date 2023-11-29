@@ -35,8 +35,8 @@ export const items = [
     )
   },
   {
-    title: 'Mint BRLX',
-    path: '/mint-BRLX',
+    title: 'Tokens',
+    path: '/tokens',
     icon: (
       <SvgIcon fontSize="small">
         <CogIcon />
