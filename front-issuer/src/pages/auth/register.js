@@ -1,4 +1,3 @@
-import Head from "next/head";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
@@ -8,6 +7,7 @@ import { useAuth } from "src/hooks/use-auth";
 import { Layout as AuthLayout } from "src/layouts/auth/layout";
 import { useState } from "react";
 import { useSDK } from "@metamask/sdk-react";
+import { PageTitle } from "src/components/page-title";
 
 const Page = () => {
   const router = useRouter();
@@ -59,9 +59,7 @@ const Page = () => {
 
   return (
     <>
-      <Head>
-        <title>Registro | Devias Kit</title>
-      </Head>
+      <PageTitle>Registro</PageTitle>
       <Box
         sx={{
           flex: "1 1 auto",
