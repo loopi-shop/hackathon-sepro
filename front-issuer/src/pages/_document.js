@@ -63,8 +63,9 @@ class CustomDocument extends Document {
           <Fonts />
         </Head>
         <body>
-        <Main />
-        <NextScript />
+          <Main />
+          <NextScript />
+          <script type="module" src="/node_modules/@govbr-ds/core/dist/core.min.js"></script>
         </body>
       </Html>
     );
