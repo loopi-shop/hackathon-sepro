@@ -29,6 +29,7 @@ const App = (props) => {
   return (
     <CacheProvider value={emotionCache}>
       <Head>
+        <link href="https://fonts.cdnfonts.com/css/rawline" rel="stylesheet" />
         <title>
           Título Público Federal
         </title>
