@@ -1,28 +1,36 @@
-import { forwardRef, useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { Box, Button, TextField, Stack, Dialog, DialogContent, DialogContentText, DialogTitle, Slide, Icon, Skeleton, Typography, CircularProgress } from '@mui/material';
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
+import { forwardRef, useEffect, useState } from "react";
+import PropTypes from "prop-types";
+import {
+  Box,
+  Button,
+  TextField,
+  Stack,
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Slide,
+  Icon,
+  Skeleton,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 import { useSDK } from "@metamask/sdk-react";
-import { useTPF } from 'src/hooks/use-tpf';
-import { addDays, format } from 'date-fns';
-import BigNumber from 'bignumber.js';
-import { NumericFormat } from 'react-number-format';
-import { useSnackbar } from 'notistack';
+import { useTPF } from "src/hooks/use-tpf";
+import { addDays, format } from "date-fns";
+import BigNumber from "bignumber.js";
+import { NumericFormat } from "react-number-format";
+import { useSnackbar } from "notistack";
+import { MetamaskButton } from "src/components/metamask-button";
 
-const Transition = forwardRef(function Transition(
-  props,
-  ref
-) {
+const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="left" ref={ref} {...props} />;
 });
 
 export const TPFBuy = (props) => {
-  const {
-    open,
-    handleClose,
-    tpf = {}
-  } = props;
+  const { open, handleClose, tpf = {} } = props;
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -35,10 +43,9 @@ export const TPFBuy = (props) => {
       amount: 1000,
     },
     validationSchema: Yup.object({
-      amount: Yup
-        .number()
-        .min(tpf.minimumValue)
-        .required('Valor mínimo é obrigatório'),
+      amount: Yup.number()
+        .min(tpf.minimumValue, `Valor informado deve ser maior que ${tpf.minimumValue}`)
+        .required("Valor mínimo é obrigatório"),
     }),
     onSubmit: async (values) => {
       setIsLoadingSubmit(true);
@@ -52,8 +59,8 @@ export const TPFBuy = (props) => {
         });
         setSubmitProgress(20);
         const txHash = await sdk.getProvider().request({
-          method: 'eth_sendTransaction',
-          params: [txAllowance]
+          method: "eth_sendTransaction",
+          params: [txAllowance],
         });
         setSubmitProgress(40);
         console.info(`eth_sendTransaction:approve `, txHash);
@@ -65,9 +72,12 @@ export const TPFBuy = (props) => {
         setSubmitProgress(50);
       } catch (error) {
         console.error(`approve:`, error);
-        enqueueSnackbar(`Erro para aprovar a transferencia de token do contrato ${tpf.contractAddress} para o contrato ${tpf.asset}`, {
-          variant: "error"
-        });
+        enqueueSnackbar(
+          `Erro para aprovar a transferencia de token do contrato ${tpf.contractAddress} para o contrato ${tpf.asset}`,
+          {
+            variant: "error",
+          }
+        );
         setIsLoadingSubmit(false);
         return;
       }
@@ -82,8 +92,8 @@ export const TPFBuy = (props) => {
         setSubmitProgress(75);
         console.debug(`tx:`, tx);
         const txHash = await sdk.getProvider().request({
-          method: 'eth_sendTransaction',
-          params: [tx]
+          method: "eth_sendTransaction",
+          params: [tx],
         });
         setSubmitProgress(100);
         enqueueSnackbar(`Transação de investimento: ${txHash}`, {
@@ -93,11 +103,11 @@ export const TPFBuy = (props) => {
       } catch (error) {
         console.error(`deposit:`, error);
         enqueueSnackbar(`Erro para concretizar o investimento no contrato ${tpf.contractAddress}`, {
-          variant: "error"
+          variant: "error",
         });
       }
       setIsLoadingSubmit(false);
-    }
+    },
   });
 
   useEffect(() => {
@@ -115,42 +125,42 @@ export const TPFBuy = (props) => {
 
   useEffect(() => {
     if (!connected) connect();
-  }, [connected])
+  }, [connected]);
 
   const getExpirationDate = () => {
     if (tpf?.startTimestamp) {
       const expirationDate = addDays(tpf.startTimestamp, tpf.durationDays);
-      return format(expirationDate, 'dd/MM/yyyy');
+      return format(expirationDate, "dd/MM/yyyy");
     }
-  }
+  };
 
   const [unitPrice, setUnitPrice] = useState(null);
   useEffect(() => {
     if (open && tpf?.contractAddress) {
       getPrice({
         contractAddress: tpf.contractAddress,
-        timestamp: Date.now() / 1000
+        timestamp: Date.now() / 1000,
       }).then((price) => {
         setUnitPrice(price);
-      })
+      });
       const timer = setInterval(async () => {
-        console.info(`price:refreshed`)
+        console.info(`price:refreshed`);
         const price = await getPrice({
           contractAddress: tpf.contractAddress,
-          timestamp: Date.now() / 1000
+          timestamp: Date.now() / 1000,
         });
         setUnitPrice(price);
       }, 10_000);
 
       return () => {
-        console.info(`price:refresh:stopped`)
+        console.info(`price:refresh:stopped`);
         clearInterval(timer);
-      }
+      };
     }
-  }, [open, tpf])
+  }, [open, tpf]);
 
   const [lastSimulatedValue, setLastSimulatedValue] = useState(new BigNumber(0));
-  const [simulated, setSimulated] = useState(false)
+  const [simulated, setSimulated] = useState(false);
   const simulate = () => {
     const amount = new BigNumber(formik.values.amount).shiftedBy(tpf.decimals);
     preview({
@@ -158,48 +168,57 @@ export const TPFBuy = (props) => {
       contractAddress: tpf.contractAddress,
       timestamp: Date.now() / 1000,
     }).then((quantity) => {
-      setLastSimulatedValue(new BigNumber(quantity).shiftedBy(-tpf.decimals))
+      setLastSimulatedValue(new BigNumber(quantity).shiftedBy(-tpf.decimals));
       setSimulated(true);
     });
-  }
+  };
 
   const clearSimulated = () => {
     if (simulated) setSimulated(false);
-  }
+  };
 
   const handleChangeAmount = (e) => {
     clearSimulated();
     formik.handleChange(e);
-  }
+  };
 
   useEffect(() => {
     if (simulated) simulate();
   }, [unitPrice]);
 
   return (
-    <Dialog
-      TransitionComponent={Transition}
-      open={open}
-      onClose={handleClose}
-    >
+    <Dialog TransitionComponent={Transition} open={open} onClose={handleClose}>
       <DialogTitle textAlign="center">Compra de Título Público</DialogTitle>
       <DialogContent>
-        <DialogContentText>
-          <strong>Símbolo:</strong> {tpf.symbol}<br />
-          <strong>Nome:</strong> {tpf.name}<br />
-          <strong>Endereço do Contrato:</strong> {tpf.contractAddress}<br />
-          <strong>Data de Vencimento:</strong> {getExpirationDate()}<br />
-          <strong>Rentabilidade:</strong> {(tpf.yield / 100).toFixed(2)}%<br />
-          <strong>Valor Mínimo:</strong> {tpf.minimumValue}<br />
-          {
-            unitPrice &&
-            (<><strong>Preço Unitário:</strong> {new BigNumber(unitPrice).shiftedBy(-tpf.decimals).toString()}<br /></>)
-          }
-        </DialogContentText>
-        <form
-          noValidate
-          onSubmit={formik.handleSubmit}
+        <DialogContentText
+          style={{
+            display: "grid",
+            gridTemplateColumns: "35% 1fr",
+            gap: "8px",
+          }}
         >
+          <strong>Símbolo:</strong>
+          <span>{tpf.symbol}</span>
+          <strong>Nome:</strong>
+          <span>{tpf.name}</span>
+          <div style={{ gridColumnStart: 1, gridColumnEnd: 3 }}>
+            <strong>Endereço do Contrato:</strong>
+            <p style={{ textAlign: "right", margin: 0, padding: 0 }}> {tpf.contractAddress}</p>
+          </div>
+          <strong>Data de Vencimento:</strong>
+          <span>{getExpirationDate()}</span>
+          <strong>Rentabilidade:</strong>
+          <span>{(tpf.yield / 100).toFixed(2)}%</span>
+          <strong>Valor Mínimo:</strong>
+          <span>{tpf.minimumValue}</span>
+          {unitPrice && (
+            <>
+              <strong>Preço Unitário:</strong>{" "}
+              <span>{new BigNumber(unitPrice).shiftedBy(-tpf.decimals).toString()}</span>
+            </>
+          )}
+        </DialogContentText>
+        <form noValidate onSubmit={formik.handleSubmit}>
           <Stack spacing={3}>
             <NumericFormat
               error={!!(formik.touched.amount && formik.errors.amount)}
@@ -215,23 +234,10 @@ export const TPFBuy = (props) => {
               fixedDecimalScale
               customInput={TextField}
             />
-            <Button
-              fullWidth
-              size="large"
-              onClick={connect}
-            >
-              <Icon sx={{ mr: 2, width: '40px', height: '40px' }}>
-                <img alt={'Logo metamask'} src={'/assets/logos/logo-metamask.svg'} />
-              </Icon>
-              {connected && account ? `Connected as: ${account}` : 'Connect With Metamask'}
-            </Button>
+            <MetamaskButton connect={connect} connected={connected} account={account} />
           </Stack>
           {formik.errors.submit && (
-            <Typography
-              color="error"
-              sx={{ mt: 3 }}
-              variant="body2"
-            >
+            <Typography color="error" sx={{ mt: 3 }} variant="body2">
               {formik.errors.submit}
             </Typography>
           )}
@@ -240,45 +246,48 @@ export const TPFBuy = (props) => {
               <DialogContentText sx={{ mt: 1 }} textAlign="center">
                 <strong>Quantidade a receber:</strong> {lastSimulatedValue.toFormat(tpf.decimals)}
               </DialogContentText>
-              <Box sx={{ display: 'flex', mt: 3, justifyContent: 'center' }}>
+              <Box sx={{ display: "flex", mt: 3, justifyContent: "center" }}>
                 <CircularProgress variant="determinate" value={submitProgress} />
                 Carregando...
               </Box>
             </>
-          ) : (<>
-            <Button
-              disabled={unitPrice === null || unitPrice === undefined}
-              fullWidth
-              size="large"
-              sx={{ mt: 1 }}
-              type="button"
-              variant="contained"
-              color="secondary"
-              onClick={simulate}
-            >
-              Simular
-            </Button>
-            {
-              !simulated ? <Skeleton animation="wave" variant="text" sx={{ mt: 1 }} />
-                : <DialogContentText sx={{ mt: 1 }} textAlign="center">
+          ) : (
+            <>
+              <Button
+                disabled={unitPrice === null || unitPrice === undefined}
+                fullWidth
+                size="large"
+                sx={{ mt: 1 }}
+                type="button"
+                variant="contained"
+                color="secondary"
+                onClick={simulate}
+              >
+                Simular
+              </Button>
+              {!simulated ? (
+                <Skeleton animation="wave" variant="text" sx={{ mt: 1 }} />
+              ) : (
+                <DialogContentText sx={{ mt: 1 }} textAlign="center">
                   <strong>Quantidade a receber:</strong> {lastSimulatedValue.toFormat(tpf.decimals)}
                 </DialogContentText>
-            }
-            <Button
-              disabled={!connected || !account || !simulated}
-              fullWidth
-              size="large"
-              sx={{ mt: 1 }}
-              type="submit"
-              variant="contained"
-            >
-              Comprar
-            </Button>
-          </>)}
+              )}
+              <Button
+                disabled={!connected || !account || !simulated}
+                fullWidth
+                size="large"
+                sx={{ mt: 1 }}
+                type="submit"
+                variant="contained"
+              >
+                Comprar
+              </Button>
+            </>
+          )}
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 };
 
 TPFBuy.propTypes = {
@@ -286,4 +295,3 @@ TPFBuy.propTypes = {
   handleClose: PropTypes.func,
   tpf: PropTypes.object,
 };
-
