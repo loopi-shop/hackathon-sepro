@@ -12,6 +12,7 @@ import { TPFProvider } from 'src/contexts/tpf-context';
 import { MetaMaskProvider } from '@metamask/sdk-react';
 import 'simplebar-react/dist/simplebar.min.css';
 import { SnackbarProvider } from 'notistack';
+import '@govbr-ds/core/dist/core.min.css';
 
 const clientSideEmotionCache = createEmotionCache();
 
