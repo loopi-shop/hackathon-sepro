@@ -1,10 +1,15 @@
 require('@nomiclabs/hardhat-ethers');
+require('@nomiclabs/hardhat-etherscan');
+require('hardhat-ignore-warnings');
 
 const dotenv = require('dotenv');
 dotenv.config();
 
 module.exports = {
     defaultNetwork: 'mumbai',
+    etherscan: {
+        apiKey: '5MZ2RAF915QYPRV876XQRIVRQWBGG1Y1TM',
+    },
     networks: {
         besus: {
             url: 'http://localhost:8545',
@@ -42,4 +47,5 @@ module.exports = {
         },
         version: '0.8.19',
     },
+    warnings: 'off',
 };

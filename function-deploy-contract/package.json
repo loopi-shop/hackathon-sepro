@@ -9,7 +9,7 @@
     "firebase-functions": "^4.5.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "firebase deploy --only functions",
     "serve": "npm --prefix functions run serve"
   },
   "author": "",

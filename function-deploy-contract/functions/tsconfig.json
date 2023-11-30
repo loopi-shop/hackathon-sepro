@@ -26,6 +26,9 @@
     "strictPropertyInitialization": false,
     "target": "es2020"
   },
+  "files": [
+    "./hardhat.config.ts"
+  ],
   "include": [
     "src"
   ]

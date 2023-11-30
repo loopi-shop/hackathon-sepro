@@ -1,0 +1,10 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "CTRStorage",
+  "sourceName": "contracts/trex/registry/storage/CTRStorage.sol",
+  "abi": [],
+  "bytecode": "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea26469706673582212201460ebcbdf481b524d3b702bbe08fda5aa842bb0d22773e5dc99f14c3991722664736f6c63430008130033",
+  "deployedBytecode": "0x6080604052600080fdfea26469706673582212201460ebcbdf481b524d3b702bbe08fda5aa842bb0d22773e5dc99f14c3991722664736f6c63430008130033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

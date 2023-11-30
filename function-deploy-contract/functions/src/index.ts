@@ -2,8 +2,7 @@ import { onRequest } from 'firebase-functions/v2/https';
 import express, { Request, Response } from 'express';
 // @ts-ignore
 import { ethers, network, run } from 'hardhat';
-import DefaultCompliance from '../contracts/DefaultCompliance.json';
-import Receivable from '../contracts/Receivable.json';
+import { exec } from 'child_process';
 
 const app = express();
 
@@ -12,38 +11,38 @@ app.use((req, res, next) => {
 });
 
 app.post('', async (req: Request, res: Response) => {
-    const [deployer] = await ethers.getSigners();
-    const defaultComplianceFactory = await ethers.getContractFactoryFromArtifact(DefaultCompliance, deployer);
-
-    const defaultCompliance = await defaultComplianceFactory.deploy();
-
-    console.log(`Deployed defaultCompliance at ${defaultCompliance.address}`);
-    console.log(`(tx hash: ${defaultCompliance.deployTransaction.hash})`);
-
-    await defaultCompliance.deployTransaction.wait(1);
-
     const {
+        blockListCountryCode,
         decimals,
-        endTimestamp,
-        endPoolTimestamp,
+        duration,
         identityRegistry,
         name,
         maxAssets,
-        minAssets,
-        minDeposit,
         stableToken,
         startTimestamp,
         symbol,
         yieldPercentage,
     } = req.body;
 
+    const [deployer] = await ethers.getSigners();
+    const defaultComplianceFactory = await ethers.getContractFactory('ComplianceTpft', deployer);
+
+    const defaultCompliance = await defaultComplianceFactory.deploy(blockListCountryCode);
+
+    console.log(`Deployed defaultCompliance at ${defaultCompliance.address}`);
+    console.log(`(tx hash: ${defaultCompliance.deployTransaction.hash})`);
+
+    await defaultCompliance.deployTransaction.wait(1);
+
     const params = [
         name,
         symbol,
         decimals,
+        startTimestamp,
+        duration,
         stableToken,
         yieldPercentage,
-        [startTimestamp, endTimestamp, endPoolTimestamp, minDeposit, minAssets, maxAssets],
+        maxAssets,
         identityRegistry,
         defaultCompliance.address,
         ethers.constants.AddressZero,
@@ -51,7 +50,7 @@ app.post('', async (req: Request, res: Response) => {
 
     console.log('Trying to deploy token with the following params:', JSON.stringify(params));
 
-    const tokenContractFactory = await ethers.getContractFactoryFromArtifact(Receivable, deployer);
+    const tokenContractFactory = await ethers.getContractFactory('FederalPublicTitlePermissioned', deployer);
     const tokenImplementation = await tokenContractFactory.deploy(...params, { gasLimit: 7000000 });
 
     console.log(`Deployed Token at ${tokenImplementation.address}`);
@@ -59,10 +58,10 @@ app.post('', async (req: Request, res: Response) => {
 
     await tokenImplementation.deployTransaction.wait(1);
 
-    const addedAgent = await tokenImplementation.connect(deployer).addAgent(deployer.address);
+    verifyContract(tokenImplementation.address, params)
+        .catch((error) => console.log(error));
 
-    console.log(`Added agent ${deployer.address} to Token ${tokenImplementation.address}`);
-    console.log(`(tx hash: ${addedAgent.hash})`);
+    res.setHeader('Access-Control-Allow-Origin', '"*"');
 
     res.json({
         defaultCompliance: defaultCompliance.address,
@@ -70,4 +69,31 @@ app.post('', async (req: Request, res: Response) => {
     });
 });
 
-exports.deploy = onRequest(app);
+const verifyContract = async (contractAddress: string, args: any[]) => {
+    const chainId = network.config.chainId!;
+
+    if (chainId !== 137 && chainId !== 80001) return;
+
+    console.log('Verifying contract...');
+
+    try {
+        const command = `npx hardhat verify:verify --address ${contractAddress} --constructor-args ${args.join(',')}`;
+
+        exec(command, (err, stdout, stderr) => {
+            if (err) {
+                console.error(err);
+            } else {
+                console.log(`stdout: ${stdout}`);
+                console.log(`stderr: ${stderr}`);
+            }
+        });
+    } catch (error: any) {
+        if (error.message.toLowerCase().includes('already verified')) {
+            console.log('Already verified!');
+        } else {
+            console.log(error);
+        }
+    }
+};
+
+exports.deploy = onRequest({ timeoutSeconds: 300 }, app);
