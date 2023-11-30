@@ -4,6 +4,22 @@ import investmentsRepository from 'src/repositories/investments.repository';
 import { useAuth } from 'src/hooks/use-auth';
 import { Interface, JsonRpcProvider, Wallet } from 'ethers';
 import BigNumber from 'bignumber.js';
+import axios from 'axios';
+
+/**
+ * @typedef TPF_API
+ * @property {number[]} blockListCountryCode
+ * @property {number} decimals
+ * @property {number} duration Duration Days
+ * @property {string} identityRegistry address of idendity
+ * @property {string} name
+ * @property {string} maxAssets Numeric string
+ * @property {string} stableToken Numeric string
+ * @property {string} startTimestamp epoc
+ * @property {string} stableAddress Numeric string
+ * @property {string} symbol
+ * @property {string} yieldPercentage Numeric string **6 decimals**
+ */
 
 const TPF_ABI = [
   {
@@ -168,6 +184,15 @@ const handlers = {
       }
     };
   },
+  [HANDLERS.CREATE]: (state, action) => {
+    return {
+      ...state,
+      tpf: {
+        isLoading: action.isLoading,
+        data: action.payload,
+      }
+    };
+  },
 };
 
 const reducer = (state, action) => (
@@ -219,18 +244,73 @@ export const TPFProvider = (props) => {
   const { isAuthenticated } = useAuth();
   const providerRef = useRef(new JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL, Number(process.env.NEXT_PUBLIC_CHAIN_ID)));
 
-  const create = async (tpf) => {
+  /**
+   * @param {TPF_API} tpf 
+   */
+  const register = async (tpf) => {
+    const api_url = process.env.NEXT_PUBLIC_DEPLOY_CONTRACT_API_URL;
+    const { data: output } = await axios.post(api_url, tpf);
+    return output;
+  }
+
+  /**
+   * @param {Omit<import("src/repositories/investments.repository").TPF, "id">} tpf 
+   */
+  const createWithDefaults = async (tpf) => {
     dispatch({
       type: HANDLERS.CREATE,
       isLoading: true,
       payload: null,
     });
-    const created = await investmentsRepository.create(tpf);
-    dispatch({
-      type: HANDLERS.CREATE,
-      isLoading: false,
-      payload: created,
-    });
+    try {
+      /**
+       * @type {TPF_API}
+       */
+      const payloadAPI = {
+        decimals: 6,
+        blockListCountryCode: tpf.blocklistCountryCode,
+        duration: tpf.durationDays,
+        identityRegistry: process.env.NEXT_PUBLIC_IDENTITY_REGISTRY,
+        maxAssets: tpf.maxAssets,
+        name: tpf.name,
+        stableAddress: process.env.NEXT_PUBLIC_BRLX_CONTRACT,
+        stableToken: process.env.NEXT_PUBLIC_BRLX_CONTRACT,
+        symbol: tpf.symbol,
+        startTimestamp: parseInt(Date.now() / 1000),
+        yieldPercentage: tpf.yield * 10 ** 4,
+      }
+      const outputCreatedContract = await register(payloadAPI);
+      console.log(`outputCreatedContract:`, outputCreatedContract);
+      /**
+       * @type {Omit<import("src/repositories/investments.repository").TPF, "id">} 
+       */
+      const tpfFilled = {
+        asset: payloadAPI.stableToken,
+        decimals: payloadAPI.decimals,
+        contractAddress: outputCreatedContract.contractAddress,
+        durationDays: tpf.durationDays,
+        maxAssets: tpf.maxAssets,
+        name: tpf.name,
+        startTimestamp: payloadAPI.startTimestamp,
+        symbol: tpf.symbol,
+        yield: tpf.yield,
+        _identityRegistry: payloadAPI.identityRegistry,
+        _compliance: outputCreatedContract.defaultCompliance,
+      };
+      const created = tpfFilled; // await investmentsRepository.create(tpfFilled);
+      dispatch({
+        type: HANDLERS.CREATE,
+        isLoading: false,
+        payload: created,
+      });
+    } catch (error) {
+      dispatch({
+        type: HANDLERS.CREATE,
+        isLoading: false,
+        payload: null,
+      });
+      throw error;
+    }
   }
 
   const list = async () => {
@@ -355,7 +435,7 @@ export const TPFProvider = (props) => {
       value={{
         ...state,
         list,
-        create,
+        create: createWithDefaults,
         invest,
         getPrice,
         approve,
