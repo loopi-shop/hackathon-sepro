@@ -4,9 +4,9 @@ import { styled } from '@mui/material/styles';
 import { withAuthGuard } from 'src/hocs/with-auth-guard';
 import { SideNav } from './side-nav';
 import { TopNav } from './top-nav';
-import {items} from "./config";
-import {useAuth} from "../../hooks/use-auth";
-import {useRouter} from "next/router";
+import { items } from "./config";
+import { useAuth } from "../../hooks/use-auth";
+import { useRouter } from "next/router";
 
 const SIDE_NAV_WIDTH = 280;
 
@@ -48,14 +48,14 @@ export const Layout = withAuthGuard((props) => {
     [pathname]
   );
 
-  if(pageConfig.roles && !pageConfig.roles?.includes(user?.role)) {
-    if(!user) {
+  if (pageConfig?.roles && !pageConfig.roles?.includes(user?.role)) {
+    if (!user) {
       router.replace('/auth/login')
-          .catch(console.error);
+        .catch(console.error);
       return <></>;
     }
 
-    console.log(`Forbidden access to ${pathname}, redirecting`, {user, pageConfig});
+    console.log(`Forbidden access to ${pathname}, redirecting`, { user, pageConfig });
     router
       .replace({
         pathname: '/404',

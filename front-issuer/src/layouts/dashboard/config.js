@@ -2,6 +2,7 @@ import ChartBarIcon from '@heroicons/react/24/solid/ChartBarIcon';
 import CogIcon from '@heroicons/react/24/solid/CogIcon';
 import UsersIcon from '@heroicons/react/24/solid/UsersIcon';
 import TableCellsIcon from '@heroicons/react/24/solid/TableCellsIcon';
+import PlusCircleIcon from '@heroicons/react/24/solid/PlusCircleIcon';
 import { SvgIcon } from '@mui/material';
 import { RoleEnum } from "../../contexts/auth-context";
 
@@ -32,7 +33,17 @@ export const items = [
       <SvgIcon fontSize="small">
         <TableCellsIcon />
       </SvgIcon>
-    )
+    ),
+  },
+  {
+    title: 'Registrar Título',
+    path: '/tpf/create',
+    roles: [RoleEnum.ADMIN],
+    icon: (
+      <SvgIcon fontSize="small">
+        <PlusCircleIcon />
+      </SvgIcon>
+    ),
   },
   {
     title: 'Tokens',
