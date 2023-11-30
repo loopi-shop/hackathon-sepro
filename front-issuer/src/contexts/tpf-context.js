@@ -4,6 +4,7 @@ import investmentsRepository from 'src/repositories/investments.repository';
 import { useAuth } from 'src/hooks/use-auth';
 import { Interface, JsonRpcProvider, Wallet } from 'ethers';
 import BigNumber from 'bignumber.js';
+import axios from 'axios';
 
 /**
  * @typedef TPF_API
@@ -248,15 +249,7 @@ export const TPFProvider = (props) => {
    */
   const register = async (tpf) => {
     const api_url = process.env.NEXT_PUBLIC_DEPLOY_CONTRACT_API_URL;
-    const response = await fetch(api_url, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(tpf)
-    });
-    const output = await response.json();
+    const { data: output } = await axios.post(api_url, tpf);
     return output;
   }
 

@@ -16,6 +16,7 @@ const Page = () => {
   const formik = useFormik({
     initialValues: {
       blocklistCountryCode: [''],
+      startDate: new Date(),
     },
     validationSchema: Yup.object({
       blocklistCountryCode: Yup.array(Yup.string()),
@@ -75,7 +76,7 @@ const Page = () => {
     sm: 6,
     xs: 12,
   }
-
+  // colocar prefixo LTN no nome e no simbolo
   return (
     <>
       <Head>
@@ -99,7 +100,7 @@ const Page = () => {
             >
               <Stack spacing={1}>
                 <Typography variant="h4">
-                  Cadastro de Título
+                  Cadastro de Título Público LTN
                 </Typography>
               </Stack>
             </Stack>
@@ -120,6 +121,7 @@ const Page = () => {
                     helperText={formik.touched.name && formik.errors.name}
                     name="name"
                     label="Nome"
+                    prefix='LTN'
                     fullWidth
                     value={formik.values.name}
                     onChange={formik.handleChange}
@@ -135,11 +137,29 @@ const Page = () => {
                     helperText={formik.touched.symbol && formik.errors.symbol}
                     name="symbol"
                     label="Símbolo"
+                    prefix='LTN'
                     fullWidth
                     value={formik.values.symbol}
                     inputProps={{ style: { textTransform: "uppercase" } }}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
+                  />
+                </Grid>
+                <Grid
+                  item
+                  {...gridItemSize}
+                >
+                  <TextField
+                    error={!!(formik.touched.startDate && formik.errors.startDate)}
+                    helperText={formik.touched.startDate && formik.errors.startDate}
+                    name="startDate"
+                    label="Data de Inicio"
+                    fullWidth
+                    type="date"
+                    value={formik.values.startDate}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    InputLabelProps={{ shrink: true }}
                   />
                 </Grid>
                 <Grid
