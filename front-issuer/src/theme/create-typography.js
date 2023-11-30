@@ -18,39 +18,54 @@ export const createTypography = (theme) => {
   const fontSizeScaleUp09 = multiplyFontSize(fontSizeBasePx, 'px', 5.16);
   const fontSizeScaleUp10 = multiplyFontSize(fontSizeBasePx, 'px', 6.192);
   const fontSizeScaleUp11 = multiplyFontSize(fontSizeBasePx, 'px', 7.43);
+
+  const fontWeightThin = 100;
+  const fontWeightExtraLight = 200;
+  const fontWeightLight = 300;
+  const fontWeightRegular = 400;
+  const fontWeightMedium = 500;
+  const fontWeightSemiBold = 600;
+  const fontWeightBold = 700;
+  const fontWeightExtraBold = 800;
+  const fontWeightBlack = 900;
+
+  const fontLineHeightLow = 1.15;
+  const fontLineHeightMedium = 1.45;
+  const fontLineHeightHigh = 1.85;
+
   return {
     fontFamily: 'Rawline, "Raleway", sans-serif',
     fontSize: fontSizeBasePx,
+    htmlFontSize: fontSizeBasePx,
+    fontWeightBold,
+    fontWeightLight,
+    fontWeightMedium,
+    fontWeightRegular,
     body1: {
-      fontSize: '1rem',
       fontWeight: 400,
       lineHeight: 1.5
     },
     body2: {
-      fontSize: '0.875rem',
       fontWeight: 400,
       lineHeight: 1.57
     },
     button: {
-      fontWeight: 600
+      fontSize: fontSizeScaleUp01,
+      fontWeight: fontWeightSemiBold,
     },
     caption: {
-      fontSize: '0.75rem',
       fontWeight: 500,
       lineHeight: 1.66
     },
     subtitle1: {
-      fontSize: '1rem',
       fontWeight: 500,
       lineHeight: 1.57
     },
     subtitle2: {
-      fontSize: '0.875rem',
       fontWeight: 500,
       lineHeight: 1.57
     },
     overline: {
-      fontSize: '0.75rem',
       fontWeight: 600,
       letterSpacing: '0.5px',
       lineHeight: 2.5,
@@ -58,58 +73,64 @@ export const createTypography = (theme) => {
     },
     h1: {
       fontFamily: 'Rawline, "Raleway",  sans-serif',
-      fontWeight: 700,
+      fontWeight: fontWeightMedium,
       fontSize: fontSizeScaleUp04,
-      lineHeight: 1.2,
+      lineHeight: fontLineHeightLow,
       [theme.breakpoints.up('sm')]: {
         fontSize: fontSizeScaleUp06,
+        fontWeight: fontWeightLight,
       },
     },
     h2: {
       fontFamily: 'Rawline, "Raleway",  sans-serif',
-      fontWeight: 700,
+      fontWeight: fontWeightSemiBold,
       fontSize: fontSizeScaleUp03,
-      lineHeight: 1.2,
+      lineHeight: fontLineHeightLow,
       [theme.breakpoints.up('sm')]: {
         fontSize: fontSizeScaleUp05,
+        fontWeight: fontWeightRegular,
       },
     },
     h3: {
       fontFamily: 'Rawline, "Raleway",  sans-serif',
-      fontWeight: 700,
+      fontWeight: fontWeightBold,
       fontSize: fontSizeScaleUp03,
-      lineHeight: 1.2,
+      lineHeight: fontLineHeightLow,
       [theme.breakpoints.up('sm')]: {
         fontSize: fontSizeScaleUp04,
+        fontWeight: fontWeightMedium,
       },
     },
     h4: {
       fontFamily: 'Rawline, "Raleway",  sans-serif',
-      fontWeight: 700,
+      fontWeight: fontWeightBold,
       fontSize: fontSizeScaleUp01,
-      lineHeight: 1.2,
+      lineHeight: fontLineHeightLow,
       [theme.breakpoints.up('sm')]: {
         fontSize: fontSizeScaleUp03,
+        fontWeight: fontWeightSemiBold,
       },
     },
     h5: {
       fontFamily: 'Rawline, "Raleway",  sans-serif',
-      fontWeight: 700,
+      fontWeight: fontWeightExtraBold,
       fontSize: fontSizeBasePx,
-      lineHeight: 1.2,
+      lineHeight: fontLineHeightLow,
       textTransform: 'uppercase',
       [theme.breakpoints.up('sm')]: {
         fontSize: fontSizeScaleUp02,
+        fontWeight: fontWeightBold,
       },
     },
     h6: {
       fontFamily: 'Rawline, "Raleway",  sans-serif',
-      fontWeight: 700,
+      fontWeight: fontWeightExtraBold,
       fontSize: fontSizeScaleDown01,
-      lineHeight: 1.2,
+      lineHeight: fontLineHeightLow,
       textTransform: 'uppercase',
       [theme.breakpoints.up('sm')]: {
         fontSize: fontSizeScaleUp01,
+        fontWeight: fontWeightExtraBold,
       },
     }
   };
