@@ -11,7 +11,6 @@ import {
   DialogContentText,
   Slide,
   Icon,
-  Skeleton,
   Typography,
   CircularProgress,
   Paper,
