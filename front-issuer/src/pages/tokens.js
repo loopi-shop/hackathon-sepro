@@ -2,10 +2,10 @@ import { Layout as DashboardLayout } from '../layouts/dashboard/layout';
 import { useEffect, useState } from 'react';
 import { ethers } from "ethers";
 import { Box, Container, Grid, Stack, Typography } from '@mui/material';
-import Head from 'next/head';
 import { TokenCard } from '../sections/tokens/token-card';
 import {useAuth} from "../hooks/use-auth";
 import {RoleEnum} from "../contexts/auth-context";
+import { PageTitle } from 'src/components/page-title';
 
 const Page = () => {
   const [account, setAccount] = useState();
@@ -59,11 +59,7 @@ const Page = () => {
 
   return (
     <>
-      <Head>
-        <title>
-          Token List | Devias Kit
-        </title>
-      </Head>
+      <PageTitle>Lista de tokens</PageTitle>
       <Box component="main"
         sx={{
           flexGrow: 1,

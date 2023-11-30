@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import Head from 'next/head';
 import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIcon';
 import ArrowUpOnSquareIcon from '@heroicons/react/24/solid/ArrowUpOnSquareIcon';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
@@ -10,6 +9,7 @@ import { CustomersTable } from 'src/sections/customer/customers-table';
 import { CustomersSearch } from 'src/sections/customer/customers-search';
 import { applyPagination } from 'src/utils/apply-pagination';
 import usersRepository from "../repositories/users.repository";
+import { PageTitle } from 'src/components/page-title';
 
 const useCustomers = (data, page, rowsPerPage) => {
   return useMemo(
@@ -67,11 +67,7 @@ const Page = () => {
 
   return (
     <>
-      <Head>
-        <title>
-          Customers | Devias Kit
-        </title>
-      </Head>
+      <PageTitle>Clientes</PageTitle>
       <Box
         component="main"
         sx={{

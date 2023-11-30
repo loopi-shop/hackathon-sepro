@@ -1,4 +1,3 @@
-import Head from 'next/head';
 import { subDays, subHours } from 'date-fns';
 import { Box, Container, Unstable_Grid2 as Grid } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
@@ -10,16 +9,13 @@ import { OverviewTasksProgress } from 'src/sections/overview/overview-tasks-prog
 import { OverviewTotalCustomers } from 'src/sections/overview/overview-total-customers';
 import { OverviewTotalProfit } from 'src/sections/overview/overview-total-profit';
 import { OverviewTraffic } from 'src/sections/overview/overview-traffic';
+import { PageTitle } from 'src/components/page-title';
 
 const now = new Date();
 
 const Page = () => (
   <>
-    <Head>
-      <title>
-        Overview | Devias Kit
-      </title>
-    </Head>
+    <PageTitle>Visão Geral</PageTitle>
     <Box
       component="main"
       sx={{
