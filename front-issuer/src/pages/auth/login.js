@@ -6,6 +6,7 @@ import { useAuth } from "src/hooks/use-auth";
 import { Layout as AuthLayout } from "src/layouts/auth/layout";
 import { useSDK } from "@metamask/sdk-react";
 import { PageTitle } from "src/components/page-title";
+import { MetamaskButton } from "src/components/metamask-button";
 
 const Page = () => {
   const router = useRouter();
