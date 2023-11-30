@@ -1,19 +1,24 @@
 import Head from 'next/head';
-import { Box, Button, Container, Grid, Stack, SvgIcon, TextField, Typography } from '@mui/material';
+import { Box, Button, Container, Grid, Stack, TextField, Typography } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { NumericFormat } from 'react-number-format';
-import { addDays, format } from 'date-fns';
+import { addDays, format, differenceInDays } from 'date-fns';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { CountryISOSelect } from 'src/components/country-iso-select';
+import { useTPF } from 'src/hooks/use-tpf';
+import { useSnackbar } from 'notistack';
 
 const Page = () => {
+  const { create } = useTPF();
+  const { enqueueSnackbar } = useSnackbar();
+
   const formik = useFormik({
     initialValues: {
-      blacklistCountryCode: [''],
+      blocklistCountryCode: [''],
     },
     validationSchema: Yup.object({
-      blacklistCountryCode: Yup.array(Yup.string()),
+      blocklistCountryCode: Yup.array(Yup.string()),
       name: Yup.string().min(1, 'O nome deve conter pelo menos ${min} caractere')
         .required('O nome deve ser informado'),
       symbol: Yup.string().min(1, 'O símbolo deve conter pelo menos ${min} caractere')
@@ -31,6 +36,36 @@ const Page = () => {
     }),
     onSubmit: async (values) => {
       console.log(`submitted:`, values);
+      const yieldPercent = parseInt(values.yieldPercent.replace('.', ''));
+      const maxAssets = parseInt(values.maxAssets.replace('.', ''));
+      const duration = differenceInDays(new Date(values.expirationDate), new Date());
+      const tpfPayload = {
+        yield: yieldPercent,
+        durationDays: duration,
+        blocklistCountryCode: values.blocklistCountryCode
+          .filter((b) => b !== '')
+          .map(Number),
+        symbol: values.symbol,
+        name: values.name,
+        maxAssets,
+      }
+      console.log(`create payload:`, tpfPayload);
+      try {
+        await create(tpfPayload);
+        enqueueSnackbar(`Título criado (ENDERECO)`, {
+          variant: "info",
+          autoHideDuration: 10000,
+        });
+        formik.setValues({
+          blocklistCountryCode: [''],
+        });
+      } catch (error) {
+        console.error(`error on create`, error);
+        enqueueSnackbar(`Erro para criar o título`, {
+          variant: "error",
+          autoHideDuration: 10000,
+        });
+      }
     }
   });
 
@@ -102,6 +137,7 @@ const Page = () => {
                     label="Símbolo"
                     fullWidth
                     value={formik.values.symbol}
+                    inputProps={{ style: { textTransform: "uppercase" } }}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                   />
@@ -146,16 +182,19 @@ const Page = () => {
                   item
                   {...gridItemSize}
                 >
-                  <TextField
+                  <NumericFormat
                     error={!!(formik.touched.maxAssets && formik.errors.maxAssets)}
                     helperText={formik.touched.maxAssets && formik.errors.maxAssets}
-                    name="maxAssets"
-                    label="Emissão Máxima"
-                    type="number"
                     fullWidth
-                    value={formik.values.maxAssets}
-                    onChange={formik.handleChange}
+                    label="Emissão Máxima"
+                    name="maxAssets"
                     onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    value={formik.values.maxAssets}
+                    decimalScale={6}
+                    fixedDecimalScale
+                    customInput={TextField}
+                    valueIsNumericString={false}
                   />
                 </Grid>
                 <Grid
@@ -163,13 +202,13 @@ const Page = () => {
                   {...gridItemSize}
                 >
                   <CountryISOSelect
-                    error={!!(formik.touched.blacklistCountryCode && formik.errors.blacklistCountryCode)}
-                    helperText={formik.touched.blacklistCountryCode && formik.errors.blacklistCountryCode}
-                    name="blacklistCountryCode"
-                    label="Blacklist País"
+                    error={!!(formik.touched.blocklistCountryCode && formik.errors.blocklistCountryCode)}
+                    helperText={formik.touched.blocklistCountryCode && formik.errors.blocklistCountryCode}
+                    name="blocklistCountryCode"
+                    label="Blocklist País"
                     fullWidth
                     multiple
-                    value={formik.values.blacklistCountryCode}
+                    value={formik.values.blocklistCountryCode}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                   />
