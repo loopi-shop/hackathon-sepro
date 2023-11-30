@@ -44,7 +44,7 @@ const App = (props) => {
           <MetaMaskProvider debug={false} sdkOptions={{
             checkInstallationImmediately: false,
             dappMetadata: {
-              name: "Hackaton Sepro",
+              name: "Hackaton Serpro",
               url: typeof window !== "undefined" ? window.location.host : 'http://localhost:3000',
             }
           }}>
