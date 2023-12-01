@@ -21,22 +21,30 @@ const tableHeaders = [
     description: 'Data de vencimento',
     roles: [RoleEnum.COMMON, RoleEnum.ADMIN],
     format: ({ rowData }) => {
-      const expirationDate = addDays(rowData.startTimestamp, rowData.durationDays);
+      // FIX addDays returning date -1
+      const expirationDate = addDays(rowData.startTimestamp, rowData.durationDays + 1);
       return format(expirationDate, 'dd/MM/yyyy');
     }
   },
   {
-    key: 'maxAssets',
-    description: 'Total Emitido (BRLX)',
+    key: 'totalAssets',
+    description: 'Total Arrecadado (BRLX)',
     roles: [RoleEnum.ADMIN],
     format: ({ rowData, value }) => {
-      return (value / 10 ** rowData.decimals).toFixed(rowData.decimals);
+      return value < 0
+        ? 'Carregando...'
+        : (value / 10 ** rowData.decimals).toFixed(rowData.decimals)
     }
   },
   {
-    key: 'minimumValue',
-    description: 'Valor mínimo (BRLX)',
-    roles: [RoleEnum.COMMON, RoleEnum.ADMIN]
+    key: 'totalSupply',
+    description: 'Total Emitido',
+    roles: [RoleEnum.COMMON, RoleEnum.ADMIN],
+    format: ({ rowData, value }) => {
+      return value < 0
+        ? 'Carregando...'
+        : (value / 10 ** rowData.decimals).toFixed(rowData.decimals)
+    }
   },
   {
     key: 'yield',
@@ -47,8 +55,23 @@ const tableHeaders = [
   {
     key: 'unitPrice',
     description: 'Preço Unitário',
-    roles: [RoleEnum.COMMON, RoleEnum.ADMIN]
-  }
+    roles: [RoleEnum.COMMON, RoleEnum.ADMIN],
+    format: ({ rowData, value }) => {
+      return value < 0
+        ? 'Carregando...'
+        : (value / 10 ** rowData.decimals).toFixed(rowData.decimals)
+    }
+  },
+  {
+    key: 'balance',
+    description: 'Saldo Disponível (BRLX)',
+    roles: [RoleEnum.COMMON, RoleEnum.ADMIN],
+    format: ({ rowData, value }) => {
+      return value < 0
+        ? 'Carregando...'
+        : (value / 10 ** rowData.decimals).toFixed(rowData.decimals)
+    }
+  },
 ];
 
 export const TPFTable = (props) => {
@@ -56,6 +79,9 @@ export const TPFTable = (props) => {
     count = 0,
     items = [],
     unitPriceList = [],
+    totalAssetsList = [],
+    totalSupplyList = [],
+    balanceList = [],
     onPageChange = () => { },
     onRowsPerPageChange,
     page = 0,
@@ -118,7 +144,7 @@ export const TPFTable = (props) => {
   return (
     <>
       <CardsList>
-        {items.map(TPFItemCard(unitPriceList, headers, settleLoading, isAdmin, settle, buy))}
+        {items.map(TPFItemCard(unitPriceList, totalAssetsList, totalSupplyList, balanceList, headers, settleLoading, isAdmin, settle, buy))}
       </CardsList>
       <TablePagination
         component="div"
@@ -150,6 +176,9 @@ TPFTable.propTypes = {
   count: PropTypes.number,
   items: PropTypes.array,
   unitPriceList: PropTypes.array,
+  totalAssetsList: PropTypes.array,
+  totalSupplyList: PropTypes.array,
+  balanceList: PropTypes.array,
   onDeselectAll: PropTypes.func,
   onDeselectOne: PropTypes.func,
   onPageChange: PropTypes.func,

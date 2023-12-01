@@ -4,8 +4,17 @@ import { Button, CircularProgress, Icon, SvgIcon } from '@mui/material';
 import { CardItem } from 'src/components/cards';
 
 export const TPFItemCard =
-  (unitPriceList, headers, settleLoading, isAdmin, settle, buy) => (item) => {
+  (unitPriceList, totalAssetsList, totalSupplyList, balanceList, headers, settleLoading, isAdmin, settle, buy) => (item) => {
     const unitPrice = unitPriceList.find((up) => up.symbol === item.symbol)?.price;
+    const totalAssets = totalAssetsList.find((up) => up.symbol === item.symbol)?.totalAssets;
+    const totalSupply = totalSupplyList.find((up) => up.symbol === item.symbol)?.totalSupply;
+    const balance = balanceList.find((up) => up.symbol === item.symbol)?.balance;
+    const itemComplement = {
+      totalAssets,
+      totalSupply,
+      balance,
+      unitPrice,
+    }
     return (
       <CardItem key={item.symbol} title={item.symbol}>
         <div
@@ -48,13 +57,9 @@ export const TPFItemCard =
               </b>
               <br />
               <span style={{ fontSize: '14px', lineHeight: '20px' }}>
-                {header.key === 'unitPrice'
-                  ? !unitPrice
-                    ? 'Carregando...'
-                    : (unitPrice / 10 ** item.decimals).toFixed(item.decimals)
-                  : header.format
-                  ? header.format({ rowData: item, value: item[header.key] })
-                  : item[header.key]}
+                {header.format
+                  ? header.format({ rowData: item, value: item[header.key] ?? itemComplement[header.key] })
+                  : item[header.key] ?? itemComplement[header.key]}
               </span>
             </p>
           ))}
