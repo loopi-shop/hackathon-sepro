@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import { TablePagination } from '@mui/material';
 import { useMemo } from 'react';
 import { RoleEnum } from 'src/contexts/auth-context';
 import { useAuth } from 'src/hooks/use-auth';
@@ -10,6 +9,7 @@ import { useSnackbar } from 'notistack';
 import { TPFItemCard } from './tpf-item-card';
 import { CardsList } from 'src/components/cards';
 import { TPFHolders } from './tpf-holders';
+import { TPFPagination } from './tpf-pagination';
 
 function isLoadingValue(value) {
   return value === null || value === undefined || value < 0;
@@ -88,10 +88,10 @@ export const TPFTable = (props) => {
     totalAssetsList = [],
     totalSupplyList = [],
     balanceList = [],
-    onPageChange = () => { },
+    onPageChange = (event, value) => { },
     onRowsPerPageChange,
     page = 0,
-    rowsPerPage = 0,
+    rowsPerPage = 6,
     handleOpenBuy,
     embedded = false
   } = props;
@@ -168,27 +168,11 @@ export const TPFTable = (props) => {
         {items.map(TPFItemCard(unitPriceList, totalAssetsList, totalSupplyList, balanceList, headers, settleLoading, isAdmin, settle, buy, handleOpenHolders))}
       </CardsList>
       {!embedded && (
-        <TablePagination
-          component="div"
-          count={count}
-          onPageChange={onPageChange}
-          onRowsPerPageChange={onRowsPerPageChange}
+        <TPFPagination
           page={page}
           rowsPerPage={rowsPerPage}
-          rowsPerPageOptions={[8, 16, 64]}
-          labelRowsPerPage="Linhas por página:"
-          getItemAriaLabel={(type) => {
-            switch (type) {
-              case 'first':
-                return 'Primeira página';
-              case 'last':
-                return 'Última página';
-              case 'next':
-                return 'Próxima página';
-              case 'previous':
-                return 'Página anterior';
-            }
-          }}
+          count={count}
+          onPageChange={onPageChange}
         />
       )}
     </>

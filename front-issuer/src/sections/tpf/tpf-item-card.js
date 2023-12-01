@@ -19,7 +19,7 @@ export const TPFItemCard =
 
     const withdraw = () => {
       console.log(`Withdraw of token ${item.contractAddress}`);
-    }
+    };
 
     return (
       <CardItem key={item.symbol} title={item.symbol}>
@@ -64,7 +64,10 @@ export const TPFItemCard =
               <br />
               <span style={{ fontSize: '14px', lineHeight: '20px' }}>
                 {header.format
-                  ? header.format({ rowData: item, value: item[header.key] ?? itemComplement[header.key] })
+                  ? header.format({
+                    rowData: item,
+                    value: item[header.key] ?? itemComplement[header.key]
+                  })
                   : item[header.key] ?? itemComplement[header.key]}
               </span>
             </p>
@@ -85,19 +88,21 @@ export const TPFItemCard =
               style={{ borderRadius: '50px', maxWidth: 'fit-content' }}
               onClick={() => (isAdmin ? settle(item) : buy(item))}
               startIcon={
-                <Icon style={{ width: '28px', height: '28px' }}>
-                  <SvgIcon fontSize="medium" style={{ width: '24px', height: '24px' }}>
-                    <FontAwesomeIcon icon={faCartShopping} />
-                  </SvgIcon>
-                </Icon>
+                <SvgIcon fontSize="small">
+                  <FontAwesomeIcon icon={faCartShopping} />
+                </SvgIcon>
               }
             >
               {settleLoading[item.symbol] && <CircularProgress size={24} sx={{ mr: 1 }} />}
               {isAdmin ? 'Liquidar' : 'Comprar'}
             </Button>
-            <IconButton color="primary" style={{ cursor: 'pointer' }} onClick={isAdmin ? holders : withdraw}>
-              <SvgIcon>
-                <FontAwesomeIcon icon={isAdmin ? faUsers : faMoneyBillTransfer} />
+            <IconButton
+              color="primary"
+              style={{ cursor: 'pointer' }}
+              onClick={isAdmin ? holders : withdraw}
+            >
+              <SvgIcon fontSize='medium'>
+                <FontAwesomeIcon icon={isAdmin ? faUsers : faShareNodes} />
               </SvgIcon>
             </IconButton>
           </p>
