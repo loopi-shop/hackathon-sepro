@@ -102,6 +102,10 @@ export const TPFContext = createContext({
    */
   balanceOf: async ({ contractAddress, accountAddress }) => { },
   /**
+   * @returns {Promise<number>}
+   */
+  balanceOfAsset: async ({ contractAddress, accountAddress, assetAddress }) => { },
+  /**
    * @returns {Promise<{ data: string, to: string, nonce: number, value: string }>}
    */
   approve: async ({ amount, contractAddress, asset }) => { },
@@ -113,6 +117,10 @@ export const TPFContext = createContext({
    * @returns {Promise<{ data: string, to: string, nonce: number, value: string }>}
    */
   redeem: async ({ contractAddress, from }) => { },
+  /**
+   * @returns {Promise<{ data: string, to: string, nonce: number, value: string }>}
+   */
+  withdraw: async ({ contractAddress, from, destinationAddress, amount }) => { },
   /**
    * @returns {Promise<number>}
    */
@@ -345,6 +353,37 @@ export const TPFProvider = (props) => {
     }
   }
 
+  const withdraw = async ({ contractAddress, from, destinationAddress, amount }) => {
+    const data = TPFContractInterface.encodeFunctionData("withdrawAssets", [destinationAddress, amount]);
+    const tx = {
+      data,
+      value: "0",
+      to: contractAddress,
+      from: from,
+    };
+    const [nonce, gasPrice] = await Promise.all([
+      providerRef.current.getTransactionCount(receiver).then((curNonce) => curNonce ?? 0),
+      providerRef.current.send("eth_gasPrice", []),
+    ]);
+
+    return {
+      ...tx,
+      nonce: `0x${new BigNumber(nonce).toString(16)}`,
+      gasPrice: gasPrice,
+    }
+  }
+
+  const balanceOfAsset = async ({ contractAddress, accountAddress, assetAddress }) => {
+    const data = TPFContractInterface.encodeFunctionData('balanceOf', [contractAddress]);
+    const response = await providerRef.current.call({
+      to: assetAddress,
+      from: accountAddress,
+      data,
+      value: 0,
+    });
+    return new BigNumber(response).toNumber();
+  }
+
   useEffect(
     () => {
       if (isAuthenticated) list();
@@ -368,6 +407,8 @@ export const TPFProvider = (props) => {
         balanceOf,
         getTotalAssets,
         getTotalSupply,
+        withdraw,
+        balanceOfAsset,
       }}
     >
       {children}
