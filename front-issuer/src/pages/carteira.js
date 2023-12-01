@@ -8,7 +8,7 @@ import { RoleEnum } from '../contexts/auth-context';
 import { PageTitle } from 'src/components/page-title';
 import { CardsList } from 'src/components/cards';
 
-const Page = () => {
+export const WalletPage = ({ embedded }) => {
   const [account, setAccount] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [tokens, setTokens] = useState([]);
@@ -65,36 +65,38 @@ const Page = () => {
   });
 
   return (
-    <>
-      <PageTitle>Minha carteira</PageTitle>
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          py: 8
-        }}
-      >
-        <Container maxWidth="lg">
-          <Stack spacing={3}>
-            <div>
-              <Typography variant="h4" sx={{ mb: 3 }}>
-                Minha carteira
-              </Typography>
-            </div>
-            <div>
-              <CardsList>
-                {tokens.map((token, index) => (
-                  <TokenCard token={token} account={account} key={index} />
-                ))}
-              </CardsList>
-            </div>
-          </Stack>
-        </Container>
-      </Box>
-    </>
+    <Box
+      component="main"
+      sx={{
+        flexGrow: 1,
+        py: 8
+      }}
+    >
+      <Container maxWidth={embedded ? 'xl' : 'lg'}>
+        <Stack spacing={3}>
+          <div>
+            <Typography variant="h4" style={{ fontWeight: 500 }}>
+              Minha carteira
+            </Typography>
+          </div>
+          <div>
+            <CardsList>
+              {tokens.map((token, index) => (
+                <TokenCard token={token} account={account} key={index} />
+              ))}
+            </CardsList>
+          </div>
+        </Stack>
+      </Container>
+    </Box>
   );
 };
 
-Page.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
+WalletPage.getLayout = (page) => (
+  <DashboardLayout>
+    <PageTitle>Minha carteira</PageTitle>
+    {page}
+  </DashboardLayout>
+);
 
-export default Page;
+export default WalletPage;

@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import Head from 'next/head';
-import ArrowPathIcon from '@heroicons/react/24/solid/ArrowPathIcon';
 import _ from 'lodash';
-import { Box, Button, Container, Stack, SvgIcon, Typography } from '@mui/material';
+import { Box, Button, Container, Stack, Typography } from '@mui/material';
 import { useSelection } from 'src/hooks/use-selection';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { TPFTable } from 'src/sections/tpf/tpf-table';
@@ -10,6 +8,7 @@ import { TPFBuy } from 'src/sections/tpf/tpf-buy';
 import { applyPagination } from 'src/utils/apply-pagination';
 import { useTPF } from 'src/hooks/use-tpf';
 import { PageTitle } from 'src/components/page-title';
+import Link from 'next/link';
 
 const useTPFs = (page, rowsPerPage, data) => {
   return useMemo(() => {
@@ -23,7 +22,7 @@ const useTPFIds = (tpfs) => {
   }, [tpfs]);
 };
 
-const Page = () => {
+export const TPFPage = ({ embedded }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(8);
   const [unitPriceList, setUnitPriceList] = useState([]);
@@ -86,7 +85,6 @@ const Page = () => {
 
   return (
     <>
-      <PageTitle>Títulos disponíveis</PageTitle>
       {isOpenBuy && <TPFBuy open={isOpenBuy} handleClose={handleCloseBuy} tpf={buyTPF} />}
       <Box
         component="main"
@@ -104,19 +102,24 @@ const Page = () => {
                 </Typography>
               </Stack>
               <div>
-                <Button
-                  style={{ borderRadius: '50px', padding: '8px 24px' }}
-                  variant="outlined"
-                  color="primary"
-                  onClick={() => {
-                    if (!tpfs?.isLoading) list();
-                  }}
-                >
-                  Atualizar
-                </Button>
+                {embedded ? (
+                  <Link href="/titulo">Ver todos</Link>
+                ) : (
+                  <Button
+                    style={{ borderRadius: '50px', padding: '8px 24px' }}
+                    variant="outlined"
+                    color="primary"
+                    onClick={() => {
+                      if (!tpfs?.isLoading) list();
+                    }}
+                  >
+                    Atualizar
+                  </Button>
+                )}
               </div>
             </Stack>
             <TPFTable
+              embedded={embedded}
               count={tpfs?.data?.length ?? 0}
               items={tpfsPaginated}
               onDeselectAll={tpfsSelection.handleDeselectAll}
@@ -139,6 +142,11 @@ const Page = () => {
   );
 };
 
-Page.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
+TPFPage.getLayout = (page) => (
+  <DashboardLayout>
+    <PageTitle>Títulos disponíveis</PageTitle>
+    {page}
+  </DashboardLayout>
+);
 
-export default Page;
+export default TPFPage;
