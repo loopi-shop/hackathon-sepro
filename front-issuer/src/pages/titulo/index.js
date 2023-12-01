@@ -25,7 +25,7 @@ const useTPFIds = (tpfs) => {
 
 export const TPFPage = ({ embedded }) => {
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(8);
+  const [rowsPerPage, setRowsPerPage] = useState(6);
   const [unitPriceList, setUnitPriceList] = useState([]);
   const [totalAssetsList, setTotalAssetsList] = useState([]);
   const [totalSupplyList, setTotalSupplyList] = useState([]);
