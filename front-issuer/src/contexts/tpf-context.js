@@ -98,6 +98,10 @@ export const TPFContext = createContext({
    */
   getTotalSupply: async ({ contractAddress }) => { },
   /**
+   * @returns {Promise<any>}
+   */
+  getHolders: async ({ contractAddress }) => { },
+  /**
    * @returns {Promise<number>}
    */
   balanceOf: async ({ contractAddress, accountAddress }) => { },
@@ -302,6 +306,17 @@ export const TPFProvider = (props) => {
     return new BigNumber(response).toNumber();
   }
 
+  const getHolders = async ({ contractAddress }) => {
+    const data = TPFContractInterface.encodeFunctionData('holders', []);
+    const response = await providerRef.current.call({
+      to: contractAddress,
+      data,
+      value: 0,
+    });
+    console.log(`holdersResponse:`, response);
+    return response;
+  }
+
   const waitTransaction = async ({ txHash }) => {
     console.info(`waiting transaction...`);
     return providerRef.current.waitForTransaction(txHash);
@@ -368,6 +383,7 @@ export const TPFProvider = (props) => {
         balanceOf,
         getTotalAssets,
         getTotalSupply,
+        getHolders,
       }}
     >
       {children}

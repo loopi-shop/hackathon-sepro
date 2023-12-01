@@ -1,18 +1,20 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUsers, faMoneyBillTransfer, faEllipsisV } from '@fortawesome/free-solid-svg-icons'
-import { Button, CircularProgress, IconButton, SvgIcon } from '@mui/material';
+import { faUsers, faMoneyBillTransfer, faEllipsisV, faCartShopping } from '@fortawesome/free-solid-svg-icons'
+import { Button, CircularProgress, IconButton, Icon, SvgIcon } from '@mui/material';
 import { CardItem } from 'src/components/cards';
 
 export const TPFItemCard =
-  (unitPriceList, totalAssetsList, totalSupplyList, balanceList, headers, settleLoading, isAdmin, settle, buy) => (item) => {
+  (unitPriceList, totalAssetsList, totalSupplyList, balanceList, headers, settleLoading, isAdmin, settle, buy, openHolders) => (item) => {
     const itemComplement = {
       totalAssets: unitPriceList.find((up) => up.symbol === item.symbol)?.price,
       totalSupply: totalAssetsList.find((up) => up.symbol === item.symbol)?.totalAssets,
       balance: totalSupplyList.find((up) => up.symbol === item.symbol)?.totalSupply,
       unitPrice: balanceList.find((up) => up.symbol === item.symbol)?.balance,
     }
+
     const holders = () => {
       console.log(`Show holders list of token ${item.contractAddress}`);
+      openHolders(item);
     }
 
     const withdraw = () => {
@@ -85,7 +87,7 @@ export const TPFItemCard =
               startIcon={
                 <Icon style={{ width: '28px', height: '28px' }}>
                   <SvgIcon fontSize="medium" style={{ width: '24px', height: '24px' }}>
-                    <ShoppingCartIcon />
+                    <FontAwesomeIcon icon={faCartShopping} />
                   </SvgIcon>
                 </Icon>
               }

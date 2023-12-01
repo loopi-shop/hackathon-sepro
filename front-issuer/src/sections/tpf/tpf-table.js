@@ -9,6 +9,7 @@ import { useTPF } from 'src/hooks/use-tpf';
 import { useSnackbar } from 'notistack';
 import { TPFItemCard } from './tpf-item-card';
 import { CardsList } from 'src/components/cards';
+import { TPFHolders } from './tpf-holders';
 
 function isLoadingValue(value) {
   return value === null || value === undefined || value < 0;
@@ -99,6 +100,19 @@ export const TPFTable = (props) => {
   const { redeem, broadcast } = useTPF();
   const { enqueueSnackbar } = useSnackbar();
 
+  const [openHolders, setOpenHolders] = useState(false);
+  const [selectedTPF, setSelectedTPF] = useState(undefined);
+
+  const handleOpenHolders = (tpf) => {
+    setSelectedTPF(tpf);
+    setOpenHolders(true);
+  }
+
+  const closeHolders = () => {
+    setSelectedTPF(undefined);
+    setOpenHolders(false);
+  }
+
   const isAdmin = useMemo(() => {
     return hasRole([RoleEnum.ADMIN]);
   }, [user]);
@@ -149,8 +163,9 @@ export const TPFTable = (props) => {
 
   return (
     <>
+      <TPFHolders open={openHolders} handleClose={closeHolders} tpf={selectedTPF} />
       <CardsList>
-        {items.map(TPFItemCard(unitPriceList, totalAssetsList, totalSupplyList, balanceList, headers, settleLoading, isAdmin, settle, buy))}
+        {items.map(TPFItemCard(unitPriceList, totalAssetsList, totalSupplyList, balanceList, headers, settleLoading, isAdmin, settle, buy, handleOpenHolders))}
       </CardsList>
       {!embedded && (
         <TablePagination
