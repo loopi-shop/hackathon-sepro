@@ -3,8 +3,7 @@ export function CardsList({ children }) {
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-        justifyContent: 'center',
+        gridTemplateColumns: 'repeat(auto-fit, 350px)',
         justifyItems: 'center',
         gap: '40px'
       }}

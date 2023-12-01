@@ -166,17 +166,23 @@ export const TPFBuy = (props) => {
   }, [open, tpf]);
 
   const [lastSimulatedValue, setLastSimulatedValue] = useState(new BigNumber(0));
+  const [isLoadingSimulation, setIsLoadingSimulation] = useState(false);
   const [simulated, setSimulated] = useState(false);
   const simulate = () => {
+    setIsLoadingSimulation(true);
     const amount = new BigNumber(formik.values.amount).shiftedBy(tpf.decimals);
     preview({
       amount: amount.toNumber(),
       contractAddress: tpf.contractAddress,
       timestamp: Date.now() / 1000
-    }).then((quantity) => {
-      setLastSimulatedValue(new BigNumber(quantity).shiftedBy(-tpf.decimals));
-      setSimulated(true);
-    });
+    })
+      .then((quantity) => {
+        setLastSimulatedValue(new BigNumber(quantity).shiftedBy(-tpf.decimals));
+        setSimulated(true);
+      })
+      .finally(() => {
+        setIsLoadingSimulation(false);
+      });
   };
 
   const clearSimulated = () => {
@@ -302,7 +308,7 @@ export const TPFBuy = (props) => {
                   <strong>Você irá receber:</strong> {lastSimulatedValue.toFormat(tpf.decimals)}
                 </DialogContentText>
                 <Box sx={{ display: 'flex', mt: 3, justifyContent: 'center' }}>
-                  <CircularProgress size={24} value={submitProgress} sx={{mr: 1}} /> Carregando...
+                  <CircularProgress size={24} value={submitProgress} sx={{ mr: 1 }} /> Carregando...
                 </Box>
               </>
             ) : (
@@ -316,6 +322,11 @@ export const TPFBuy = (props) => {
                   color="primary"
                   onClick={simulate}
                   style={{ borderRadius: '50px' }}
+                  startIcon={
+                    isLoadingSimulation && (
+                      <CircularProgress size={24} value={submitProgress} sx={{ mr: 1 }} />
+                    )
+                  }
                 >
                   Simular
                 </Button>
