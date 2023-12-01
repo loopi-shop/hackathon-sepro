@@ -1,20 +1,24 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUsers, faMoneyBillTransfer, faEllipsisV } from '@fortawesome/free-solid-svg-icons'
-import { Button, CircularProgress, Icon, SvgIcon } from '@mui/material';
+import { Button, CircularProgress, IconButton, SvgIcon } from '@mui/material';
 import { CardItem } from 'src/components/cards';
 
 export const TPFItemCard =
   (unitPriceList, totalAssetsList, totalSupplyList, balanceList, headers, settleLoading, isAdmin, settle, buy) => (item) => {
-    const unitPrice = unitPriceList.find((up) => up.symbol === item.symbol)?.price;
-    const totalAssets = totalAssetsList.find((up) => up.symbol === item.symbol)?.totalAssets;
-    const totalSupply = totalSupplyList.find((up) => up.symbol === item.symbol)?.totalSupply;
-    const balance = balanceList.find((up) => up.symbol === item.symbol)?.balance;
     const itemComplement = {
-      totalAssets,
-      totalSupply,
-      balance,
-      unitPrice,
+      totalAssets: unitPriceList.find((up) => up.symbol === item.symbol)?.price,
+      totalSupply: totalAssetsList.find((up) => up.symbol === item.symbol)?.totalAssets,
+      balance: totalSupplyList.find((up) => up.symbol === item.symbol)?.totalSupply,
+      unitPrice: balanceList.find((up) => up.symbol === item.symbol)?.balance,
     }
+    const holders = () => {
+      console.log(`Show holders list of token ${item.contractAddress}`);
+    }
+
+    const withdraw = () => {
+      console.log(`Withdraw of token ${item.contractAddress}`);
+    }
+
     return (
       <CardItem key={item.symbol} title={item.symbol}>
         <div
@@ -42,11 +46,11 @@ export const TPFItemCard =
             </p>
           </div>
 
-          <Icon style={{ width: '32px', height: '32px' }} color="primary">
+          <IconButton style={{ width: '32px', height: '32px' }} color="primary">
             <SvgIcon fontSize="medium" style={{ width: '24px', height: '24px' }}>
               <FontAwesomeIcon icon={faEllipsisV} />
             </SvgIcon>
-          </Icon>
+          </IconButton>
         </div>
 
         <div style={{ display: 'grid', gridTemplate: '1fr', gap: '8px' }}>
@@ -82,11 +86,11 @@ export const TPFItemCard =
               {settleLoading[item.symbol] && <CircularProgress size={24} sx={{ mr: 1 }} />}
               {isAdmin ? 'Liquidar' : 'Comprar'}
             </Button>
-            <Icon color="primary" style={{ cursor: 'pointer' }}>
+            <IconButton color="primary" style={{ cursor: 'pointer' }} onClick={isAdmin ? holders : withdraw}>
               <SvgIcon>
                 <FontAwesomeIcon icon={isAdmin ? faUsers : faMoneyBillTransfer} />
               </SvgIcon>
-            </Icon>
+            </IconButton>
           </p>
         </div>
       </CardItem>
