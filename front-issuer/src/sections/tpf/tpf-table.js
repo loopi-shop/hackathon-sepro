@@ -56,7 +56,7 @@ export const TPFTable = (props) => {
     count = 0,
     items = [],
     unitPriceList = [],
-    onPageChange = () => {},
+    onPageChange = () => { },
     onRowsPerPageChange,
     page = 0,
     rowsPerPage = 0,

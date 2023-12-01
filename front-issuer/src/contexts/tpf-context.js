@@ -298,7 +298,7 @@ export const TPFProvider = (props) => {
         durationDays: tpf.durationDays,
         maxAssets: tpf.maxAssets,
         name: tpf.name,
-        startTimestamp: payloadAPI.startTimestamp,
+        startTimestamp: startDate,
         symbol: tpf.symbol,
         yield: tpf.yield,
         _identityRegistry: payloadAPI.identityRegistry,
