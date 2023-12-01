@@ -82,6 +82,13 @@ export const TPFItemCard =
               variant="contained"
               style={{ borderRadius: '50px', maxWidth: 'fit-content' }}
               onClick={() => (isAdmin ? settle(item) : buy(item))}
+              startIcon={
+                <Icon style={{ width: '28px', height: '28px' }}>
+                  <SvgIcon fontSize="medium" style={{ width: '24px', height: '24px' }}>
+                    <ShoppingCartIcon />
+                  </SvgIcon>
+                </Icon>
+              }
             >
               {settleLoading[item.symbol] && <CircularProgress size={24} sx={{ mr: 1 }} />}
               {isAdmin ? 'Liquidar' : 'Comprar'}

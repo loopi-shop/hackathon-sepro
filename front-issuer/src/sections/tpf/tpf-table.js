@@ -25,6 +25,7 @@ const tableHeaders = [
     description: 'Data de vencimento',
     roles: [RoleEnum.COMMON, RoleEnum.ADMIN],
     format: ({ rowData }) => {
+      if (!rowData.startTimestamp || !rowData.durationDays) return '';
       // FIX addDays returning date -1
       const expirationDate = addDays(rowData.startTimestamp, rowData.durationDays + 1);
       return format(expirationDate, 'dd/MM/yyyy');
@@ -90,7 +91,8 @@ export const TPFTable = (props) => {
     onRowsPerPageChange,
     page = 0,
     rowsPerPage = 0,
-    handleOpenBuy
+    handleOpenBuy,
+    embedded = false
   } = props;
 
   const { hasRole, user } = useAuth();
@@ -150,28 +152,30 @@ export const TPFTable = (props) => {
       <CardsList>
         {items.map(TPFItemCard(unitPriceList, totalAssetsList, totalSupplyList, balanceList, headers, settleLoading, isAdmin, settle, buy))}
       </CardsList>
-      <TablePagination
-        component="div"
-        count={count}
-        onPageChange={onPageChange}
-        onRowsPerPageChange={onRowsPerPageChange}
-        page={page}
-        rowsPerPage={rowsPerPage}
-        rowsPerPageOptions={[8, 16, 64]}
-        labelRowsPerPage="Linhas por página:"
-        getItemAriaLabel={(type) => {
-          switch (type) {
-            case 'first':
-              return 'Primeira página';
-            case 'last':
-              return 'Última página';
-            case 'next':
-              return 'Próxima página';
-            case 'previous':
-              return 'Página anterior';
-          }
-        }}
-      />
+      {!embedded && (
+        <TablePagination
+          component="div"
+          count={count}
+          onPageChange={onPageChange}
+          onRowsPerPageChange={onRowsPerPageChange}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          rowsPerPageOptions={[8, 16, 64]}
+          labelRowsPerPage="Linhas por página:"
+          getItemAriaLabel={(type) => {
+            switch (type) {
+              case 'first':
+                return 'Primeira página';
+              case 'last':
+                return 'Última página';
+              case 'next':
+                return 'Próxima página';
+              case 'previous':
+                return 'Página anterior';
+            }
+          }}
+        />
+      )}
     </>
   );
 };
