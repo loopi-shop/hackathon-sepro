@@ -31,20 +31,19 @@ const App = (props) => {
     <CacheProvider value={emotionCache}>
       <Head>
         <link href="https://fonts.cdnfonts.com/css/rawline" rel="stylesheet" />
-        <title>
-          Título Público Federal
-        </title>
-        <meta
-          name="viewport"
-          content="initial-scale=1, width=device-width"
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css"
         />
+        <title>Título Público Federal</title>
+        <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <SnackbarProvider maxSnack={10}>
           <MetaMaskProvider debug={false} sdkOptions={{
             checkInstallationImmediately: false,
             dappMetadata: {
-              name: "Hackaton Sepro",
+              name: "Hackaton Serpro",
               url: typeof window !== "undefined" ? window.location.host : 'http://localhost:3000',
             }
           }}>
