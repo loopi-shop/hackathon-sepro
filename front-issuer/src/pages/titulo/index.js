@@ -42,12 +42,12 @@ const Page = () => {
   const [buyTPF, setBuyTPF] = useState(undefined);
   const [isOpenBuy, setOpenBuy] = useState(false);
   const handleOpenBuy = (buyTPF) => {
-    window.history.pushState({ buyTPF }, '', `/tpf#${buyTPF.symbol}`);
+    window.history.pushState({ buyTPF }, '', `/titulo#${buyTPF.symbol}`);
     setBuyTPF(buyTPF);
     setOpenBuy(true);
   };
   const handleCloseBuy = () => {
-    window.history.replaceState({}, '', `/tpf`);
+    window.history.replaceState({}, '', `/titulo`);
     setOpenBuy(false);
     setBuyTPF(undefined);
   };
