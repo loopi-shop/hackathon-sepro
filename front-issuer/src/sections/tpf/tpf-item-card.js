@@ -1,9 +1,9 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faUsers,
-  faMoneyBillTransfer,
   faEllipsisV,
-  faBagShopping
+  faCartShopping,
+  faShareNodes
 } from '@fortawesome/free-solid-svg-icons';
 import { Button, CircularProgress, IconButton, SvgIcon } from '@mui/material';
 import { CardItem } from 'src/components/cards';
@@ -103,7 +103,7 @@ export const TPFItemCard =
               onClick={() => (isAdmin ? settle(item) : buy(item))}
               startIcon={
                 <SvgIcon fontSize="small">
-                  <FontAwesomeIcon icon={faBagShopping} />
+                  <FontAwesomeIcon icon={faCartShopping} />
                 </SvgIcon>
               }
             >
@@ -116,7 +116,7 @@ export const TPFItemCard =
               onClick={isAdmin ? holders : withdraw}
             >
               <SvgIcon fontSize='medium'>
-                <FontAwesomeIcon icon={isAdmin ? faUsers : faMoneyBillTransfer} />
+                <FontAwesomeIcon icon={isAdmin ? faUsers : faShareNodes} />
               </SvgIcon>
             </IconButton>
           </p>
