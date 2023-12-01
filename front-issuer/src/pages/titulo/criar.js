@@ -84,7 +84,7 @@ const Page = () => {
     sm: 6,
     xs: 12,
   }
-  // colocar prefixo LTN no nome e no simbolo
+
   return (
     <>
       <Head>
