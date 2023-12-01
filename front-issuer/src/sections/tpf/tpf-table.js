@@ -97,20 +97,33 @@ export const TPFTable = (props) => {
   } = props;
 
   const { hasRole, user } = useAuth();
-  const { redeem, broadcast } = useTPF();
+  const { broadcast, listHolders, redeem } = useTPF();
   const { enqueueSnackbar } = useSnackbar();
 
   const [openHolders, setOpenHolders] = useState(false);
   const [selectedTPF, setSelectedTPF] = useState(undefined);
+  const [holders, setHolders] = useState([]);
 
   const handleOpenHolders = (tpf) => {
     setSelectedTPF(tpf);
-    setOpenHolders(true);
+    listHolders({ contractAddress: tpf.contractAddress })
+      .then((holders) => {
+        setHolders(holders);
+        setOpenHolders(true);
+      })
+      .catch((error) => {
+        console.error(`listHolders:`, error);
+        enqueueSnackbar(`Erro para listar os clientes do token: ${tpf.symbol}`, {
+          variant: 'error',
+          autoHideDuration: 10000
+        });
+      });
   }
 
   const closeHolders = () => {
-    setSelectedTPF(undefined);
     setOpenHolders(false);
+    setSelectedTPF(undefined);
+    setHolders([]);
   }
 
   const isAdmin = useMemo(() => {
@@ -163,7 +176,13 @@ export const TPFTable = (props) => {
 
   return (
     <>
-      <TPFHolders open={openHolders} handleClose={closeHolders} tpf={selectedTPF} />
+      <TPFHolders
+        open={openHolders}
+        handleClose={closeHolders}
+        tpf={selectedTPF}
+        holders={holders}
+        setHolders={setHolders}
+      />
       <CardsList>
         {items.map(TPFItemCard(unitPriceList, totalAssetsList, totalSupplyList, balanceList, headers, settleLoading, isAdmin, settle, buy, handleOpenHolders))}
       </CardsList>
