@@ -264,6 +264,7 @@ export const TPFBuy = (props) => {
             )}
           </div>
         </DialogContentText>
+        <hr style={{height: 2, margin: "24px 0"}} />
         <form noValidate onSubmit={formik.handleSubmit} style={{ margin: '16px' }}>
           <Stack spacing={1}>
             <MetamaskButton connect={connect} connected={connected} account={account} />

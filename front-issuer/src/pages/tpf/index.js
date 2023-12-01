@@ -11,56 +11,44 @@ import { applyPagination } from 'src/utils/apply-pagination';
 import { useTPF } from 'src/hooks/use-tpf';
 
 const useTPFs = (page, rowsPerPage, data) => {
-  return useMemo(
-    () => {
-      return applyPagination(data, page, rowsPerPage);
-    },
-    [page, rowsPerPage, data]
-  );
+  return useMemo(() => {
+    return applyPagination(data, page, rowsPerPage);
+  }, [page, rowsPerPage, data]);
 };
 
 const useTPFIds = (tpfs) => {
-  return useMemo(
-    () => {
-      return tpfs.map((tpf) => tpf.acronym);
-    },
-    [tpfs]
-  );
+  return useMemo(() => {
+    return tpfs.map((tpf) => tpf.acronym);
+  }, [tpfs]);
 };
 
 const Page = () => {
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(8);
   const [unitPriceList, setUnitPriceList] = useState([]);
   const { list, tpfs, getPrice } = useTPF();
   const tpfsPaginated = useTPFs(page, rowsPerPage, tpfs?.data ?? []);
   const tpfIds = useTPFIds(tpfsPaginated);
   const tpfsSelection = useSelection(tpfIds);
 
-  const handlePageChange = useCallback(
-    (event, value) => {
-      setPage(value);
-    },
-    []
-  );
+  const handlePageChange = useCallback((event, value) => {
+    setPage(value);
+  }, []);
 
-  const handleRowsPerPageChange = useCallback(
-    (event) => {
-      setRowsPerPage(event.target.value);
-    },
-    []
-  );
+  const handleRowsPerPageChange = useCallback((event) => {
+    setRowsPerPage(event.target.value);
+  }, []);
 
   const [buyTPF, setBuyTPF] = useState(undefined);
   const [isOpenBuy, setOpenBuy] = useState(false);
   const handleOpenBuy = (buyTPF) => {
     setBuyTPF(buyTPF);
     setOpenBuy(true);
-  }
+  };
   const handleCloseBuy = () => {
     setOpenBuy(false);
     setBuyTPF(undefined);
-  }
+  };
 
   const loadUnitPriceList = async () => {
     if (!tpfs.isLoading && tpfs?.data?.length > 0) {
@@ -69,40 +57,36 @@ const Page = () => {
       let tempPrices = [];
       for (let index = 0; index < chunks.length; index++) {
         const tpfChunk = chunks[index];
-        const pricesSettled = await Promise.allSettled(tpfChunk.map((tpf) => getPrice({
-          contractAddress: tpf.contractAddress,
-          timestamp,
-        }).then((price) => ({
-          symbol: tpf.symbol,
-          price,
-        }))));
-        tempPrices = pricesSettled
-          .reduce((acc, cur) => {
-            if (cur.status !== 'fulfilled') return acc;
-            return acc.concat(cur.value);
-          }, tempPrices);
+        const pricesSettled = await Promise.allSettled(
+          tpfChunk.map((tpf) =>
+            getPrice({
+              contractAddress: tpf.contractAddress,
+              timestamp
+            }).then((price) => ({
+              symbol: tpf.symbol,
+              price
+            }))
+          )
+        );
+        tempPrices = pricesSettled.reduce((acc, cur) => {
+          if (cur.status !== 'fulfilled') return acc;
+          return acc.concat(cur.value);
+        }, tempPrices);
       }
       setUnitPriceList(tempPrices);
     }
-  }
+  };
 
   useEffect(() => {
-    loadUnitPriceList()
-  }, [tpfs])
-
+    loadUnitPriceList();
+  }, [tpfs]);
 
   return (
     <>
       <Head>
-        <title>
-          TPF | Lista de títulos
-        </title>
+        <title>TPF | Lista de títulos</title>
       </Head>
-      {isOpenBuy && <TPFBuy
-        open={isOpenBuy}
-        handleClose={handleCloseBuy}
-        tpf={buyTPF}
-      />}
+      {isOpenBuy && <TPFBuy open={isOpenBuy} handleClose={handleCloseBuy} tpf={buyTPF} />}
       <Box
         component="main"
         sx={{
@@ -112,24 +96,17 @@ const Page = () => {
       >
         <Container maxWidth="xl">
           <Stack spacing={3}>
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              spacing={4}
-            >
+            <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={1}>
-                <Typography variant="h4">
-                  Títulos
+                <Typography variant="h4" style={{ fontWeight: 500 }}>
+                  Títulos disponíveis
                 </Typography>
               </Stack>
               <div>
                 <Button
-                  startIcon={(
-                    <SvgIcon fontSize="small">
-                      <ArrowPathIcon />
-                    </SvgIcon>
-                  )}
-                  variant="contained"
+                  style={{ borderRadius: '50px', padding: "8px 24px" }}
+                  variant="outlined"
+                  color="primary"
                   onClick={() => {
                     if (!tpfs?.isLoading) list();
                   }}
@@ -161,10 +138,6 @@ const Page = () => {
   );
 };
 
-Page.getLayout = (page) => (
-  <DashboardLayout>
-    {page}
-  </DashboardLayout>
-);
+Page.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
 
 export default Page;
