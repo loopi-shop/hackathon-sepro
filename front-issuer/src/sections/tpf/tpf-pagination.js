@@ -2,9 +2,8 @@ import PropTypes from 'prop-types';
 import { useMemo } from 'react';
 import { Button, IconButton, SvgIcon } from '@mui/material';
 import { Container } from '@mui/system';
-
-import ChevronRightIcon from '@heroicons/react/24/solid/ChevronRightIcon';
-import ChevronLeftIcon from '@heroicons/react/24/solid/ChevronLeftIcon';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
 export const TPFPagination = (props) => {
   const { count = 0, rowsPerPage = 6, page = 0, onPageChange = (event, page) => {} } = props;
@@ -25,7 +24,7 @@ export const TPFPagination = (props) => {
         sx={{ mr: 2 }}
       >
         <SvgIcon fontSize="small">
-          <ChevronLeftIcon />
+          <FontAwesomeIcon icon={faChevronLeft} />
         </SvgIcon>
       </IconButton>
 
@@ -59,7 +58,7 @@ export const TPFPagination = (props) => {
         sx={{ ml: 2 }}
       >
         <SvgIcon fontSize="small">
-          <ChevronRightIcon />
+          <FontAwesomeIcon icon={faChevronRight} />
         </SvgIcon>
       </IconButton>
     </Container>
