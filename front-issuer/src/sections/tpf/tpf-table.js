@@ -87,7 +87,7 @@ export const TPFTable = (props) => {
     try {
       console.info('Liquidando Titulo:', tpf);
       const tx = await redeem({ contractAddress: tpf.contractAddress, from: user.publicKey });
-      console.log(`tx:redeem:`, tx);
+      console.info(`tx:redeem:`, tx);
       const { txHash } = await broadcast({ tx });
       enqueueSnackbar(`Transação de liquidação: ${txHash}`, {
         variant: 'info',
