@@ -7,7 +7,8 @@ import { useAuth } from 'src/hooks/use-auth';
 import { addDays, format } from 'date-fns';
 import { useTPF } from 'src/hooks/use-tpf';
 import { useSnackbar } from 'notistack';
-import { ItemCard } from './tpf-item-card';
+import { TPFItemCard } from './tpf-item-card';
+import { CardsList } from 'src/components/cards';
 
 const tableHeaders = [
   {
@@ -116,17 +117,9 @@ export const TPFTable = (props) => {
 
   return (
     <>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          justifyContent: 'center',
-          justifyItems: 'center',
-          gap: '40px'
-        }}
-      >
-        {items.map(ItemCard(unitPriceList, headers, settleLoading, isAdmin, settle, buy))}
-      </div>
+      <CardsList>
+        {items.map(TPFItemCard(unitPriceList, headers, settleLoading, isAdmin, settle, buy))}
+      </CardsList>
       <TablePagination
         component="div"
         count={count}

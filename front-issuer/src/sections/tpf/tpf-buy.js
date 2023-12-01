@@ -302,8 +302,7 @@ export const TPFBuy = (props) => {
                   <strong>Você irá receber:</strong> {lastSimulatedValue.toFormat(tpf.decimals)}
                 </DialogContentText>
                 <Box sx={{ display: 'flex', mt: 3, justifyContent: 'center' }}>
-                  <CircularProgress variant="determinate" value={submitProgress} />
-                  Carregando...
+                  <CircularProgress size={24} value={submitProgress} sx={{mr: 1}} /> Carregando...
                 </Box>
               </>
             ) : (
