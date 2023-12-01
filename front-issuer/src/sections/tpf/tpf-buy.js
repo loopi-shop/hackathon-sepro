@@ -26,6 +26,7 @@ import { NumericFormat } from 'react-number-format';
 import { useSnackbar } from 'notistack';
 import { MetamaskButton } from 'src/components/metamask-button';
 import Link from 'next/link';
+import { getContractLink } from 'src/utils/token-link';
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="left" ref={ref} {...props} />;
@@ -242,7 +243,7 @@ export const TPFBuy = (props) => {
               <strong>Endereço do contrato</strong>
               <br />
               <Link
-                href={`https://polygonscan.com/address/${tpf.contractAddress}`}
+                href={getContractLink(tpf.contractAddress)}
                 target="_blank"
                 title={tpf.contractAddress}
                 style={{ color: '#0076D6', textDecoration: 'none' }}
