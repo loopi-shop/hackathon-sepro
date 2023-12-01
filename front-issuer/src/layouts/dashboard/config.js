@@ -8,7 +8,7 @@ import { RoleEnum } from "../../contexts/auth-context";
 
 export const items = [
   {
-    title: 'Overview',
+    title: 'Início',
     path: '/',
     icon: (
       <SvgIcon fontSize="small">
@@ -17,8 +17,8 @@ export const items = [
     )
   },
   {
-    title: 'Customers',
-    path: '/customers',
+    title: 'Clientes',
+    path: '/clientes',
     roles: [RoleEnum.ADMIN],
     icon: (
       <SvgIcon fontSize="small">
@@ -28,7 +28,7 @@ export const items = [
   },
   {
     title: 'Títulos',
-    path: '/tpf',
+    path: '/titulo',
     icon: (
       <SvgIcon fontSize="small">
         <TableCellsIcon />
@@ -37,7 +37,7 @@ export const items = [
   },
   {
     title: 'Registrar Título',
-    path: '/tpf/create',
+    path: '/titulo/criar',
     roles: [RoleEnum.ADMIN],
     icon: (
       <SvgIcon fontSize="small">
@@ -46,8 +46,8 @@ export const items = [
     ),
   },
   {
-    title: 'Tokens',
-    path: '/tokens',
+    title: 'Minha carteira',
+    path: '/carteira',
     icon: (
       <SvgIcon fontSize="small">
         <CogIcon />
