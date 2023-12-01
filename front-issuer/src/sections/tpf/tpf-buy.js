@@ -25,6 +25,7 @@ import BigNumber from 'bignumber.js';
 import { NumericFormat } from 'react-number-format';
 import { useSnackbar } from 'notistack';
 import { MetamaskButton } from 'src/components/metamask-button';
+import Link from 'next/link';
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="left" ref={ref} {...props} />;
@@ -234,9 +235,14 @@ export const TPFBuy = (props) => {
             <p>
               <strong>Endereço do contrato</strong>
               <br />
-              <span title={tpf.contractAddress} style={{ color: '#0076D6' }}>
+              <Link
+                href={`https://polygonscan.com/address/${tpf.contractAddress}`}
+                target="_blank"
+                title={tpf.contractAddress}
+                style={{ color: '#0076D6', textDecoration: 'none' }}
+              >
                 {tpf.contractAddress.substring(0, 22)}...
-              </span>
+              </Link>
             </p>
           </div>
           <div style={{ border: '1px solid #F8DFE2', padding: '16px' }}>
@@ -264,6 +270,7 @@ export const TPFBuy = (props) => {
             )}
           </div>
         </DialogContentText>
+        <hr style={{ height: 2, margin: '24px 0' }} />
         <form noValidate onSubmit={formik.handleSubmit} style={{ margin: '16px' }}>
           <Stack spacing={1}>
             <MetamaskButton connect={connect} connected={connected} account={account} />
@@ -295,8 +302,7 @@ export const TPFBuy = (props) => {
                   <strong>Você irá receber:</strong> {lastSimulatedValue.toFormat(tpf.decimals)}
                 </DialogContentText>
                 <Box sx={{ display: 'flex', mt: 3, justifyContent: 'center' }}>
-                  <CircularProgress variant="determinate" value={submitProgress} />
-                  Carregando...
+                  <CircularProgress size={24} value={submitProgress} sx={{mr: 1}} /> Carregando...
                 </Box>
               </>
             ) : (
