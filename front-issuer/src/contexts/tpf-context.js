@@ -206,6 +206,7 @@ export const TPFContext = createContext({
   list: async () => { },
   /**
    * @param {Omit<import("src/repositories/investments.repository").TPF, "id">} tpf 
+   * @returns {Promise<import("src/repositories/investments.repository").TPF>}
    */
   create: async (tpf) => { },
   /**
@@ -246,6 +247,7 @@ export const TPFProvider = (props) => {
 
   /**
    * @param {TPF_API} tpf 
+   * @returns {Promise<{ defaultCompliance: string, tokenImplementation: string }>}
    */
   const register = async (tpf) => {
     const api_url = process.env.NEXT_PUBLIC_DEPLOY_CONTRACT_API_URL;
@@ -263,6 +265,12 @@ export const TPFProvider = (props) => {
       payload: null,
     });
     try {
+      let startDate = new Date();
+      if (tpf.startDate) {
+        startDate = new Date(tpf.startDate);
+        const userTimezoneOffset = startDate.getTimezoneOffset() * 60000;
+        startDate = new Date(startDate.getTime() + userTimezoneOffset);
+      }
       /**
        * @type {TPF_API}
        */
@@ -276,18 +284,17 @@ export const TPFProvider = (props) => {
         stableAddress: process.env.NEXT_PUBLIC_BRLX_CONTRACT,
         stableToken: process.env.NEXT_PUBLIC_BRLX_CONTRACT,
         symbol: tpf.symbol,
-        startTimestamp: parseInt(Date.now() / 1000),
+        startTimestamp: parseInt(startDate.getTime() / 1000),
         yieldPercentage: tpf.yield * 10 ** 4,
       }
       const outputCreatedContract = await register(payloadAPI);
-      console.log(`outputCreatedContract:`, outputCreatedContract);
       /**
        * @type {Omit<import("src/repositories/investments.repository").TPF, "id">} 
        */
       const tpfFilled = {
         asset: payloadAPI.stableToken,
         decimals: payloadAPI.decimals,
-        contractAddress: outputCreatedContract.contractAddress,
+        contractAddress: outputCreatedContract.tokenImplementation,
         durationDays: tpf.durationDays,
         maxAssets: tpf.maxAssets,
         name: tpf.name,
@@ -297,12 +304,13 @@ export const TPFProvider = (props) => {
         _identityRegistry: payloadAPI.identityRegistry,
         _compliance: outputCreatedContract.defaultCompliance,
       };
-      const created = tpfFilled; // await investmentsRepository.create(tpfFilled);
+      const created = await investmentsRepository.create(tpfFilled);
       dispatch({
         type: HANDLERS.CREATE,
         isLoading: false,
         payload: created,
       });
+      return created;
     } catch (error) {
       dispatch({
         type: HANDLERS.CREATE,
