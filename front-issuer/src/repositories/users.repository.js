@@ -6,7 +6,7 @@ class UsersRepository extends AbstractRepository {
 
   /**
    * @param auth {User}
-   * @param formData {{country: string, name: string, publicKey: string}}
+   * @param formData {{country: string, name: string, taxId, publicKey: string, kyc: any}}
    * @returns {Promise<*>}
    */
   createFromAuth(auth, formData) {
@@ -18,6 +18,8 @@ class UsersRepository extends AbstractRepository {
       name: formData.name,
       publicKey: formData.publicKey,
       role: RoleEnum.COMMON,
+      taxId: formData.taxId,
+      kyc: formData.kyc,
     }
 
     return this.create(cleanUser.id, cleanUser);

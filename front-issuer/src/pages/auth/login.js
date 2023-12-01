@@ -13,7 +13,7 @@ const Page = () => {
   const auth = useAuth();
   const [account, setAccount] = useState("");
   const [errors, setErrors] = useState([]);
-  const { sdk, connected, chainId } = useSDK();
+  const { sdk, connected } = useSDK();
 
   const handleSkip = useCallback(() => {
     auth.skip().then(() => router.push("/"));
@@ -22,13 +22,12 @@ const Page = () => {
   const connect = async () => {
     try {
       const accounts = await sdk?.connect();
-      console.log(accounts, chainId);
+      console.info('Connected metamask accounts', accounts);
       setAccount(accounts?.[0]);
 
       const publicKey = accounts?.[0];
       await auth.signIn(`${publicKey}@loopipay.com`, `pass${publicKey}`).catch((error) => {
         console.error("Fail on Login", error);
-        console.log(JSON.stringify(error));
 
         const errorMessage = ["auth/invalid-email", "auth/invalid-login-credentials"].includes(
           error.code

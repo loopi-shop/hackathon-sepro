@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { Box, Button, Container, Grid, Stack, SvgIcon, TextField, Typography } from '@mui/material';
+import { Box, Button, Container, Grid, Stack, TextField, Typography } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { NumericFormat } from 'react-number-format';
@@ -30,7 +30,7 @@ const Page = () => {
 
     }),
     onSubmit: async (values) => {
-      console.log(`submitted:`, values);
+      console.info(`submitted:`, values);
     }
   });
 

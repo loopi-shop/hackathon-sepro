@@ -14,7 +14,6 @@ import { PageTitle } from 'src/components/page-title';
 const useCustomers = (data, page, rowsPerPage) => {
   return useMemo(
     () => {
-      console.log('data', data);
       return applyPagination(data, page, rowsPerPage);
     },
     [data, page, rowsPerPage]
@@ -40,7 +39,6 @@ const Page = () => {
     if(isLoading) return;
     setIsLoading(true);
     usersRepository.list().then((list) => {
-      console.log('list', list);
       setCustomers(list ?? []);
     });
   });
@@ -48,8 +46,6 @@ const Page = () => {
   const customersPaginated = useCustomers(customers, page, rowsPerPage);
   const customersIds = useCustomerIds(customers);
   const customersSelection = useSelection(customersIds);
-
-  console.log('customers', customers);
 
   const handlePageChange = useCallback(
     (event, value) => {

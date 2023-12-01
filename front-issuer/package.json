@@ -25,6 +25,7 @@
     "@mui/material": "5.11.10",
     "@mui/system": "5.11.9",
     "@mui/x-date-pickers": "5.0.19",
+    "@onchain-id/identity-sdk": "^1.7.0",
     "apexcharts": "3.37.0",
     "bignumber.js": "^9.1.2",
     "date-fns": "2.29.3",
