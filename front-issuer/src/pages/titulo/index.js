@@ -42,10 +42,12 @@ const Page = () => {
   const [buyTPF, setBuyTPF] = useState(undefined);
   const [isOpenBuy, setOpenBuy] = useState(false);
   const handleOpenBuy = (buyTPF) => {
+    window.history.pushState({ buyTPF }, '', `/tpf#${buyTPF.symbol}`);
     setBuyTPF(buyTPF);
     setOpenBuy(true);
   };
   const handleCloseBuy = () => {
+    window.history.replaceState({}, '', `/tpf`);
     setOpenBuy(false);
     setBuyTPF(undefined);
   };
@@ -104,7 +106,7 @@ const Page = () => {
               </Stack>
               <div>
                 <Button
-                  style={{ borderRadius: '50px', padding: "8px 24px" }}
+                  style={{ borderRadius: '50px', padding: '8px 24px' }}
                   variant="outlined"
                   color="primary"
                   onClick={() => {
