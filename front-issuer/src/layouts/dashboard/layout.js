@@ -55,7 +55,7 @@ export const Layout = withAuthGuard((props) => {
       return <></>;
     }
 
-    console.log(`Forbidden access to ${pathname}, redirecting`, { user, pageConfig });
+    console.error(`Forbidden access to ${pathname}, redirecting`, { user, pageConfig });
     router
       .replace({
         pathname: '/404',

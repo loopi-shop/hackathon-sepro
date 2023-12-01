@@ -12,6 +12,7 @@ import { TPFProvider } from 'src/contexts/tpf-context';
 import { MetaMaskProvider } from '@metamask/sdk-react';
 import 'simplebar-react/dist/simplebar.min.css';
 import { SnackbarProvider } from 'notistack';
+import { Message } from 'src/components/message';
 import '@govbr-ds/core/dist/core.min.css';
 
 const clientSideEmotionCache = createEmotionCache();
@@ -39,23 +40,32 @@ const App = (props) => {
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
       <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <SnackbarProvider maxSnack={10}>
-          <MetaMaskProvider debug={false} sdkOptions={{
-            checkInstallationImmediately: false,
-            dappMetadata: {
-              name: "Hackaton Serpro",
-              url: typeof window !== "undefined" ? window.location.host : 'http://localhost:3000',
-            }
-          }}>
+        <SnackbarProvider
+          maxSnack={10}
+          Components={{
+            success: Message,
+            info: Message,
+            warning: Message,
+            danger: Message
+          }}
+        >
+          <MetaMaskProvider
+            debug={false}
+            sdkOptions={{
+              checkInstallationImmediately: false,
+              dappMetadata: {
+                name: 'Hackaton Serpro',
+                url: typeof window !== 'undefined' ? window.location.host : 'http://localhost:3000'
+              }
+            }}
+          >
             <AuthProvider>
               <ThemeProvider theme={theme}>
                 <CssBaseline />
                 <TPFProvider>
                   <AuthConsumer>
-                    {
-                      (auth) => auth.isLoading
-                        ? <SplashScreen />
-                        : getLayout(<Component {...pageProps} />)
+                    {(auth) =>
+                      auth.isLoading ? <SplashScreen /> : getLayout(<Component {...pageProps} />)
                     }
                   </AuthConsumer>
                 </TPFProvider>

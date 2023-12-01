@@ -58,7 +58,7 @@ export const TPFTable = (props) => {
     count = 0,
     items = [],
     unitPriceList = [],
-    onPageChange = () => {},
+    onPageChange = () => { },
     onRowsPerPageChange,
     page = 0,
     rowsPerPage = 0,
@@ -90,7 +90,7 @@ export const TPFTable = (props) => {
     try {
       console.info('Liquidando Titulo:', tpf);
       const tx = await redeem({ contractAddress: tpf.contractAddress, from: user.publicKey });
-      console.log(`tx:redeem:`, tx);
+      console.info(`tx:redeem:`, tx);
       const { txHash } = await broadcast({ tx });
       enqueueSnackbar(`Transação de liquidação: ${txHash}`, {
         variant: 'info',
@@ -132,6 +132,19 @@ export const TPFTable = (props) => {
           page={page}
           rowsPerPage={rowsPerPage}
           rowsPerPageOptions={[8, 16, 64]}
+          labelRowsPerPage="Linhas por página:"
+          getItemAriaLabel={(type) => {
+            switch (type) {
+              case 'first':
+                return 'Primeira página';
+              case 'last':
+                return 'Última página';
+              case 'next':
+                return 'Próxima página';
+              case 'previous':
+                return 'Página anterior';
+            }
+          }}
         />
       )}
     </>

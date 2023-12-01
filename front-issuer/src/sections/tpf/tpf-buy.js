@@ -40,7 +40,7 @@ export const TPFBuy = (props) => {
 
   const { enqueueSnackbar } = useSnackbar();
 
-  const { sdk, connected, chainId, account } = useSDK();
+  const { sdk, connected, account } = useSDK();
   const { invest, getPrice, approve, waitTransaction, simulate: preview } = useTPF();
   const [isLoadingSubmit, setIsLoadingSubmit] = useState(false);
   const [submitProgress, setSubmitProgress] = useState(10);
@@ -123,7 +123,7 @@ export const TPFBuy = (props) => {
   const connect = async () => {
     try {
       const accounts = await sdk?.connect();
-      console.log(accounts, chainId);
+      console.info('Connected metamask accounts', accounts);
     } catch (err) {
       console.error(`failed to connect..`, err);
     }

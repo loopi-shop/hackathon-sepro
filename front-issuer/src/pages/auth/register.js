@@ -2,36 +2,48 @@ import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { Box, Button, Link, Stack, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Link,
+  Stack,
+  TextField,
+  Typography
+} from '@mui/material';
 import { useAuth } from "src/hooks/use-auth";
 import { Layout as AuthLayout } from "src/layouts/auth/layout";
 import { useState } from "react";
 import { useSDK } from "@metamask/sdk-react";
 import { PageTitle } from "src/components/page-title";
+import { MetamaskButton } from '../../components/metamask-button';
+import {CountryISOSelect} from "../../components/country-iso-select";
 
 const Page = () => {
   const router = useRouter();
   const auth = useAuth();
   const [account, setAccount] = useState("");
-  const { sdk, connected, chainId } = useSDK();
+  const { sdk, connected } = useSDK();
 
   const formik = useFormik({
     initialValues: {
       name: "Demo",
-      country: "Brasil",
+      country: 76, /* Brasil */
+      taxId: '000.000.000-00',
       submit: null,
     },
     validationSchema: Yup.object({
       name: Yup.string().max(255, "Máximo de 255 caracteres").required("Nome é obrigatório"),
       country: Yup.string().max(255, "Máximo de 255 caracteres").required("País é obrigatório"),
+      taxId: Yup.string().max(255, "Máximo de 255 caracteres").required("Documento é obrigatório"),
     }),
     onSubmit: async (values, helpers) => {
       try {
-        const { name, country } = values;
+        const { name, country, taxId } = values;
         const publicKey = account;
         await auth.signUp(`${publicKey}@loopipay.com`, `pass${publicKey}`, {
           name,
           country,
+          taxId,
           publicKey,
         });
         router.push("/");
@@ -50,7 +62,7 @@ const Page = () => {
   const connect = async () => {
     try {
       const accounts = await sdk?.connect();
-      console.log(accounts, chainId);
+      console.info('Connected metamask accounts', accounts);
       setAccount(accounts?.[0]);
     } catch (err) {
       console.warn(`Falha ao conectar...`, err);
@@ -98,15 +110,25 @@ const Page = () => {
                   onChange={formik.handleChange}
                   value={formik.values.name}
                 />
-                <TextField
+                <CountryISOSelect
                   error={!!(formik.touched.country && formik.errors.country)}
-                  fullWidth
                   helperText={formik.touched.country && formik.errors.country}
-                  label="País"
                   name="country"
+                  label="País"
+                  fullWidth
+                  value={formik.values.country}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                />
+                <TextField
+                  error={!!(formik.touched.taxId && formik.errors.taxId)}
+                  fullWidth
+                  helperText={formik.touched.taxId && formik.errors.taxId}
+                  label="CPF ou Nº do Documento"
+                  name="taxId"
                   onBlur={formik.handleBlur}
                   onChange={formik.handleChange}
-                  value={formik.values.country}
+                  value={formik.values.taxId}
                 />
                 <MetamaskButton connect={connect} connected={connected} account={account} />
               </Stack>

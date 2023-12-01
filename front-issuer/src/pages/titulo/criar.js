@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { Box, Button, Container, Grid, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, Container, Grid, Stack, TextField, Typography, InputAdornment } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { NumericFormat } from 'react-number-format';
@@ -10,13 +10,13 @@ import { useTPF } from 'src/hooks/use-tpf';
 import { useSnackbar } from 'notistack';
 
 const Page = () => {
-  const { create } = useTPF();
+  const { create, tpf } = useTPF();
   const { enqueueSnackbar } = useSnackbar();
 
   const formik = useFormik({
     initialValues: {
       blocklistCountryCode: [''],
-      startDate: new Date(),
+      startDate: format(new Date(), 'yyyy-MM-dd'),
     },
     validationSchema: Yup.object({
       blocklistCountryCode: Yup.array(Yup.string()),
@@ -24,11 +24,15 @@ const Page = () => {
         .required('O nome deve ser informado'),
       symbol: Yup.string().min(1, 'O símbolo deve conter pelo menos ${min} caractere')
         .required('O símbolo deve ser informado'),
+      startDate: Yup.date()
+        .required('A data de início deve ser informada'),
       expirationDate: Yup.date()
-        .min(addDays(new Date(), 30), ({ min }) => {
-          return `A data de expiração deve ser maior que ${format(min, 'dd/MM/yyyy')}`;
-        })
-        .required('A data de expiração é obrigatória'),
+        .required('A data de expiração deve ser informada')
+        .when('startDate', ([startDate]) => {
+          return Yup.date()
+            .min(addDays(startDate ?? new Date(), 30), ({ min }) => `A data de expiração deve ser maior que ${format(min, 'dd/MM/yyyy')}`)
+            .typeError('A data de expiração deve ser informada')
+        }),
       yieldPercent: Yup.number().min(0.01, 'O percentual de rendimento deve ser igual ou maior maior que ${min}')
         .required('O percentual de rendimento deve ser informado'),
       maxAssets: Yup.number().min(1, 'A emissão máxima deve ser igual ou maior que ${min}')
@@ -36,7 +40,6 @@ const Page = () => {
 
     }),
     onSubmit: async (values) => {
-      console.log(`submitted:`, values);
       const yieldPercent = parseInt(values.yieldPercent.replace('.', ''));
       const maxAssets = parseInt(values.maxAssets.replace('.', ''));
       const duration = differenceInDays(new Date(values.expirationDate), new Date());
@@ -46,20 +49,25 @@ const Page = () => {
         blocklistCountryCode: values.blocklistCountryCode
           .filter((b) => b !== '')
           .map(Number),
-        symbol: values.symbol,
-        name: values.name,
+        symbol: `LTN${values.symbol.toUpperCase()}`,
+        name: `LTN${values.name.toUpperCase()}`,
         maxAssets,
+        startDate: values.startDate,
       }
-      console.log(`create payload:`, tpfPayload);
       try {
-        await create(tpfPayload);
-        enqueueSnackbar(`Título criado (ENDERECO)`, {
+        const created = await create(tpfPayload);
+        enqueueSnackbar(`Título criado (${created.contractAddress})`, {
           variant: "info",
           autoHideDuration: 10000,
         });
-        formik.setValues({
-          blocklistCountryCode: [''],
-        });
+
+        formik.setFieldValue('blocklistCountryCode', formik.initialValues.blocklistCountryCode);
+        formik.setFieldValue('startDate', formik.initialValues.startDate);
+        formik.setFieldValue('name', '');
+        formik.setFieldValue('symbol', '');
+        formik.setFieldValue('expirationDate', '');
+        formik.setFieldValue('yieldPercent', '');
+        formik.setFieldValue('maxAssets', '');
       } catch (error) {
         console.error(`error on create`, error);
         enqueueSnackbar(`Erro para criar o título`, {
@@ -76,7 +84,7 @@ const Page = () => {
     sm: 6,
     xs: 12,
   }
-  // colocar prefixo LTN no nome e no simbolo
+
   return (
     <>
       <Head>
@@ -121,7 +129,12 @@ const Page = () => {
                     helperText={formik.touched.name && formik.errors.name}
                     name="name"
                     label="Nome"
-                    prefix='LTN'
+                    InputProps={{
+                      startAdornment: <InputAdornment position="start">LTN</InputAdornment>,
+                    }}
+                    inputProps={{
+                      style: { textTransform: "uppercase" },
+                    }}
                     fullWidth
                     value={formik.values.name}
                     onChange={formik.handleChange}
@@ -137,10 +150,14 @@ const Page = () => {
                     helperText={formik.touched.symbol && formik.errors.symbol}
                     name="symbol"
                     label="Símbolo"
-                    prefix='LTN'
                     fullWidth
                     value={formik.values.symbol}
-                    inputProps={{ style: { textTransform: "uppercase" } }}
+                    InputProps={{
+                      startAdornment: <InputAdornment position="start">LTN</InputAdornment>,
+                    }}
+                    inputProps={{
+                      style: { textTransform: "uppercase" },
+                    }}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                   />
@@ -255,6 +272,7 @@ const Page = () => {
                   {...gridItemSize}
                 >
                   <Button
+                    disabled={tpf.isLoading}
                     fullWidth
                     size="large"
                     type="submit"
