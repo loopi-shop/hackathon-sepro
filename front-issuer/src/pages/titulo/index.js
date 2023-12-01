@@ -9,6 +9,7 @@ import { TPFTable } from 'src/sections/tpf/tpf-table';
 import { TPFBuy } from 'src/sections/tpf/tpf-buy';
 import { applyPagination } from 'src/utils/apply-pagination';
 import { useTPF } from 'src/hooks/use-tpf';
+import { PageTitle } from 'src/components/page-title';
 
 const useTPFs = (page, rowsPerPage, data) => {
   return useMemo(() => {
@@ -85,9 +86,7 @@ const Page = () => {
 
   return (
     <>
-      <Head>
-        <title>TPF | Lista de títulos</title>
-      </Head>
+      <PageTitle>Títulos disponíveis</PageTitle>
       {isOpenBuy && <TPFBuy open={isOpenBuy} handleClose={handleCloseBuy} tpf={buyTPF} />}
       <Box
         component="main"
