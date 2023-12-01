@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { Box, Button, Container, Grid, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, Container, Grid, Stack, TextField, Typography, InputAdornment } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { NumericFormat } from 'react-number-format';
@@ -16,7 +16,7 @@ const Page = () => {
   const formik = useFormik({
     initialValues: {
       blocklistCountryCode: [''],
-      startDate: new Date(),
+      startDate: format(new Date(), 'yyyy-MM-dd'),
     },
     validationSchema: Yup.object({
       blocklistCountryCode: Yup.array(Yup.string()),
@@ -46,8 +46,8 @@ const Page = () => {
         blocklistCountryCode: values.blocklistCountryCode
           .filter((b) => b !== '')
           .map(Number),
-        symbol: values.symbol,
-        name: values.name,
+        symbol: `LTN${values.symbol.toUpperCase()}`,
+        name: `LTN${values.name.toUpperCase()}`,
         maxAssets,
       }
       console.log(`create payload:`, tpfPayload);
@@ -121,7 +121,12 @@ const Page = () => {
                     helperText={formik.touched.name && formik.errors.name}
                     name="name"
                     label="Nome"
-                    prefix='LTN'
+                    InputProps={{
+                      startAdornment: <InputAdornment position="start">LTN</InputAdornment>,
+                    }}
+                    inputProps={{
+                      style: { textTransform: "uppercase" },
+                    }}
                     fullWidth
                     value={formik.values.name}
                     onChange={formik.handleChange}
@@ -137,10 +142,14 @@ const Page = () => {
                     helperText={formik.touched.symbol && formik.errors.symbol}
                     name="symbol"
                     label="Símbolo"
-                    prefix='LTN'
                     fullWidth
                     value={formik.values.symbol}
-                    inputProps={{ style: { textTransform: "uppercase" } }}
+                    InputProps={{
+                      startAdornment: <InputAdornment position="start">LTN</InputAdornment>,
+                    }}
+                    inputProps={{
+                      style: { textTransform: "uppercase" },
+                    }}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                   />
