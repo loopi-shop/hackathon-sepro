@@ -41,7 +41,7 @@ export const ItemCard = (unitPriceList, headers, settleLoading, isAdmin, settle,
         </div>
 
         <Icon style={{ width: '32px', height: '32px' }} color="primary">
-          <SvgIcon style={{ width: '32px', height: '32px' }}>
+          <SvgIcon fontSize="medium" style={{ width: '24px', height: '24px' }}>
             <EllipsisVerticalIcon />
           </SvgIcon>
         </Icon>
@@ -83,8 +83,8 @@ export const ItemCard = (unitPriceList, headers, settleLoading, isAdmin, settle,
           >
             {settleLoading[item.symbol] ? <CircularProgress /> : isAdmin ? 'Liquidar' : 'Comprar'}
           </Button>
-          <Icon style={{ width: '32px', height: '32px' }} color="primary">
-            <SvgIcon style={{ width: '32px', height: '32px' }}>
+          <Icon color="primary">
+            <SvgIcon>
               <ShareIcon />
             </SvgIcon>
           </Icon>
