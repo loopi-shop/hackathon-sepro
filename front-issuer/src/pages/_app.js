@@ -64,10 +64,8 @@ const App = (props) => {
                 <CssBaseline />
                 <TPFProvider>
                   <AuthConsumer>
-                    {
-                      (auth) => auth.isLoading
-                        ? <SplashScreen />
-                        : getLayout(<Component {...pageProps} />)
+                    {(auth) =>
+                      auth.isLoading ? <SplashScreen /> : getLayout(<Component {...pageProps} />)
                     }
                   </AuthConsumer>
                 </TPFProvider>

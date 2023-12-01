@@ -1,45 +1,49 @@
-import { useCallback, useState } from "react";
-import NextLink from "next/link";
-import { useRouter } from "next/navigation";
-import { Box, Button, Link, Stack, Typography } from "@mui/material";
-import { useAuth } from "src/hooks/use-auth";
-import { Layout as AuthLayout } from "src/layouts/auth/layout";
-import { useSDK } from "@metamask/sdk-react";
-import { PageTitle } from "src/components/page-title";
-import { MetamaskButton } from "src/components/metamask-button";
+import { useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { Box, Stack, Icon, Typography } from '@mui/material';
+import { useAuth } from 'src/hooks/use-auth';
+import { Layout as AuthLayout } from 'src/layouts/auth/layout';
+import { useSDK } from '@metamask/sdk-react';
+import { PageTitle } from 'src/components/page-title';
+import { useMessage } from 'src/hooks/use-message';
 
 const Page = () => {
   const router = useRouter();
   const auth = useAuth();
-  const [account, setAccount] = useState("");
-  const [errors, setErrors] = useState([]);
-  const { sdk, connected, chainId } = useSDK();
+  const { showDanger } = useMessage();
+  const { sdk, chainId } = useSDK();
 
   const handleSkip = useCallback(() => {
-    auth.skip().then(() => router.push("/"));
+    auth.skip().then(() => router.push('/'));
   }, [auth, router]);
+
+  const goToRegisterPage = useCallback(() => {
+    router.push('/auth/register');
+  }, [auth]);
 
   const connect = async () => {
     try {
       const accounts = await sdk?.connect();
       console.log(accounts, chainId);
-      setAccount(accounts?.[0]);
 
       const publicKey = accounts?.[0];
+
       await auth.signIn(`${publicKey}@loopipay.com`, `pass${publicKey}`).catch((error) => {
-        console.error("Fail on Login", error);
+        console.error('Fail on Login', error);
         console.log(JSON.stringify(error));
 
-        const errorMessage = ["auth/invalid-email", "auth/invalid-login-credentials"].includes(
+        const errorMessage = ['auth/invalid-email', 'auth/invalid-login-credentials'].includes(
           error.code
         )
-          ? "User Not found"
-          : error;
+          ? 'Usuário não encontrado'
+          : 'Erro desconhecido';
 
-        setErrors([errorMessage]);
+        showDanger(errorMessage);
+
         throw error;
       });
-      router.push("/");
+
+      router.push('/');
     } catch (err) {
       console.warn(`failed to connect..`, err);
     }
@@ -50,43 +54,72 @@ const Page = () => {
       <PageTitle>Entrar</PageTitle>
       <Box
         sx={{
-          backgroundColor: "background.paper",
-          flex: "1 1 auto",
-          alignItems: "center",
-          display: "flex",
-          justifyContent: "center",
+          flex: '1 1 auto',
+          alignItems: 'center',
+          display: 'flex',
+          justifyContent: 'center'
         }}
       >
         <Box
           sx={{
-            maxWidth: 550,
-            px: 3,
-            py: "100px",
-            width: "100%",
+            maxWidth: 420,
+            p: 5,
+            width: '100%',
+            boxShadow: '0px 9px 6px 0px #33333333'
           }}
         >
           <div>
             <Stack spacing={1} sx={{ mb: 3 }}>
-              <Typography variant="h4">Entrar</Typography>
-              <Typography color="text.secondary" variant="body2">
-                Não tem uma conta? &nbsp;
-                <Link
-                  component={NextLink}
-                  href="/auth/register"
-                  underline="hover"
-                  variant="subtitle2"
-                >
-                  Registrar
-                </Link>
+              <Typography variant="h4" style={{ fontSize: '20px', lineHeight: '28px' }}>
+                Entre ou Registre-se
+              </Typography>
+              <Typography
+                color="text.secondary"
+                variant="body2"
+                style={{ fontSize: '14px', lineHeight: '20px' }}
+              >
+                Escolha uma das opções abaixo
               </Typography>
             </Stack>
-            <MetamaskButton connect={connect} connected={connected} account={account} />
-            <Typography color="error" sx={{ mt: 3 }} variant="body2">
-              {errors[0]?.toString()}
+            <button
+              class="br-button secondary"
+              type="button"
+              style={{ width: '100%' }}
+              onClick={connect}
+            >
+              <Icon sx={{ mr: 2, width: '20px', height: '20px' }}>
+                <img alt={'Logo metamask'} src={'/assets/logos/logo-metamask.svg'} />
+              </Icon>
+              Conectar com MetaMask
+            </button>
+            <button
+              class="br-button secondary"
+              type="button"
+              style={{ width: '100%', marginTop: '12px' }}
+              onClick={handleSkip}
+            >
+              <span
+                class="fas fa-city"
+                style={{ width: '20px', height: '16px', marginRight: '8px' }}
+              ></span>
+              Entrar como Admin
+            </button>
+            <span class="br-divider my-4"></span>
+            <Typography
+              color="text.secondary"
+              variant="body2"
+              style={{ fontSize: '14px', lineHeight: '20px' }}
+            >
+              Ainda não tem conta?
             </Typography>
-            <Button fullWidth size="large" sx={{ mt: 3 }} onClick={handleSkip}>
-              Entrar como admin
-            </Button>
+            <button
+              class="br-button primary"
+              type="button"
+              style={{ width: '100%', marginTop: '8px' }}
+              onClick={goToRegisterPage}
+            >
+              Criar conta
+            </button>
           </div>
         </Box>
       </Box>
