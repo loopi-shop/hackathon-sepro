@@ -1,10 +1,13 @@
 import { onRequest } from 'firebase-functions/v2/https';
 import express, { Request, Response } from 'express';
+import cors from 'cors';
 // @ts-ignore
 import { ethers, network, run } from 'hardhat';
 import { exec } from 'child_process';
 
 const app = express();
+
+app.use(cors({ origin: true }));
 
 app.use((req, res, next) => {
     next();
@@ -60,8 +63,6 @@ app.post('', async (req: Request, res: Response) => {
 
     verifyContract(tokenImplementation.address, params)
         .catch((error) => console.log(error));
-
-    res.setHeader('Access-Control-Allow-Origin', '"*"');
 
     res.json({
         defaultCompliance: defaultCompliance.address,
