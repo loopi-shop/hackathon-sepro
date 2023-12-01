@@ -5,6 +5,7 @@ import { useAuth } from 'src/hooks/use-auth';
 import { Interface, JsonRpcProvider, Wallet } from 'ethers';
 import BigNumber from 'bignumber.js';
 import axios from 'axios';
+import TPF_ABI from './tpf-abi.json';
 
 /**
  * @typedef TPF_API
@@ -21,135 +22,6 @@ import axios from 'axios';
  * @property {string} yieldPercentage Numeric string **6 decimals**
  */
 
-const TPF_ABI = [
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "assets",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "receiver",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "timestamp",
-        "type": "uint256"
-      }
-    ],
-    "name": "deposit",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "currentTimestamp",
-        "type": "uint256"
-      }
-    ],
-    "name": "getPrice",
-    "outputs": [
-      {
-        "internalType": "UD60x18",
-        "name": "result",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "spender",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "approve",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "spender",
-        "type": "address"
-      }
-    ],
-    "name": "allowance",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "redeemAll",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "assets",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "timestamp",
-        "type": "uint256"
-      }
-    ],
-    "name": "previewDeposit",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-]
 const TPFContractInterface = new Interface(TPF_ABI);
 
 const HANDLERS = {
@@ -217,6 +89,18 @@ export const TPFContext = createContext({
    * @returns {Promise<number>}
    */
   getPrice: async ({ contractAddress, timestamp }) => { },
+  /**
+   * @returns {Promise<number>}
+   */
+  getTotalAssets: async ({ contractAddress }) => { },
+  /**
+   * @returns {Promise<number>}
+   */
+  getTotalSupply: async ({ contractAddress }) => { },
+  /**
+   * @returns {Promise<number>}
+   */
+  balanceOf: async ({ contractAddress, accountAddress }) => { },
   /**
    * @returns {Promise<{ data: string, to: string, nonce: number, value: string }>}
    */
@@ -388,6 +272,36 @@ export const TPFProvider = (props) => {
     return new BigNumber(response).toNumber();
   }
 
+  const getTotalAssets = async ({ contractAddress }) => {
+    const data = TPFContractInterface.encodeFunctionData('totalAssets', []);
+    const response = await providerRef.current.call({
+      to: contractAddress,
+      data,
+      value: 0,
+    });
+    return new BigNumber(response).toNumber();
+  }
+
+  const getTotalSupply = async ({ contractAddress }) => {
+    const data = TPFContractInterface.encodeFunctionData('totalSupply', []);
+    const response = await providerRef.current.call({
+      to: contractAddress,
+      data,
+      value: 0,
+    });
+    return new BigNumber(response).toNumber();
+  }
+
+  const balanceOf = async ({ contractAddress, accountAddress }) => {
+    const data = TPFContractInterface.encodeFunctionData('balanceOf', [accountAddress]);
+    const response = await providerRef.current.call({
+      to: contractAddress,
+      data,
+      value: 0,
+    });
+    return new BigNumber(response).toNumber();
+  }
+
   const waitTransaction = async ({ txHash }) => {
     console.info(`waiting transaction...`);
     return providerRef.current.waitForTransaction(txHash);
@@ -451,6 +365,9 @@ export const TPFProvider = (props) => {
         redeem,
         simulate,
         broadcast,
+        balanceOf,
+        getTotalAssets,
+        getTotalSupply,
       }}
     >
       {children}

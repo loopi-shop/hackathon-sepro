@@ -1,12 +1,24 @@
-import EllipsisVerticalIcon from '@heroicons/react/24/solid/EllipsisVerticalIcon';
-import ShareIcon from '@heroicons/react/24/solid/ShareIcon';
-import ShoppingCartIcon from '@heroicons/react/24/solid/ShoppingCartIcon';
-import { Button, CircularProgress, Icon, SvgIcon } from '@mui/material';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faUsers, faMoneyBillTransfer, faEllipsisV } from '@fortawesome/free-solid-svg-icons'
+import { Button, CircularProgress, IconButton, SvgIcon } from '@mui/material';
 import { CardItem } from 'src/components/cards';
 
 export const TPFItemCard =
-  (unitPriceList, headers, settleLoading, isAdmin, settle, buy) => (item) => {
-    const unitPrice = unitPriceList.find((up) => up.symbol === item.symbol)?.price;
+  (unitPriceList, totalAssetsList, totalSupplyList, balanceList, headers, settleLoading, isAdmin, settle, buy) => (item) => {
+    const itemComplement = {
+      totalAssets: unitPriceList.find((up) => up.symbol === item.symbol)?.price,
+      totalSupply: totalAssetsList.find((up) => up.symbol === item.symbol)?.totalAssets,
+      balance: totalSupplyList.find((up) => up.symbol === item.symbol)?.totalSupply,
+      unitPrice: balanceList.find((up) => up.symbol === item.symbol)?.balance,
+    }
+    const holders = () => {
+      console.log(`Show holders list of token ${item.contractAddress}`);
+    }
+
+    const withdraw = () => {
+      console.log(`Withdraw of token ${item.contractAddress}`);
+    }
+
     return (
       <CardItem key={item.symbol} title={item.symbol}>
         <div
@@ -34,11 +46,11 @@ export const TPFItemCard =
             </p>
           </div>
 
-          <Icon style={{ width: '32px', height: '32px' }} color="primary">
+          <IconButton style={{ width: '32px', height: '32px' }} color="primary">
             <SvgIcon fontSize="medium" style={{ width: '24px', height: '24px' }}>
-              <EllipsisVerticalIcon />
+              <FontAwesomeIcon icon={faEllipsisV} />
             </SvgIcon>
-          </Icon>
+          </IconButton>
         </div>
 
         <div style={{ display: 'grid', gridTemplate: '1fr', gap: '8px' }}>
@@ -49,13 +61,9 @@ export const TPFItemCard =
               </b>
               <br />
               <span style={{ fontSize: '14px', lineHeight: '20px' }}>
-                {header.key === 'unitPrice'
-                  ? !unitPrice
-                    ? 'Carregando...'
-                    : (unitPrice / 10 ** item.decimals).toFixed(item.decimals)
-                  : header.format
-                  ? header.format({ rowData: item, value: item[header.key] })
-                  : item[header.key]}
+                {header.format
+                  ? header.format({ rowData: item, value: item[header.key] ?? itemComplement[header.key] })
+                  : item[header.key] ?? itemComplement[header.key]}
               </span>
             </p>
           ))}
@@ -85,11 +93,11 @@ export const TPFItemCard =
               {settleLoading[item.symbol] && <CircularProgress size={24} sx={{ mr: 1 }} />}
               {isAdmin ? 'Liquidar' : 'Comprar'}
             </Button>
-            <Icon color="primary">
+            <IconButton color="primary" style={{ cursor: 'pointer' }} onClick={isAdmin ? holders : withdraw}>
               <SvgIcon>
-                <ShareIcon />
+                <FontAwesomeIcon icon={isAdmin ? faUsers : faMoneyBillTransfer} />
               </SvgIcon>
-            </Icon>
+            </IconButton>
           </p>
         </div>
       </CardItem>

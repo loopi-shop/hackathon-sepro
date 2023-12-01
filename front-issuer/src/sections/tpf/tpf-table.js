@@ -10,6 +10,10 @@ import { useSnackbar } from 'notistack';
 import { TPFItemCard } from './tpf-item-card';
 import { CardsList } from 'src/components/cards';
 
+function isLoadingValue(value) {
+  return value === null || value === undefined || value < 0;
+}
+
 const tableHeaders = [
   {
     key: 'symbol',
@@ -22,35 +26,57 @@ const tableHeaders = [
     roles: [RoleEnum.COMMON, RoleEnum.ADMIN],
     format: ({ rowData }) => {
       if (!rowData.startTimestamp || !rowData.durationDays) return '';
-
-      const expirationDate = addDays(rowData.startTimestamp, rowData.durationDays);
+      // FIX addDays returning date -1
+      const expirationDate = addDays(rowData.startTimestamp, rowData.durationDays + 1);
       return format(expirationDate, 'dd/MM/yyyy');
     }
   },
   {
-    key: 'maxAssets',
-    description: 'Total Emitido (BRLX)',
+    key: 'totalAssets',
+    description: 'Total Arrecadado (BRLX)',
     roles: [RoleEnum.ADMIN],
     format: ({ rowData, value }) => {
-      return (value / 10 ** rowData.decimals).toFixed(rowData.decimals);
+      return isLoadingValue(value)
+        ? 'Carregando...'
+        : (value / 10 ** rowData.decimals).toFixed(rowData.decimals)
     }
   },
   {
-    key: 'minimumValue',
-    description: 'Valor mínimo (BRLX)',
-    roles: [RoleEnum.COMMON, RoleEnum.ADMIN]
+    key: 'totalSupply',
+    description: 'Total Emitido',
+    roles: [RoleEnum.COMMON, RoleEnum.ADMIN],
+    format: ({ rowData, value }) => {
+      return isLoadingValue(value)
+        ? 'Carregando...'
+        : (value / 10 ** rowData.decimals).toFixed(rowData.decimals)
+    }
   },
   {
     key: 'yield',
     description: 'Rentabilidade (%)',
     roles: [RoleEnum.COMMON, RoleEnum.ADMIN],
-    format: ({ value }) => (value / 100).toFixed(2)
+    format: ({ value }) => `${(value / 100).toFixed(2)}% a.a.`
   },
   {
     key: 'unitPrice',
     description: 'Preço Unitário',
-    roles: [RoleEnum.COMMON, RoleEnum.ADMIN]
-  }
+    roles: [RoleEnum.COMMON, RoleEnum.ADMIN],
+    format: ({ rowData, value }) => {
+      return isLoadingValue(value)
+        ? 'Carregando...'
+        : (value / 10 ** rowData.decimals).toFixed(rowData.decimals)
+    }
+  },
+  {
+    key: 'balance',
+    description: 'Saldo Disponível (BRLX)',
+    roles: [RoleEnum.COMMON, RoleEnum.ADMIN],
+    format: ({ rowData, value }) => {
+      return isLoadingValue(value)
+        ? 'Carregando...'
+        : (value / 10 ** rowData.decimals).toFixed(rowData.decimals)
+    }
+  },
 ];
 
 export const TPFTable = (props) => {
@@ -58,6 +84,9 @@ export const TPFTable = (props) => {
     count = 0,
     items = [],
     unitPriceList = [],
+    totalAssetsList = [],
+    totalSupplyList = [],
+    balanceList = [],
     onPageChange = () => { },
     onRowsPerPageChange,
     page = 0,
@@ -121,7 +150,7 @@ export const TPFTable = (props) => {
   return (
     <>
       <CardsList>
-        {items.map(TPFItemCard(unitPriceList, headers, settleLoading, isAdmin, settle, buy))}
+        {items.map(TPFItemCard(unitPriceList, totalAssetsList, totalSupplyList, balanceList, headers, settleLoading, isAdmin, settle, buy))}
       </CardsList>
       {!embedded && (
         <TablePagination
@@ -155,6 +184,9 @@ TPFTable.propTypes = {
   count: PropTypes.number,
   items: PropTypes.array,
   unitPriceList: PropTypes.array,
+  totalAssetsList: PropTypes.array,
+  totalSupplyList: PropTypes.array,
+  balanceList: PropTypes.array,
   onDeselectAll: PropTypes.func,
   onDeselectOne: PropTypes.func,
   onPageChange: PropTypes.func,
