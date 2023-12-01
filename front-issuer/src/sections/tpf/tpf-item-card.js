@@ -1,23 +1,39 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUsers, faMoneyBillTransfer, faEllipsisV } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faUsers,
+  faMoneyBillTransfer,
+  faEllipsisV,
+  faBagShopping
+} from '@fortawesome/free-solid-svg-icons';
 import { Button, CircularProgress, IconButton, SvgIcon } from '@mui/material';
 import { CardItem } from 'src/components/cards';
 
 export const TPFItemCard =
-  (unitPriceList, totalAssetsList, totalSupplyList, balanceList, headers, settleLoading, isAdmin, settle, buy) => (item) => {
+  (
+    unitPriceList,
+    totalAssetsList,
+    totalSupplyList,
+    balanceList,
+    headers,
+    settleLoading,
+    isAdmin,
+    settle,
+    buy
+  ) =>
+  (item) => {
     const itemComplement = {
       totalAssets: unitPriceList.find((up) => up.symbol === item.symbol)?.price,
       totalSupply: totalAssetsList.find((up) => up.symbol === item.symbol)?.totalAssets,
       balance: totalSupplyList.find((up) => up.symbol === item.symbol)?.totalSupply,
-      unitPrice: balanceList.find((up) => up.symbol === item.symbol)?.balance,
-    }
+      unitPrice: balanceList.find((up) => up.symbol === item.symbol)?.balance
+    };
     const holders = () => {
       console.log(`Show holders list of token ${item.contractAddress}`);
-    }
+    };
 
     const withdraw = () => {
       console.log(`Withdraw of token ${item.contractAddress}`);
-    }
+    };
 
     return (
       <CardItem key={item.symbol} title={item.symbol}>
@@ -62,7 +78,10 @@ export const TPFItemCard =
               <br />
               <span style={{ fontSize: '14px', lineHeight: '20px' }}>
                 {header.format
-                  ? header.format({ rowData: item, value: item[header.key] ?? itemComplement[header.key] })
+                  ? header.format({
+                      rowData: item,
+                      value: item[header.key] ?? itemComplement[header.key]
+                    })
                   : item[header.key] ?? itemComplement[header.key]}
               </span>
             </p>
@@ -83,18 +102,20 @@ export const TPFItemCard =
               style={{ borderRadius: '50px', maxWidth: 'fit-content' }}
               onClick={() => (isAdmin ? settle(item) : buy(item))}
               startIcon={
-                <Icon style={{ width: '28px', height: '28px' }}>
-                  <SvgIcon fontSize="medium" style={{ width: '24px', height: '24px' }}>
-                    <ShoppingCartIcon />
-                  </SvgIcon>
-                </Icon>
+                <SvgIcon fontSize="small">
+                  <FontAwesomeIcon icon={faBagShopping} />
+                </SvgIcon>
               }
             >
               {settleLoading[item.symbol] && <CircularProgress size={24} sx={{ mr: 1 }} />}
               {isAdmin ? 'Liquidar' : 'Comprar'}
             </Button>
-            <IconButton color="primary" style={{ cursor: 'pointer' }} onClick={isAdmin ? holders : withdraw}>
-              <SvgIcon>
+            <IconButton
+              color="primary"
+              style={{ cursor: 'pointer' }}
+              onClick={isAdmin ? holders : withdraw}
+            >
+              <SvgIcon fontSize='medium'>
                 <FontAwesomeIcon icon={isAdmin ? faUsers : faMoneyBillTransfer} />
               </SvgIcon>
             </IconButton>
