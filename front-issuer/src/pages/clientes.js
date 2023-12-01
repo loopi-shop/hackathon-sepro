@@ -1,6 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIcon';
-import ArrowUpOnSquareIcon from '@heroicons/react/24/solid/ArrowUpOnSquareIcon';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 import { Box, Button, Container, Stack, SvgIcon, Typography } from '@mui/material';
 import { useSelection } from 'src/hooks/use-selection';
@@ -59,60 +57,69 @@ const Page = () => {
     >
       <Container maxWidth="xl">
         <Stack spacing={3}>
-          <Stack direction="row" justifyContent="space-between" spacing={4}>
-            <Stack spacing={1}>
-              <Typography variant="h4">Customers</Typography>
+          <Stack spacing={2}>
+            <Typography variant="h4">Clientes</Typography>
+            <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack alignItems="center" direction="row" spacing={1}>
                 <Button
-                  color="inherit"
-                  startIcon={
-                    <SvgIcon fontSize="small">
-                      <ArrowUpOnSquareIcon />
-                    </SvgIcon>
-                  }
+                  fontSize="small"
+                  color="primary"
+                  variant="outlined"
+                  sx={{ borderRadius: '50px' }}
                 >
-                  Import
+                  Importar
                 </Button>
                 <Button
-                  color="inherit"
-                  startIcon={
-                    <SvgIcon fontSize="small">
-                      <ArrowDownOnSquareIcon />
-                    </SvgIcon>
-                  }
+                  fontSize="small"
+                  color="primary"
+                  variant="outlined"
+                  sx={{ borderRadius: '50px' }}
                 >
-                  Export
+                  Exportar
                 </Button>
               </Stack>
+              <div>
+                <Button
+                  startIcon={
+                    <SvgIcon fontSize="small">
+                      <PlusIcon />
+                    </SvgIcon>
+                  }
+                  variant="contained"
+                  sx={{ borderRadius: '50px' }}
+                >
+                  Adicionar
+                </Button>
+              </div>
             </Stack>
-            <div>
-              <Button
-                startIcon={
-                  <SvgIcon fontSize="small">
-                    <PlusIcon />
-                  </SvgIcon>
-                }
-                variant="contained"
-              >
-                Add
-              </Button>
-            </div>
           </Stack>
-          <CustomersSearch />
-          <CustomersTable
-            count={customers.length}
-            items={customersPaginated}
-            onDeselectAll={customersSelection.handleDeselectAll}
-            onDeselectOne={customersSelection.handleDeselectOne}
-            onPageChange={handlePageChange}
-            onRowsPerPageChange={handleRowsPerPageChange}
-            onSelectAll={customersSelection.handleSelectAll}
-            onSelectOne={customersSelection.handleSelectOne}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            selected={customersSelection.selected}
-          />
+          <div>
+            <Button
+              startIcon={
+                <SvgIcon fontSize="small">
+                  <PlusIcon />
+                </SvgIcon>
+              }
+              variant="contained"
+            >
+              Add
+            </Button>
+          </div>
         </Stack>
+        <CustomersSearch />
+        <CustomersTable
+          count={customers.length}
+          items={customersPaginated}
+          onDeselectAll={customersSelection.handleDeselectAll}
+          onDeselectOne={customersSelection.handleDeselectOne}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleRowsPerPageChange}
+          onSelectAll={customersSelection.handleSelectAll}
+          onSelectOne={customersSelection.handleSelectOne}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          selected={customersSelection.selected}
+        />
       </Container>
     </Box>
   );
