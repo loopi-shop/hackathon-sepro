@@ -10,6 +10,10 @@ import { useSnackbar } from 'notistack';
 import { TPFItemCard } from './tpf-item-card';
 import { CardsList } from 'src/components/cards';
 
+function isLoadingValue(value) {
+  return value === null || value === undefined || value < 0;
+}
+
 const tableHeaders = [
   {
     key: 'symbol',
@@ -31,7 +35,7 @@ const tableHeaders = [
     description: 'Total Arrecadado (BRLX)',
     roles: [RoleEnum.ADMIN],
     format: ({ rowData, value }) => {
-      return value < 0
+      return isLoadingValue(value)
         ? 'Carregando...'
         : (value / 10 ** rowData.decimals).toFixed(rowData.decimals)
     }
@@ -41,7 +45,7 @@ const tableHeaders = [
     description: 'Total Emitido',
     roles: [RoleEnum.COMMON, RoleEnum.ADMIN],
     format: ({ rowData, value }) => {
-      return value < 0
+      return isLoadingValue(value)
         ? 'Carregando...'
         : (value / 10 ** rowData.decimals).toFixed(rowData.decimals)
     }
@@ -50,14 +54,14 @@ const tableHeaders = [
     key: 'yield',
     description: 'Rentabilidade (%)',
     roles: [RoleEnum.COMMON, RoleEnum.ADMIN],
-    format: ({ value }) => (value / 100).toFixed(2)
+    format: ({ value }) => `${(value / 100).toFixed(2)}% a.a.`
   },
   {
     key: 'unitPrice',
     description: 'Preço Unitário',
     roles: [RoleEnum.COMMON, RoleEnum.ADMIN],
     format: ({ rowData, value }) => {
-      return value < 0
+      return isLoadingValue(value)
         ? 'Carregando...'
         : (value / 10 ** rowData.decimals).toFixed(rowData.decimals)
     }
@@ -67,7 +71,7 @@ const tableHeaders = [
     description: 'Saldo Disponível (BRLX)',
     roles: [RoleEnum.COMMON, RoleEnum.ADMIN],
     format: ({ rowData, value }) => {
-      return value < 0
+      return isLoadingValue(value)
         ? 'Carregando...'
         : (value / 10 ** rowData.decimals).toFixed(rowData.decimals)
     }

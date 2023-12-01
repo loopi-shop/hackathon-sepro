@@ -1,5 +1,5 @@
-import EllipsisVerticalIcon from '@heroicons/react/24/solid/EllipsisVerticalIcon';
-import ShareIcon from '@heroicons/react/24/solid/ShareIcon';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faUsers, faMoneyBillTransfer, faEllipsisV } from '@fortawesome/free-solid-svg-icons'
 import { Button, CircularProgress, Icon, SvgIcon } from '@mui/material';
 import { CardItem } from 'src/components/cards';
 
@@ -44,7 +44,7 @@ export const TPFItemCard =
 
           <Icon style={{ width: '32px', height: '32px' }} color="primary">
             <SvgIcon fontSize="medium" style={{ width: '24px', height: '24px' }}>
-              <EllipsisVerticalIcon />
+              <FontAwesomeIcon icon={faEllipsisV} />
             </SvgIcon>
           </Icon>
         </div>
@@ -82,9 +82,9 @@ export const TPFItemCard =
               {settleLoading[item.symbol] && <CircularProgress size={24} sx={{ mr: 1 }} />}
               {isAdmin ? 'Liquidar' : 'Comprar'}
             </Button>
-            <Icon color="primary">
+            <Icon color="primary" style={{ cursor: 'pointer' }}>
               <SvgIcon>
-                <ShareIcon />
+                <FontAwesomeIcon icon={isAdmin ? faUsers : faMoneyBillTransfer} />
               </SvgIcon>
             </Icon>
           </p>
