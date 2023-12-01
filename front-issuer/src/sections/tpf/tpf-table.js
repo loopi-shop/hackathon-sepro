@@ -128,6 +128,19 @@ export const TPFTable = (props) => {
         page={page}
         rowsPerPage={rowsPerPage}
         rowsPerPageOptions={[8, 16, 64]}
+        labelRowsPerPage="Linhas por página:"
+        getItemAriaLabel={(type) => {
+          switch (type) {
+            case 'first':
+              return 'Primeira página';
+            case 'last':
+              return 'Última página';
+            case 'next':
+              return 'Próxima página';
+            case 'previous':
+              return 'Página anterior';
+          }
+        }}
       />
     </>
   );
