@@ -1,15 +1,25 @@
-import { Button, Icon } from '@mui/material';
+import { Icon } from '@mui/material';
 
-export function MetamaskButton({ connect, connected, account }) {
+/**
+ * MetaMaskButton component
+ * @param {Object} props - Props
+ * @param {string} [props.className] - Class name (optional)
+ * @param {React.CSSProperties} [props.style] - Style (optional)
+ * @param {Function} props.onClick - Callback function that is called when the button is clicked
+ * @returns {React.Component} A MetaMaskButton component
+ */
+export function MetaMaskButton({ className, style, onClick }) {
   return (
-    <Button fullWidth size="large" onClick={connect}>
-      <Icon sx={{ mr: 2, width: '24px', height: '24px' }}>
-        <img
-          alt={'Logo metamask'}
-          src={'/assets/logos/logo-metamask.svg'}
-        />
+    <button
+      className={['br-button secondary', className].join(' ')}
+      type="button"
+      style={{ ...style, width: '100%' }}
+      onClick={onClick}
+    >
+      <Icon sx={{ mr: 2, width: '20px', height: '20px' }}>
+        <img alt={'Logo metamask'} src={'/assets/logos/logo-metamask.svg'} />
       </Icon>
-      {connected && account ? `Conectado com: ${account}` : 'Conectar com a Metamask'}
-    </Button>
+      Conectar com MetaMask
+    </button>
   );
 }
