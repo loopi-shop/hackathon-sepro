@@ -1,25 +1,22 @@
 import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, Stack, Icon, Typography } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { useAuth } from 'src/hooks/use-auth';
 import { Layout as AuthLayout } from 'src/layouts/auth/layout';
 import { useSDK } from '@metamask/sdk-react';
 import { PageTitle } from 'src/components/page-title';
 import { useMessage } from 'src/hooks/use-message';
+import { MetaMaskButton } from 'src/components/metamask-button';
 
 const Page = () => {
   const router = useRouter();
   const auth = useAuth();
   const { showDanger } = useMessage();
-  const { sdk, chainId } = useSDK();
+  const { sdk } = useSDK();
 
   const handleSkip = useCallback(() => {
     auth.skip().then(() => router.push('/'));
   }, [auth, router]);
-
-  const goToRegisterPage = useCallback(() => {
-    router.push('/auth/register');
-  }, [auth]);
 
   const connect = async () => {
     try {
@@ -80,30 +77,20 @@ const Page = () => {
                 Escolha uma das opções abaixo
               </Typography>
             </Stack>
+            <MetaMaskButton onClick={connect} />
             <button
-              class="br-button secondary"
-              type="button"
-              style={{ width: '100%' }}
-              onClick={connect}
-            >
-              <Icon sx={{ mr: 2, width: '20px', height: '20px' }}>
-                <img alt={'Logo metamask'} src={'/assets/logos/logo-metamask.svg'} />
-              </Icon>
-              Conectar com MetaMask
-            </button>
-            <button
-              class="br-button secondary"
+              className="br-button secondary"
               type="button"
               style={{ width: '100%', marginTop: '12px' }}
               onClick={handleSkip}
             >
               <span
-                class="fas fa-city"
+                className="fas fa-city"
                 style={{ width: '20px', height: '16px', marginRight: '8px' }}
               ></span>
               Entrar como Admin
             </button>
-            <span class="br-divider my-4"></span>
+            <span className="br-divider my-4"></span>
             <Typography
               color="text.secondary"
               variant="body2"
@@ -112,10 +99,10 @@ const Page = () => {
               Ainda não tem conta?
             </Typography>
             <button
-              class="br-button primary"
+              className="br-button primary"
               type="button"
               style={{ width: '100%', marginTop: '8px' }}
-              onClick={goToRegisterPage}
+              onClick={() => router.push('/auth/register')}
             >
               Criar conta
             </button>
