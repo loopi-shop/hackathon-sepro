@@ -39,7 +39,7 @@ contract FederalPublicTitlePermissioned is Context, Token {
     uint256 private immutable _start;
     uint256 private immutable _duration;
 
-    uint64 private _yield;
+    uint64 private immutable _yield;
 
     uint256 private _totalAssets;
     uint256 private _maxAssets;
@@ -145,7 +145,7 @@ contract FederalPublicTitlePermissioned is Context, Token {
         return _duration;
     }
 
-    /**
+        /**
      * @dev Getter for the vesting duration.
      */
     function yield() public view virtual returns (uint64) {
@@ -194,11 +194,6 @@ contract FederalPublicTitlePermissioned is Context, Token {
         // return type(uint256).max;
         _maxAssets += increase;
         return _maxAssets;
-    }
-
-    function setYield(uint64 yield_) public virtual onlyAgent {
-        _yield = yield_;
-        yieldUd = ud(_yield * 1e10);
     }
 
     // /** @dev See {IERC4626-maxMint}. */
