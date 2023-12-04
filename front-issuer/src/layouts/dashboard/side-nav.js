@@ -8,7 +8,7 @@ import { Scrollbar } from 'src/components/scrollbar';
 import { items } from './config';
 import { SideNavItem } from './side-nav-item';
 import { useAuth } from '../../hooks/use-auth';
-import { SideNavBottom } from './site-nav-bottom';
+import { SideNavBottom } from './side-nav-bottom';
 
 export const SideNav = (props) => {
   const { open, onClose } = props;
