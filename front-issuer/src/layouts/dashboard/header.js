@@ -35,7 +35,7 @@ export const DashboardHeader = ({ onMenuClick }) => {
           </div>
           <div className="header-search">
             <div className="br-input has-icon">
-              <label for="searchbox-86987">Texto da pesquisa</label>
+              <label htmlFor="searchbox-86987">Texto da pesquisa</label>
               <input id="searchbox-86987" type="text" placeholder="O que você procura?" />
               <button className="br-button circle small" type="button" aria-label="Pesquisar">
                 <i className="fas fa-search" aria-hidden="true"></i>
