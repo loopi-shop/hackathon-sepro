@@ -44,7 +44,7 @@ const tableHeaders = [
   {
     key: 'totalSupply',
     description: 'Total Emitido',
-    roles: [RoleEnum.COMMON, RoleEnum.ADMIN],
+    roles: [RoleEnum.ADMIN],
     format: ({ rowData, value }) => {
       return isLoadingValue(value)
         ? 'Carregando...'
