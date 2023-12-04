@@ -20,6 +20,7 @@ import { useSnackbar } from 'notistack';
 import { CardItem } from 'src/components/cards';
 import EllipsisVerticalIcon from '@heroicons/react/24/solid/EllipsisVerticalIcon';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
+import { formatBRLX } from 'src/utils/format';
 
 export const TokenCard = ({ token, account }) => {
   const { enqueueSnackbar } = useSnackbar();
@@ -27,13 +28,12 @@ export const TokenCard = ({ token, account }) => {
   const { user, isAdmin } = useAuth();
 
   const mintBRLX = async () => {
-    const signer =
-      isAdmin
-        ? new ethers.Wallet(
-            process.env.NEXT_PUBLIC_ADM_PRIVATE_KEY,
-            new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL)
-          )
-        : await new ethers.BrowserProvider(window.ethereum).getSigner();
+    const signer = isAdmin
+      ? new ethers.Wallet(
+          process.env.NEXT_PUBLIC_ADM_PRIVATE_KEY,
+          new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL)
+        )
+      : await new ethers.BrowserProvider(window.ethereum).getSigner();
 
     const abi = 'function mint(address, uint256)';
     const erc20Contract = new ethers.Contract(process.env.NEXT_PUBLIC_BRLX_CONTRACT, [abi], signer);
@@ -62,7 +62,12 @@ export const TokenCard = ({ token, account }) => {
     decimals = decimals.toString();
 
     const offset = quantity.length - decimals;
-    return `${quantity.slice(0, offset)}.${quantity.slice(offset)}`;
+    const value = `${quantity.slice(0, offset)}.${quantity.slice(offset)}`;
+
+    if (token.isToMint) {
+      return formatBRLX(parseFloat(value));
+    }
+    return value;
   };
 
   return (
