@@ -2,20 +2,16 @@ import {
   Avatar,
   Box,
   Button,
-  Card,
   CardActions,
   CardContent,
   CircularProgress,
-  Divider,
   Icon,
-  Link,
   SvgIcon,
   Typography
 } from '@mui/material';
 import { ethers } from 'ethers';
 import { useState } from 'react';
 import { useAuth } from '../../hooks/use-auth';
-import { RoleEnum } from '../../contexts/auth-context';
 import { useSnackbar } from 'notistack';
 import { CardItem } from 'src/components/cards';
 import EllipsisVerticalIcon from '@heroicons/react/24/solid/EllipsisVerticalIcon';
@@ -62,7 +58,7 @@ export const TokenCard = ({ token, account }) => {
     decimals = decimals.toString();
 
     const offset = quantity.length - decimals;
-    const value = `${quantity.slice(0, offset)}.${quantity.slice(offset)}`;
+    const value = `${offset > 0 ? quantity.slice(0, offset) : 0}.${quantity.slice(offset)}`;
 
     if (token.isToMint) {
       return formatBRLX(parseFloat(value));
