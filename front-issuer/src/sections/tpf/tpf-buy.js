@@ -1,21 +1,14 @@
-import XMarkIcon from '@heroicons/react/24/solid/XMarkIcon';
-import { forwardRef, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
   Box,
   Button,
   TextField,
   Stack,
-  Dialog,
   DialogContent,
   DialogContentText,
-  Slide,
-  Icon,
   Typography,
-  CircularProgress,
-  Paper,
-  SvgIcon
-} from '@mui/material';
+  CircularProgress} from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useSDK } from '@metamask/sdk-react';
@@ -29,14 +22,7 @@ import { AddressButton } from 'src/components/address-button';
 import { shortenAddress } from 'src/utils/shorten-address';
 import Link from 'next/link';
 import { getContractLink } from 'src/utils/token-link';
-
-const Transition = forwardRef(function Transition(props, ref) {
-  return <Slide direction="left" ref={ref} {...props} />;
-});
-
-const CustomPaper = forwardRef(function CustomPaper(props, ref) {
-  return <Paper ref={ref} style={{ borderRadius: 0, padding: '16px' }} {...props} />;
-});
+import { CustomDialog } from 'src/components/dialog';
 
 export const TPFBuy = (props) => {
   const { open, handleClose, tpf = {} } = props;
@@ -202,24 +188,7 @@ export const TPFBuy = (props) => {
   }, [unitPrice]);
 
   return (
-    <Dialog
-      TransitionComponent={Transition}
-      open={open}
-      onClose={handleClose}
-      PaperComponent={CustomPaper}
-      maxWidth
-    >
-      <div style={{ fontSize: '20px', fontWeight: 600 }}>
-        Compra de Título Público
-        <Icon
-          style={{ float: 'right', width: 40, height: 40, coloer: 'navy', cursor: 'pointer' }}
-          onClick={handleClose}
-        >
-          <SvgIcon>
-            <XMarkIcon />
-          </SvgIcon>
-        </Icon>
-      </div>
+    <CustomDialog title="Compra de Título Público" open={open} handleClose={handleClose}>
       <DialogContent style={{ margin: 0, padding: 0 }}>
         <DialogContentText
           style={{
@@ -366,7 +335,7 @@ export const TPFBuy = (props) => {
           </Stack>
         </form>
       </DialogContent>
-    </Dialog>
+    </CustomDialog>
   );
 };
 
