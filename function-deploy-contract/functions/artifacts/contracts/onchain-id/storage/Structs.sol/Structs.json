@@ -1,0 +1,10 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "Structs",
+  "sourceName": "contracts/onchain-id/storage/Structs.sol",
+  "abi": [],
+  "bytecode": "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea2646970667358221220408a9af9c8caa5d708848fe3f057a8845d417d0c8720e0855b8615d1a44be02964736f6c63430008130033",
+  "deployedBytecode": "0x6080604052600080fdfea2646970667358221220408a9af9c8caa5d708848fe3f057a8845d417d0c8720e0855b8615d1a44be02964736f6c63430008130033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

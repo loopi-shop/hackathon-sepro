@@ -135,3 +135,6 @@ dist
 
 # database cert
 hackathon-sepro-firebase-adminsdk.json
+
+# G Cloud Json
+dev-gcloud.json
