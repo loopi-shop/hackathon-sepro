@@ -92,7 +92,7 @@ export const TPFWithdraw = (props) => {
       });
 
       console.info('start broadcast tx:', tx);
-      const { txHash } = await broadcast(tx).catch((err) => {
+      const { txHash } = await broadcast({ tx }).catch((err) => {
         console.error(`failed to broadcast tx`, tx, err);
         enqueueSnackbar(`Falha ao enviar transação`, {
           variant: 'error',
