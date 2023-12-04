@@ -6,10 +6,10 @@ import { CardItem } from 'src/components/cards';
 export const TPFItemCard =
   (unitPriceList, totalAssetsList, totalSupplyList, balanceList, headers, settleLoading, isAdmin, settle, buy, openHolders) => (item) => {
     const itemComplement = {
-      totalAssets: unitPriceList.find((up) => up.symbol === item.symbol)?.price,
-      totalSupply: totalAssetsList.find((up) => up.symbol === item.symbol)?.totalAssets,
-      balance: totalSupplyList.find((up) => up.symbol === item.symbol)?.totalSupply,
-      unitPrice: balanceList.find((up) => up.symbol === item.symbol)?.balance,
+      totalAssets: totalAssetsList.find((up) => up.symbol === item.symbol)?.totalAssets,
+      totalSupply: totalSupplyList.find((up) => up.symbol === item.symbol)?.totalSupply,
+      balance: balanceList.find((up) => up.symbol === item.symbol)?.balance,
+      unitPrice: unitPriceList.find((up) => up.symbol === item.symbol)?.price,
     }
 
     const holders = () => {
