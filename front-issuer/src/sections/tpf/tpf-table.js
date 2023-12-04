@@ -108,8 +108,8 @@ export const TPFTable = (props) => {
     console.info('Depositando no Título:', tpf);
     const quantity = (await getTotalSupply({contractAddress: tpfContractAddress})) * 1000;
     if(quantity === 0) {
-      console.error('Erro ao liquidar, total supply equal to zero');
-      throw Error('Erro ao liquidar, total supply equal to zero');
+      console.error('Erro ao liquidar, total supply igual a zero');
+      throw Error('Erro ao liquidar, total supply igual a zero');
     }
 
     const transferInput = {
@@ -119,7 +119,7 @@ export const TPFTable = (props) => {
       to: tpfContractAddress,
     };
 
-    console.info('Inputs to deposit', transferInput);
+    console.info('entradas para deposito', transferInput);
     const transaction = await transfer(transferInput);
     console.info('Resultado do depósito do título', transaction);
   }
