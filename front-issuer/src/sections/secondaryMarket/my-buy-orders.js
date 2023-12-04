@@ -54,7 +54,7 @@ export function MyBuyOrders() {
         }}
       >
         <Typography variant="h6" sx={{ textTransform: 'none', pl: '16px' }}>
-          Ordens de compra
+          Ordens de compra {search ? `(${search})` : ''}
         </Typography>
         <Box>
           {searchOpen ? (

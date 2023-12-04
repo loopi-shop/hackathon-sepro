@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { normalizeString } from 'src/utils/format';
 import secondaryMarket from "../../utils/secondary-market";
 import {useAuth} from "../use-auth";
 
@@ -22,7 +23,7 @@ export function useBuyOrders() {
   };
 
   return {
-    orders: orders.filter((order) => order.name.includes(search)),
+    orders: orders.filter((order) => normalizeString(order.name).includes(normalizeString(search))),
     removeOrder,
     search,
     setSearch,

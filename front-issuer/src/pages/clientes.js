@@ -1,6 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIcon';
-import ArrowUpOnSquareIcon from '@heroicons/react/24/solid/ArrowUpOnSquareIcon';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 import { Box, Button, Container, Stack, SvgIcon, Typography } from '@mui/material';
 import { useSelection } from 'src/hooks/use-selection';
@@ -10,6 +8,17 @@ import { CustomersSearch } from 'src/sections/customer/customers-search';
 import { applyPagination } from 'src/utils/apply-pagination';
 import usersRepository from '../repositories/users.repository';
 import { PageTitle } from 'src/components/page-title';
+import { normalizeString } from 'src/utils/format';
+
+const useCustomersFiltered = (data, search) => {
+  return useMemo(() => {
+    const dataFiltered =
+      search.length > 0
+        ? data.filter((d) => normalizeString(d.name).includes(normalizeString(search)))
+        : data;
+    return dataFiltered;
+  }, [data, search]);
+};
 
 const useCustomers = (data, page, rowsPerPage) => {
   return useMemo(() => {
@@ -24,6 +33,7 @@ const useCustomerIds = (customers) => {
 };
 
 const Page = () => {
+  const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [isLoading, setIsLoading] = useState(false);
@@ -37,6 +47,7 @@ const Page = () => {
     });
   }, []);
 
+  const customersFiltered = useCustomersFiltered(customers, search);
   const customersPaginated = useCustomers(customers, page, rowsPerPage);
   const customersIds = useCustomerIds(customers);
   const customersSelection = useSelection(customersIds);
@@ -59,60 +70,57 @@ const Page = () => {
     >
       <Container maxWidth="xl">
         <Stack spacing={3}>
-          <Stack direction="row" justifyContent="space-between" spacing={4}>
-            <Stack spacing={1}>
-              <Typography variant="h4">Customers</Typography>
+          <Stack spacing={2}>
+            <Typography variant="h4">Clientes</Typography>
+            <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack alignItems="center" direction="row" spacing={1}>
                 <Button
-                  color="inherit"
-                  startIcon={
-                    <SvgIcon fontSize="small">
-                      <ArrowUpOnSquareIcon />
-                    </SvgIcon>
-                  }
+                  fontSize="small"
+                  color="primary"
+                  variant="outlined"
+                  sx={{ borderRadius: '50px' }}
                 >
-                  Import
+                  Importar
                 </Button>
                 <Button
-                  color="inherit"
-                  startIcon={
-                    <SvgIcon fontSize="small">
-                      <ArrowDownOnSquareIcon />
-                    </SvgIcon>
-                  }
+                  fontSize="small"
+                  color="primary"
+                  variant="outlined"
+                  sx={{ borderRadius: '50px' }}
                 >
-                  Export
+                  Exportar
                 </Button>
               </Stack>
+              <div>
+                <Button
+                  startIcon={
+                    <SvgIcon fontSize="small">
+                      <PlusIcon />
+                    </SvgIcon>
+                  }
+                  variant="contained"
+                  sx={{ borderRadius: '50px' }}
+                >
+                  Adicionar
+                </Button>
+              </div>
             </Stack>
-            <div>
-              <Button
-                startIcon={
-                  <SvgIcon fontSize="small">
-                    <PlusIcon />
-                  </SvgIcon>
-                }
-                variant="contained"
-              >
-                Add
-              </Button>
-            </div>
           </Stack>
-          <CustomersSearch />
-          <CustomersTable
-            count={customers.length}
-            items={customersPaginated}
-            onDeselectAll={customersSelection.handleDeselectAll}
-            onDeselectOne={customersSelection.handleDeselectOne}
-            onPageChange={handlePageChange}
-            onRowsPerPageChange={handleRowsPerPageChange}
-            onSelectAll={customersSelection.handleSelectAll}
-            onSelectOne={customersSelection.handleSelectOne}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            selected={customersSelection.selected}
-          />
         </Stack>
+        <CustomersSearch search={search} setSearch={setSearch} />
+        <CustomersTable
+          count={customersFiltered.length}
+          items={customersPaginated}
+          onDeselectAll={customersSelection.handleDeselectAll}
+          onDeselectOne={customersSelection.handleDeselectOne}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleRowsPerPageChange}
+          onSelectAll={customersSelection.handleSelectAll}
+          onSelectOne={customersSelection.handleSelectOne}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          selected={customersSelection.selected}
+        />
       </Container>
     </Box>
   );
