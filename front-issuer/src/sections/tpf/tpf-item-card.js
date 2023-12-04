@@ -10,17 +10,29 @@ import { Button, CircularProgress, Divider, IconButton, SvgIcon } from '@mui/mat
 import { CardItem } from 'src/components/cards';
 
 export const TPFItemCard =
-  (unitPriceList, totalAssetsList, totalSupplyList, balanceList, headers, settleLoading, isAdmin, settle, buy, openHolders) => (item) => {
+  (
+    unitPriceList,
+    totalAssetsList,
+    totalSupplyList,
+    balanceList,
+    headers,
+    settleLoading,
+    isAdmin,
+    settle,
+    buy,
+    openHolders
+  ) =>
+  (item) => {
     const itemComplement = {
-      unitPrice: totalAssetsList.find((up) => up.symbol === item.symbol)?.totalAssets,
-      totalAssets: totalSupplyList.find((up) => up.symbol === item.symbol)?.totalSupply,
-      totalSupply: balanceList.find((up) => up.symbol === item.symbol)?.balance,
-      balance: unitPriceList.find((up) => up.symbol === item.symbol)?.price,
-    }
+      totalAssets: totalAssetsList.find((up) => up.symbol === item.symbol)?.totalAssets,
+      totalSupply: totalSupplyList.find((up) => up.symbol === item.symbol)?.totalSupply,
+      balance: balanceList.find((up) => up.symbol === item.symbol)?.balance,
+      unitPrice: unitPriceList.find((up) => up.symbol === item.symbol)?.price
+    };
     const holders = () => {
       console.log(`Show holders list of token ${item.contractAddress}`);
       openHolders(item);
-    }
+    };
 
     const withdraw = () => {
       console.log(`Withdraw of token ${item.contractAddress}`);
@@ -28,9 +40,13 @@ export const TPFItemCard =
 
     const expirationHeader = headers.filter((h) => h.key === 'expirationDate')[0];
     const balanceHeader = headers.filter((h) => h.key === 'balance')[0];
-    const othersHeaders = headers.filter(
+    let othersHeaders = headers.filter(
       (h) => !['symbol', 'expirationDate', isAdmin ? 'x' : 'balance'].includes(h.key)
     );
+
+    if (!isAdmin) {
+      othersHeaders = othersHeaders.reverse();
+    }
 
     return (
       <CardItem key={item.symbol} title={item.symbol}>
@@ -97,7 +113,7 @@ export const TPFItemCard =
                 </p>
               </div>
             </div>
-            <Divider sx={{mb:1}} />
+            <Divider sx={{ mb: 1 }} />
           </>
         )}
 
@@ -111,9 +127,9 @@ export const TPFItemCard =
               <span style={{ fontSize: '14px', lineHeight: '20px' }}>
                 {header.format
                   ? header.format({
-                    rowData: item,
-                    value: item[header.key] ?? itemComplement[header.key]
-                  })
+                      rowData: item,
+                      value: item[header.key] ?? itemComplement[header.key]
+                    })
                   : item[header.key] ?? itemComplement[header.key]}
               </span>
             </p>
