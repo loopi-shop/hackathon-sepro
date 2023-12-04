@@ -24,7 +24,7 @@ export const TPFHolders = ({ open, handleClose, tpf, holders, setHolders }) => {
 };
 
 const TPFHolder = (holder, setHolders, tpf) => {
-  const [lockIcon, setLockIcon] = useState(faLockOpen);
+  const [lockIcon, setLockIcon] = useState(holder.isFrozen ? faLock : faLockOpen);
 
   const { broadcast, setFrozen } = useTPF();
 
