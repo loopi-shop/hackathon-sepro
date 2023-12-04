@@ -41,7 +41,7 @@ const Page = () => {
     usersRepository.list().then((list) => {
       setCustomers(list ?? []);
     });
-  });
+  }, []);
 
   const customersPaginated = useCustomers(customers, page, rowsPerPage);
   const customersIds = useCustomerIds(customers);
