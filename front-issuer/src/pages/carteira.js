@@ -4,7 +4,6 @@ import { ethers } from 'ethers';
 import { Box, Container, Grid, Stack, Typography } from '@mui/material';
 import { TokenCard } from '../sections/tokens/token-card';
 import { useAuth } from '../hooks/use-auth';
-import { RoleEnum } from '../contexts/auth-context';
 import { PageTitle } from 'src/components/page-title';
 import { CardsList } from 'src/components/cards';
 
@@ -12,13 +11,13 @@ export const WalletPage = ({ embedded }) => {
   const [account, setAccount] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [tokens, setTokens] = useState([]);
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
 
   /* Load Account */
   useEffect(() => {
     if (isLoading || account) return;
     setIsLoading(true);
-    if (user.role === RoleEnum.ADMIN) {
+    if (isAdmin) {
       setAccount(user.publicKey);
       setIsLoading(false);
     } else {
@@ -27,7 +26,7 @@ export const WalletPage = ({ embedded }) => {
         setIsLoading(false);
       });
     }
-  });
+  }, [account, isLoading, isAdmin, user]);
 
   /* Load balances */
   useEffect(() => {
@@ -62,7 +61,7 @@ export const WalletPage = ({ embedded }) => {
         console.error(err);
         throw err;
       });
-  });
+  }, [account, tokens, isLoading]);
 
   return (
     <Box
@@ -76,7 +75,7 @@ export const WalletPage = ({ embedded }) => {
         <Stack spacing={3}>
           <div>
             <Typography variant="h4" style={{ fontWeight: 500 }}>
-              Minha carteira
+              {isAdmin ? 'Carteira ADMIN' : 'Minha carteira'}
             </Typography>
           </div>
           <div>

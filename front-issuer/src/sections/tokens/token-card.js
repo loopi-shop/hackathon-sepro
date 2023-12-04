@@ -24,11 +24,11 @@ import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 export const TokenCard = ({ token, account }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [isLoading, setIsLoading] = useState(false);
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
 
   const mintBRLX = async () => {
     const signer =
-      user.role === RoleEnum.ADMIN
+      isAdmin
         ? new ethers.Wallet(
             process.env.NEXT_PUBLIC_ADM_PRIVATE_KEY,
             new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL)

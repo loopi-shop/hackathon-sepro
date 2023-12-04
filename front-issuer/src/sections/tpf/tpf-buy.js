@@ -1,21 +1,14 @@
-import XMarkIcon from '@heroicons/react/24/solid/XMarkIcon';
-import { forwardRef, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
   Box,
   Button,
   TextField,
   Stack,
-  Dialog,
   DialogContent,
   DialogContentText,
-  Slide,
-  Icon,
   Typography,
-  CircularProgress,
-  Paper,
-  SvgIcon
-} from '@mui/material';
+  CircularProgress} from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useSDK } from '@metamask/sdk-react';
@@ -24,16 +17,12 @@ import { addDays, format } from 'date-fns';
 import BigNumber from 'bignumber.js';
 import { NumericFormat } from 'react-number-format';
 import { useSnackbar } from 'notistack';
-import { MetamaskButton } from 'src/components/metamask-button';
+import { MetaMaskButton } from 'src/components/metamask-button';
+import { AddressButton } from 'src/components/address-button';
+import { shortenAddress } from 'src/utils/shorten-address';
 import Link from 'next/link';
-
-const Transition = forwardRef(function Transition(props, ref) {
-  return <Slide direction="left" ref={ref} {...props} />;
-});
-
-const CustomPaper = forwardRef(function CustomPaper(props, ref) {
-  return <Paper ref={ref} style={{ borderRadius: 0, padding: '16px' }} {...props} />;
-});
+import { getContractLink } from 'src/utils/token-link';
+import { CustomDialog } from 'src/components/dialog';
 
 export const TPFBuy = (props) => {
   const { open, handleClose, tpf = {} } = props;
@@ -199,24 +188,7 @@ export const TPFBuy = (props) => {
   }, [unitPrice]);
 
   return (
-    <Dialog
-      TransitionComponent={Transition}
-      open={open}
-      onClose={handleClose}
-      PaperComponent={CustomPaper}
-      maxWidth
-    >
-      <div style={{ fontSize: '20px', fontWeight: 600 }}>
-        Compra de Título Público
-        <Icon
-          style={{ float: 'right', width: 40, height: 40, coloer: 'navy', cursor: 'pointer' }}
-          onClick={handleClose}
-        >
-          <SvgIcon>
-            <XMarkIcon />
-          </SvgIcon>
-        </Icon>
-      </div>
+    <CustomDialog title="Compra de Título Público" open={open} handleClose={handleClose}>
       <DialogContent style={{ margin: 0, padding: 0 }}>
         <DialogContentText
           style={{
@@ -242,7 +214,7 @@ export const TPFBuy = (props) => {
               <strong>Endereço do contrato</strong>
               <br />
               <Link
-                href={`https://polygonscan.com/address/${tpf.contractAddress}`}
+                href={getContractLink(tpf.contractAddress)}
                 target="_blank"
                 title={tpf.contractAddress}
                 style={{ color: '#0076D6', textDecoration: 'none' }}
@@ -279,7 +251,11 @@ export const TPFBuy = (props) => {
         <hr style={{ height: 2, margin: '24px 0' }} />
         <form noValidate onSubmit={formik.handleSubmit} style={{ margin: '16px' }}>
           <Stack spacing={1}>
-            <MetamaskButton connect={connect} connected={connected} account={account} />
+            {connected ? (
+              <AddressButton>{shortenAddress(account, 16, 15)}</AddressButton>
+            ) : (
+              <MetaMaskButton onClick={connect} />
+            )}
             <b>Quanto deseja comprar?</b>
             <p>
               <b style={{ fontWeight: 600, fontSize: 14 }}>Valor</b>
@@ -359,7 +335,7 @@ export const TPFBuy = (props) => {
           </Stack>
         </form>
       </DialogContent>
-    </Dialog>
+    </CustomDialog>
   );
 };
 

@@ -31,14 +31,8 @@ const Favicon = () => (
 
 const Fonts = () => (
   <>
-    <link
-      rel="preconnect"
-      href="https://fonts.googleapis.com"
-    />
-    <link
-      rel="preconnect"
-      href="https://fonts.gstatic.com"
-    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
     <link href="https://fonts.cdnfonts.com/css/rawline" rel="stylesheet" />
     <link
       rel="stylesheet"
@@ -51,6 +45,10 @@ const Fonts = () => (
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css"
     />
   </>
 );
