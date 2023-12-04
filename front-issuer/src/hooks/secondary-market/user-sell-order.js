@@ -22,11 +22,11 @@ export function useSellOrder() {
     if (!values.quantity || !values.totalPrice) {
       return 0;
     }
-    return values.totalPrice / values.quantity;
+    return (values.totalPrice / values.quantity).toFixed(2);
   }, [values]);
 
   const sellDisabled = useMemo(() => {
-    return !values.asset, !values.quantity || !values.totalPrice;
+    return !values.asset || !values.quantity || !values.totalPrice;
   }, [values]);
 
   return {

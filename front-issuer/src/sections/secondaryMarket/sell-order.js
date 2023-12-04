@@ -6,11 +6,13 @@ import { CustomDialog } from 'src/components/dialog';
 import { Input } from 'src/components/input';
 import { Select } from 'src/components/select';
 import { useSellOrder } from 'src/hooks/secondary-market/user-sell-order';
+import { formatBRLX } from 'src/utils/format';
 import { shortenAddress } from 'src/utils/shorten-address';
 
 export function SellOrder({ open, handleClose }) {
   const { account } = useSDK();
-  const { options, values, setValue, totalAssets, unitPrice } = useSellOrder();
+  const { options, values, setValue, totalAssets, unitPrice, onClickSell, sellDisabled } =
+    useSellOrder();
 
   return (
     <CustomDialog title="Vender Título Público" open={open} handleClose={handleClose}>
@@ -42,14 +44,16 @@ export function SellOrder({ open, handleClose }) {
             type="number"
             min="1"
           />
-          Valor unitário: {unitPrice} BRLX
+          Valor unitário: {formatBRLX(unitPrice)} BRLX
         </Box>
       </Box>
       <Divider sx={{ my: 2 }} />
       <Button
-        variant="contained"
+        disabled={sellDisabled}
+        variant={sellDisabled ? 'secondary' : 'contained'}
         color="primary"
         sx={{ borderRadius: '50px', padding: '8px 24px' }}
+        onClick={onClickSell}
       >
         Vender
       </Button>

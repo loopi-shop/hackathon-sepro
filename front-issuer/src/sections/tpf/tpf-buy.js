@@ -8,7 +8,8 @@ import {
   DialogContent,
   DialogContentText,
   Typography,
-  CircularProgress} from '@mui/material';
+  CircularProgress
+} from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useSDK } from '@metamask/sdk-react';
@@ -23,6 +24,7 @@ import { shortenAddress } from 'src/utils/shorten-address';
 import Link from 'next/link';
 import { getContractLink } from 'src/utils/token-link';
 import { CustomDialog } from 'src/components/dialog';
+import { formatBRLX } from 'src/utils/format';
 
 export const TPFBuy = (props) => {
   const { open, handleClose, tpf = {} } = props;
@@ -39,8 +41,8 @@ export const TPFBuy = (props) => {
     },
     validationSchema: Yup.object({
       amount: Yup.number()
-        .min(tpf.minimumValue, `Valor informado deve ser maior que ${tpf.minimumValue}`)
-        .required('Valor mínimo é obrigatório')
+        .min(0, `Informe algum valor`)
+        .required('Infomre a quantidade que deseja comprar')
     }),
     onSubmit: async (values) => {
       setIsLoadingSubmit(true);
@@ -234,16 +236,13 @@ export const TPFBuy = (props) => {
               <br />
               <span>{(tpf.yield / 100).toFixed(2)}% a.a</span>
             </p>
-            <p>
-              <strong>Valor mínimo</strong>
-              <br />
-              <span>{tpf.minimumValue} BRLX</span>
-            </p>
             {unitPrice && (
               <p>
                 <strong>Preço Unitário</strong>
                 <br />
-                <span>{new BigNumber(unitPrice).shiftedBy(-tpf.decimals).toString()} BRLX</span>
+                <span>
+                  {formatBRLX(new BigNumber(unitPrice).shiftedBy(-tpf.decimals).toString())} BRLX
+                </span>
               </p>
             )}
           </div>

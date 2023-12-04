@@ -14,6 +14,7 @@ import {
 import { Box } from '@mui/system';
 import { Scrollbar } from 'src/components/scrollbar';
 import { useSellOrders } from 'src/hooks/secondary-market/use-sell-orders';
+import { formatBRLX } from 'src/utils/format';
 
 const headers = [
   {
@@ -30,7 +31,8 @@ const headers = [
   },
   {
     key: 'unitPrice',
-    title: 'Preço unitário (BRLX)'
+    title: 'Preço unitário (BRLX)',
+    format: formatBRLX
   },
   {
     key: 'quantity',
@@ -38,11 +40,13 @@ const headers = [
   },
   {
     key: 'totalPrice',
-    title: 'Valor do lote (BRLX)'
+    title: 'Valor do lote (BRLX)',
+    format: formatBRLX
   },
   {
     key: 'sellPrice',
-    title: 'Preço de venda (BRLX)'
+    title: 'Preço de venda (BRLX)',
+    format: formatBRLX
   }
 ];
 
@@ -86,7 +90,7 @@ export function MySellOrders() {
                 <TableRow index={index} key={index}>
                   {headers.map((head, insideIndex) => (
                     <TableCell sx={{ fontSize: '14px' }} key={insideIndex}>
-                      {order[head.key]}
+                      {head.format ? head.format(order[head.key]) : order[head.key]}
                     </TableCell>
                   ))}
                   <TableCell>
