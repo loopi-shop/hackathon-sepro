@@ -97,4 +97,4 @@ const verifyContract = async (contractAddress: string, args: any[]) => {
     }
 };
 
-exports.deploy = onRequest({ timeoutSeconds: 300 }, app);
+exports.deploy = onRequest({ memory: '512MiB', timeoutSeconds: 300 }, app);
