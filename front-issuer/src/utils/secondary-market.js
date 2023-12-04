@@ -3,10 +3,11 @@ import secondaryMarket from '../abis/secondary-market.json';
 import {JsonRpcProvider} from "ethers";
 import investmentsRepository from "../repositories/investments.repository";
 import {addDays, format} from "date-fns";
+import BigNumber from "bignumber.js";
 
 const getExpirationDate = (tpf) => {
   if (tpf?.startTimestamp) {
-    const expirationDate = addDays(tpf.startTimestamp, tpf.durationDays);
+    const expirationDate = addDays(tpf.startTimestamp.toDate(), tpf.durationDays);
     return format(expirationDate, 'dd/MM/yyyy');
   }
 };
@@ -28,16 +29,16 @@ class SecondaryMarket {
     return this.contract;
   }
 
-  async getInvestment(publicKey) {
+  async getInvestment(contractAddress) {
     if(!this.investments) {
       this.investments = {};
     }
 
-    if(!this.investments[publicKey]) {
-      this.investments[publicKey] = await investmentsRepository.findOneByPublicKey(publicKey);
+    if(!this.investments[contractAddress]) {
+      this.investments[contractAddress] = await investmentsRepository.findOneByContractAddress(contractAddress);
     }
 
-    return this.investments[publicKey];
+    return this.investments[contractAddress];
   }
 
   /**
@@ -82,10 +83,11 @@ class SecondaryMarket {
 
       const investment = await this.getInvestment(token);
       if(!investment) {
+        console.info('Investment not found: ', { order })
         return undefined;
       }
 
-      const quantity = (amount / 10n ** BigInt(investment.decimals)).toString();
+      const quantity = BigNumber(Number(amount)).shiftedBy(-investment.decimals).toFixed();
 
       return {
         internalId: internalId.toString(),
@@ -93,7 +95,7 @@ class SecondaryMarket {
         expirationDate: getExpirationDate(investment),
         yield: investment.yield,
         quantity,
-        sellPrice: (price / 10n ** 6n).toString(),
+        sellPrice: BigNumber(Number(price)).shiftedBy(-6).toFixed(6),
         isSold,
         isCanceled,
         seller,

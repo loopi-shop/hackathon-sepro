@@ -76,8 +76,8 @@ class InvestmentsRepository extends AbstractRepository {
     }));
   }
 
-  async findOneByPublicKey(publicKey) {
-    const q = query(this.getCollection(), where('publicKey', '==', publicKey));
+  async findOneByContractAddress(contractAddress) {
+    const q = query(this.getCollection(), where('contractAddress', '==', contractAddress));
     const docs = await getDocs(q);
     return docs.docs?.shift()?.data();
   }
