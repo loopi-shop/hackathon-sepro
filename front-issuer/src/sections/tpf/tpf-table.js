@@ -134,7 +134,7 @@ export const TPFTable = (props) => {
   }, [user]);
 
   const transferToRedeem = async (tpfContractAddress) => {
-    console.info('Depositando no Título:', tpf);
+    console.info('Depositando no Título:', tpfContractAddress);
     const quantity = (await getTotalSupply({ contractAddress: tpfContractAddress })) * 1000;
     if (quantity === 0) {
       console.error('Erro ao liquidar, total supply igual a zero');
