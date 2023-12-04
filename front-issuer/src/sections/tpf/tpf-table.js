@@ -8,9 +8,10 @@ import { useTPF } from 'src/hooks/use-tpf';
 import { useSnackbar } from 'notistack';
 import { TPFItemCard } from './tpf-item-card';
 import { CardsList } from 'src/components/cards';
-import { ethers } from 'ethers';
+import { ethers } from "ethers";
 import { TPFHolders } from './tpf-holders';
 import { TPFPagination } from './tpf-pagination';
+import { TPFWithdraw } from './tpf-withdraw';
 import { formatBRLX } from 'src/utils/format';
 
 function isLoadingValue(value) {
@@ -90,7 +91,7 @@ export const TPFTable = (props) => {
     totalAssetsList = [],
     totalSupplyList = [],
     balanceList = [],
-    onPageChange = (event, value) => {},
+    onPageChange = (event, value) => { },
     onRowsPerPageChange,
     page = 0,
     rowsPerPage = 6,
@@ -103,7 +104,7 @@ export const TPFTable = (props) => {
   const { enqueueSnackbar } = useSnackbar();
 
   const [openHolders, setOpenHolders] = useState(false);
-  const [selectedTPF, setSelectedTPF] = useState(undefined);
+  const [selectedTPF, setSelectedTPF] = useState({});
   const [holders, setHolders] = useState([]);
 
   const handleOpenHolders = (tpf) => {
@@ -197,8 +198,25 @@ export const TPFTable = (props) => {
     handleOpenBuy(tpf);
   };
 
+  const [openWithdraw, setOpenWithdraw] = useState(false);
+
+  const handleOpenWithdraw = (tpf) => {
+    setSelectedTPF(tpf);
+    setOpenWithdraw(true);
+  }
+
+  const closeWithdraw = () => {
+    setOpenWithdraw(false);
+    setSelectedTPF({});
+  }
+
   return (
     <>
+      <TPFWithdraw
+        open={openWithdraw}
+        handleClose={closeWithdraw}
+        tpf={selectedTPF}
+      />
       <TPFHolders
         open={openHolders}
         handleClose={closeHolders}
@@ -207,20 +225,19 @@ export const TPFTable = (props) => {
         setHolders={setHolders}
       />
       <CardsList>
-        {items.map(
-          TPFItemCard(
-            unitPriceList,
-            totalAssetsList,
-            totalSupplyList,
-            balanceList,
-            headers,
-            settleLoading,
-            isAdmin,
-            settle,
-            buy,
-            handleOpenHolders
-          )
-        )}
+        {items.map(TPFItemCard({
+          unitPriceList,
+          totalAssetsList,
+          totalSupplyList,
+          balanceList,
+          headers,
+          settleLoading,
+          isAdmin,
+          settle,
+          buy,
+          handleOpenWithdraw,
+          openHolders: handleOpenHolders,
+        }))}
       </CardsList>
       {!embedded && (
         <TPFPagination

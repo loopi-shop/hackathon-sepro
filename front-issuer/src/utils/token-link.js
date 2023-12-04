@@ -1,3 +1,3 @@
 export function getContractLink(contract) {
-  return `https://mumbai.polygonscan.com/address/${contract}`;
+  return `${process.env.NEXT_PUBLIC_SCAN_URL}${contract}`;
 }
