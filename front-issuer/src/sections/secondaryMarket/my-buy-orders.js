@@ -30,18 +30,8 @@ const headers = [
     title: 'Rentabilidade '
   },
   {
-    key: 'unitPrice',
-    title: 'Preço unitário (BRLX)',
-    format: formatBRLX
-  },
-  {
     key: 'quantity',
     title: 'Quantidade'
-  },
-  {
-    key: 'totalPrice',
-    title: 'Valor do lote (BRLX)',
-    format: formatBRLX
   },
   {
     key: 'sellPrice',

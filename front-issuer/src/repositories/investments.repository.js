@@ -1,4 +1,5 @@
 import { AbstractRepository } from "./abstract.repository";
+import {getDocs, query, where} from "firebase/firestore";
 
 /**
  * @typedef TPF
@@ -73,6 +74,12 @@ class InvestmentsRepository extends AbstractRepository {
       minimumValue: tpf.minimumValue ?? MIN_VALUE,
       contractAddress: tpf.contractAddress,
     }));
+  }
+
+  async findOneByPublicKey(publicKey) {
+    const q = query(this.getCollection(), where('publicKey', '==', publicKey));
+    const docs = await getDocs(q);
+    return docs.docs?.shift()?.data();
   }
 }
 

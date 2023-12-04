@@ -1,7 +1,6 @@
 import { faEllipsisVertical, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  Card,
   IconButton,
   SvgIcon,
   Table,
@@ -30,18 +29,8 @@ const headers = [
     title: 'Rentabilidade '
   },
   {
-    key: 'unitPrice',
-    title: 'Preço unitário (BRLX)',
-    format: formatBRLX
-  },
-  {
     key: 'quantity',
     title: 'Quantidade'
-  },
-  {
-    key: 'totalPrice',
-    title: 'Valor do lote (BRLX)',
-    format: formatBRLX
   },
   {
     key: 'sellPrice',
