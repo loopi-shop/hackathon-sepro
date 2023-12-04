@@ -413,7 +413,7 @@ export const TPFProvider = (props) => {
       from: from,
     };
     const [nonce, gasPrice] = await Promise.all([
-      providerRef.current.getTransactionCount(receiver).then((curNonce) => curNonce ?? 0),
+      providerRef.current.getTransactionCount(from).then((curNonce) => curNonce ?? 0),
       providerRef.current.send("eth_gasPrice", []),
     ]);
 
