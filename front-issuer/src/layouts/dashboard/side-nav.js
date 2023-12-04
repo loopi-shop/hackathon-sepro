@@ -15,7 +15,7 @@ import { Logo } from 'src/components/logo';
 import { Scrollbar } from 'src/components/scrollbar';
 import { items } from './config';
 import { SideNavItem } from './side-nav-item';
-import {useAuth} from "../../hooks/use-auth";
+import { useAuth } from '../../hooks/use-auth';
 
 export const SideNav = (props) => {
   const { open, onClose } = props;
@@ -25,7 +25,7 @@ export const SideNav = (props) => {
 
   // Only returns items filtered by user role
   const filteredItems = items.filter((item) => {
-      return !item.roles || (user?.role && item.roles.includes(user?.role));
+    return !item.roles || (user?.role && item.roles.includes(user?.role));
   });
 
   const content = (
@@ -72,23 +72,14 @@ export const SideNav = (props) => {
             }}
           >
             <div>
-              <Typography
-                color="inherit"
-                variant="subtitle1"
-              >
+              <Typography color="inherit" variant="subtitle1">
                 Devias
               </Typography>
-              <Typography
-                color="neutral.400"
-                variant="body2"
-              >
+              <Typography color="neutral.400" variant="body2">
                 Production
               </Typography>
             </div>
-            <SvgIcon
-              fontSize="small"
-              sx={{ color: 'neutral.500' }}
-            >
+            <SvgIcon fontSize="small" sx={{ color: 'neutral.500' }}>
               <ChevronUpDownIcon />
             </SvgIcon>
           </Box>
@@ -112,7 +103,7 @@ export const SideNav = (props) => {
             }}
           >
             {filteredItems.map((item) => {
-              const active = item.path ? (pathname === item.path) : false;
+              const active = item.path ? pathname === item.path : false;
 
               return (
                 <SideNavItem
@@ -132,25 +123,6 @@ export const SideNav = (props) => {
     </Scrollbar>
   );
 
-  if (lgUp) {
-    return (
-      <Drawer
-        anchor="left"
-        open
-        PaperProps={{
-          sx: {
-            backgroundColor: 'neutral.800',
-            color: 'common.white',
-            width: 280
-          }
-        }}
-        variant="permanent"
-      >
-        {content}
-      </Drawer>
-    );
-  }
-
   return (
     <Drawer
       anchor="left"
@@ -164,7 +136,7 @@ export const SideNav = (props) => {
         }
       }}
       sx={{ zIndex: (theme) => theme.zIndex.appBar + 100 }}
-      variant="temporary"
+      variant={lgUp ? 'persistent' : 'temporary'}
     >
       {content}
     </Drawer>
