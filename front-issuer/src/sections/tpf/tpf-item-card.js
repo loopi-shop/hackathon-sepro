@@ -102,9 +102,11 @@ export const TPFItemCard =
               style={{ borderRadius: '50px', maxWidth: 'fit-content' }}
               onClick={() => (isAdmin ? settle(item) : buy(item))}
               startIcon={
-                <SvgIcon fontSize="small">
-                  <FontAwesomeIcon icon={faCartShopping} />
-                </SvgIcon>
+                !isAdmin && (
+                  <SvgIcon fontSize="small">
+                    <FontAwesomeIcon icon={faCartShopping} />
+                  </SvgIcon>
+                )
               }
             >
               {settleLoading[item.symbol] && <CircularProgress size={24} sx={{ mr: 1 }} />}
@@ -115,7 +117,7 @@ export const TPFItemCard =
               style={{ cursor: 'pointer' }}
               onClick={isAdmin ? holders : withdraw}
             >
-              <SvgIcon fontSize='medium'>
+              <SvgIcon fontSize="medium">
                 <FontAwesomeIcon icon={isAdmin ? faUsers : faShareNodes} />
               </SvgIcon>
             </IconButton>

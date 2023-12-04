@@ -34,7 +34,7 @@ export const TPFPage = ({ embedded }) => {
   const tpfsPaginated = useTPFs(page, rowsPerPage, tpfs?.data ?? []);
   const tpfIds = useTPFIds(tpfsPaginated);
   const tpfsSelection = useSelection(tpfIds);
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
 
   const handlePageChange = useCallback((event, value) => {
     setPage(value);
@@ -93,7 +93,7 @@ export const TPFPage = ({ embedded }) => {
         const totalAssetsSettled = await Promise.allSettled(
           tpfChunk.map((tpf) =>
             getTotalAssets({
-              contractAddress: tpf.contractAddress,
+              contractAddress: tpf.contractAddress
             }).then((totalAssets) => ({
               symbol: tpf.symbol,
               totalAssets
@@ -118,7 +118,7 @@ export const TPFPage = ({ embedded }) => {
         const totalSupplySettled = await Promise.allSettled(
           tpfChunk.map((tpf) =>
             getTotalSupply({
-              contractAddress: tpf.contractAddress,
+              contractAddress: tpf.contractAddress
             }).then((totalSupply) => ({
               symbol: tpf.symbol,
               totalSupply
@@ -144,7 +144,7 @@ export const TPFPage = ({ embedded }) => {
           tpfChunk.map((tpf) =>
             balanceOf({
               contractAddress: tpf.asset,
-              accountAddress: user.publicKey,
+              accountAddress: user.publicKey
             }).then((balance) => ({
               symbol: tpf.symbol,
               balance
@@ -182,7 +182,7 @@ export const TPFPage = ({ embedded }) => {
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={1}>
                 <Typography variant="h4" style={{ fontWeight: 500 }}>
-                  Títulos disponíveis
+                  {isAdmin ? 'Títulos ativos' : 'Títulos disponíveis'}
                 </Typography>
               </Stack>
               <div>
