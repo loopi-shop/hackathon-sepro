@@ -78,6 +78,15 @@ const Page = () => {
               </Typography>
             </Stack>
             <MetaMaskButton onClick={connect} />
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: '4px', mb: '4px' }}>
+              <Typography
+                color="text.secondary"
+                variant="body2"
+                style={{ fontSize: '14px', lineHeight: '20px' }}
+              >
+                Você precisa se conectar a rede Mumbai
+              </Typography>
+            </Box>
             <button
               className="br-button secondary"
               type="button"
