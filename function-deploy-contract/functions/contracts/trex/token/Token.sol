@@ -105,7 +105,7 @@ contract Token is IToken, ERC20, Pausable, AgentRole, TokenStorage {
         string memory _name,
         string memory _symbol,
         uint8 _decimals,
-        // _onchainID can be zero address if not set, can be set later by owner
+    // _onchainID can be zero address if not set, can be set later by owner
         address _onchainID
     ) ERC20 (_name, _symbol){
         // that require is protecting legacy versions of TokenProxy contracts
@@ -225,9 +225,9 @@ contract Token is IToken, ERC20, Pausable, AgentRole, TokenStorage {
         address _to,
         uint256 _amount
     ) public virtual override(ERC20, IERC20) whenNotPaused returns (bool) {
-        require(!_frozen[_to] && !_frozen[msg.sender], "wallet is frozen");
+        require(!_frozen[_to] && !_frozen[_from], "wallet is frozen");
         // if (!(!_frozen[_to] && !_frozen[msg.sender])) revert WalletFronzen();
-        require(_amount <= balanceOf(msg.sender) - (_frozenTokens[msg.sender]), "Insufficient Balance");
+        require(_amount <= balanceOf(_from) - (_frozenTokens[_from]), "Insufficient Balance");
         // if (!(_amount <= balanceOf(msg.sender) - (_frozenTokens[msg.sender]))) revert InsufficientBalanceFrozen();
         if (checkCanTransfer(_from, _to, _amount)) {
             ERC20.transferFrom(_from, _to, _amount);
@@ -242,6 +242,7 @@ contract Token is IToken, ERC20, Pausable, AgentRole, TokenStorage {
     }
 
     function checkCanTransfer(address _from, address _to, uint256 _amount) internal returns (bool) {
+
         return _tokenIdentityRegistry.isVerified(_to) && _tokenCompliance.canTransfer(_from, _to, _amount);
     }
 
@@ -320,7 +321,7 @@ contract Token is IToken, ERC20, Pausable, AgentRole, TokenStorage {
             uint256 investorTokens = balanceOf(_lostWallet);
             uint256 frozenTokens = _frozenTokens[_lostWallet];
             _tokenIdentityRegistry.registerIdentity(_newWallet, _onchainID, _tokenIdentityRegistry.investorCountry
-                (_lostWallet));
+            (_lostWallet));
             forcedTransfer(_lostWallet, _newWallet, investorTokens);
             if (frozenTokens > 0) {
                 freezePartialTokens(_newWallet, frozenTokens);
@@ -374,7 +375,7 @@ contract Token is IToken, ERC20, Pausable, AgentRole, TokenStorage {
     /**
      *  @dev See {IToken-isFrozen}.
      */
-    function isFrozen(address _userAddress) external view override returns (bool) {
+    function isFrozen(address _userAddress) public view override returns (bool) {
         return _frozen[_userAddress];
     }
 

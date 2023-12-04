@@ -11,13 +11,17 @@ import "@openzeppelin/contracts/utils/math/Math.sol";
 import "../trex/token/Token.sol";
 import "hardhat/console.sol";
 
-import { UD60x18, ud } from "@prb/math/src/UD60x18.sol";
+import {UD60x18, ud} from "@prb/math/src/UD60x18.sol";
 
 /**
  */
 contract FederalPublicTitlePermissioned is Context, Token {
-
-    event Deposit(address indexed sender, address indexed owner, uint256 assets, uint256 shares);
+    event Deposit(
+        address indexed sender,
+        address indexed owner,
+        uint256 assets,
+        uint256 shares
+    );
 
     event Withdraw(
         address indexed sender,
@@ -35,7 +39,6 @@ contract FederalPublicTitlePermissioned is Context, Token {
     mapping(address => uint256) private _totalInvested;
     mapping(address => uint256) private _totalPlatformFees;
 
-
     uint256 private immutable _start;
     uint256 private immutable _duration;
 
@@ -47,9 +50,9 @@ contract FederalPublicTitlePermissioned is Context, Token {
     uint256 DAYS_IN_A_YEAR = 365;
 
     UD60x18 DAYS_IN_A_YEAR_UD = ud(DAYS_IN_A_YEAR * 1e18);
-    
+
     UD60x18 ONE_UD = ud(1e18);
-    
+
     UD60x18 public nominalValue = ud(1000e18);
     UD60x18 private yieldUd;
 
@@ -65,7 +68,11 @@ contract FederalPublicTitlePermissioned is Context, Token {
     /**
      * @dev Attempted to deposit more assets than the max amount for `receiver`.
      */
-    error ERC4626ExceededMaxDeposit(address receiver, uint256 assets, uint256 max);
+    error ERC4626ExceededMaxDeposit(
+        address receiver,
+        uint256 assets,
+        uint256 max
+    );
 
     /**
      * @dev Attempted to mint more shares than the max amount for `receiver`.
@@ -75,7 +82,11 @@ contract FederalPublicTitlePermissioned is Context, Token {
     /**
      * @dev Attempted to withdraw more assets than the max amount for `receiver`.
      */
-    error ERC4626ExceededMaxWithdraw(address owner, uint256 assets, uint256 max);
+    error ERC4626ExceededMaxWithdraw(
+        address owner,
+        uint256 assets,
+        uint256 max
+    );
 
     /**
      * @dev Attempted to redeem more shares than the max amount for `receiver`.
@@ -97,14 +108,16 @@ contract FederalPublicTitlePermissioned is Context, Token {
         address _identityRegistry,
         address _compliance,
         address _onchainId
-    ) Token (
-        _identityRegistry,
-        _compliance,
-        _name,
-        _symbol,
-        _decimals,
-        _onchainId
-    ) {
+    )
+    Token(
+    _identityRegistry,
+    _compliance,
+    _name,
+    _symbol,
+    _decimals,
+    _onchainId
+    )
+    {
         _asset = asset_;
         _start = startTimestamp;
         _duration = durationDays;
@@ -162,22 +175,47 @@ contract FederalPublicTitlePermissioned is Context, Token {
         return _holders;
     }
 
-    function transfer(address to, uint256 amount) public virtual override onlyAgent returns (bool) {
-        return Token.transfer(to, amount);
+    function transfer(
+        address to,
+        uint256 amount
+    ) public virtual override /*onlyAgent*/ returns (bool) {
+        bool success = Token.transfer(to, amount);
+        _addToHolders(to);
+        return success;
     }
 
-    function transferFrom(address from, address to, uint256 amount) public virtual override onlyAgent returns (bool) {
-        return Token.transferFrom(from, to, amount);
+    function transferFrom(
+        address from,
+        address to,
+        uint256 amount
+    ) public virtual override /*onlyAgent*/ returns (bool) {
+        bool success = Token.transferFrom(from, to, amount);
+        _addToHolders(to);
+        return success;
     }
 
     /** @dev See {IERC4626-convertToShares}. */
-    function convertToShares(uint256 assets, uint256 timestamp) public view virtual returns (uint256) {
+    function convertToShares(
+        uint256 assets,
+        uint256 timestamp
+    ) public view virtual returns (uint256) {
         return _convertToShares(assets, timestamp, Math.Rounding.Down);
     }
 
     /** @dev See {IERC4626-convertToAssets}. */
-    function convertToAssets(uint256 shares, address receiver, uint256 timestamp) public view virtual returns (uint256) {
-        return _convertToAssets(shares, _totalInvested[receiver], timestamp, true, Math.Rounding.Down);
+    function convertToAssets(
+        uint256 shares,
+        address receiver,
+        uint256 timestamp
+    ) public view virtual returns (uint256) {
+        return
+            _convertToAssets(
+            shares,
+            _totalInvested[receiver],
+            timestamp,
+            false,
+            Math.Rounding.Down
+        );
     }
 
     /** @dev See {IERC4626-maxDeposit}. */
@@ -190,7 +228,9 @@ contract FederalPublicTitlePermissioned is Context, Token {
         return _maxAssets;
     }
 
-    function increaseMaxAssets(uint256 increase) public virtual onlyAgent returns (uint256) {
+    function increaseMaxAssets(
+        uint256 increase
+    ) public virtual onlyAgent returns (uint256) {
         // return type(uint256).max;
         _maxAssets += increase;
         return _maxAssets;
@@ -214,8 +254,19 @@ contract FederalPublicTitlePermissioned is Context, Token {
     // }
 
     /** @dev See {IERC4626-maxWithdraw}. */
-    function maxWithdraw(address owner, address receiver, uint256 timestamp) public view virtual returns (uint256) {
-        return _convertToAssets(balanceOf(owner), _totalInvested[receiver], timestamp, false, Math.Rounding.Down);
+    function maxWithdraw(
+        address owner,
+        address receiver,
+        uint256 timestamp
+    ) public view virtual returns (uint256) {
+        return
+            _convertToAssets(
+            balanceOf(owner),
+            _totalInvested[receiver],
+            timestamp,
+            false,
+            Math.Rounding.Down
+        );
     }
 
     /** @dev See {IERC4626-maxRedeem}. */
@@ -224,7 +275,10 @@ contract FederalPublicTitlePermissioned is Context, Token {
     }
 
     /** @dev See {IERC4626-previewDeposit}. */
-    function previewDeposit(uint256 assets, uint256 timestamp) public view virtual returns (uint256) {
+    function previewDeposit(
+        uint256 assets,
+        uint256 timestamp
+    ) public view virtual returns (uint256) {
         uint256 netAssets = getNetValueWithPlatformFee(assets);
         return _convertToShares(netAssets, timestamp, Math.Rounding.Down);
     }
@@ -240,13 +294,28 @@ contract FederalPublicTitlePermissioned is Context, Token {
     // }
 
     /** @dev See {IERC4626-previewRedeem}. */
-    function previewRedeem(uint256 shares, address receiver, uint256 timestamp) public view virtual returns (uint256) {
-        return _convertToAssets(shares, _totalInvested[receiver], timestamp, true, Math.Rounding.Down);
+    function previewRedeem(
+        uint256 shares,
+        address receiver,
+        uint256 timestamp
+    ) public view virtual returns (uint256) {
+        return
+            _convertToAssets(
+            shares,
+            _totalInvested[receiver],
+            timestamp,
+            false,
+            Math.Rounding.Down
+        );
     }
 
     //var seconds = new Date().getTime() / 1000;
     /** @dev See {IERC4626-deposit}. */
-    function deposit(uint256 assets, address receiver, uint256 timestamp) public virtual returns (uint256) {
+    function deposit(
+        uint256 assets,
+        address receiver,
+        uint256 timestamp
+    ) public virtual returns (uint256) {
         uint256 maxAssets_ = maxDeposit(receiver);
         if (totalAssets() + assets > maxAssets_) {
             revert ERC4626ExceededMaxDeposit(receiver, assets, maxAssets_);
@@ -256,10 +325,10 @@ contract FederalPublicTitlePermissioned is Context, Token {
 
         _deposit(_msgSender(), receiver, assets, shares);
 
-        _holders.push(receiver);
+        _addToHolders(receiver);
 
         uint256 netAssets = getNetValueWithPlatformFee(assets);
-        
+
         _totalInvested[receiver] += netAssets;
         _totalAssets += netAssets;
         _totalPlatformFees[receiver] += (assets - netAssets);
@@ -267,8 +336,21 @@ contract FederalPublicTitlePermissioned is Context, Token {
         return shares;
     }
 
+    function _addToHolders(address receiver) internal {
+        for (uint i = 0; i < _holders.length; i++) {
+            address holder = _holders[i];
+            if (holder == receiver) return;
+        }
+        _holders.push(receiver);
+    }
+
     /** @dev See {IERC4626-redeem}. */
-    function _redeem(uint256 shares, address receiver, address owner, uint256 timestamp) internal virtual returns (uint256) {
+    function _redeem(
+        uint256 shares,
+        address receiver,
+        address owner,
+        uint256 timestamp
+    ) internal virtual returns (uint256) {
         uint256 maxShares = maxRedeem(owner);
         if (shares > maxShares) {
             revert ERC4626ExceededMaxRedeem(owner, shares, maxShares);
@@ -282,41 +364,58 @@ contract FederalPublicTitlePermissioned is Context, Token {
     }
 
     function redeemAll() public virtual onlyAgent {
-        for (uint i=0; i < _holders.length; i++) {
+        for (uint i = 0; i < _holders.length; i++) {
             address holder = _holders[i];
-            uint256 holderBalance = balanceOf(holder);
-            if (holderBalance > 0) {
-                _redeem(holderBalance, holder, holder, getEndTimestamp());
+            if(!Token.isFrozen(holder)) {
+                uint256 holderBalance = balanceOf(holder);
+                if (holderBalance > 0) {
+                    _redeem(holderBalance, holder, holder, getEndTimestamp());
+                }
             }
         }
     }
 
-    function withdrawAssets(address destination, uint256 amount) public virtual onlyAgent {
+    function withdrawAssets(
+        address destination,
+        uint256 amount
+    ) public virtual onlyAgent {
         SafeERC20.safeTransfer(_asset, destination, amount);
     }
 
     /**
      * @dev Internal conversion function (from assets to shares) with support for rounding direction.
      */
-    function _convertToShares(uint256 assets, uint256 timestamp, Math.Rounding rounding) internal view virtual returns (uint256) {
+    function _convertToShares(
+        uint256 assets,
+        uint256 timestamp,
+        Math.Rounding rounding
+    ) internal view virtual returns (uint256) {
         //return assets.mulDiv(IERC20(_shareToken).totalSupply() + 10 ** _decimalsOffset(), totalAssets() + 1, rounding);
         return _vestingSchedule(assets, timestamp);
     }
 
-    function _vestingSchedule(uint256 totalAllocation, uint256 timestamp) internal view virtual returns (uint256 total) {
+    function _vestingSchedule(
+        uint256 totalAllocation,
+        uint256 timestamp
+    ) internal view virtual returns (uint256 total) {
         if (timestamp < start()) {
-            revert ("Timestamp before start");
+            revert("Timestamp before start");
         } else if (timestamp > start() + getDurationTimestamp()) {
-            revert ("Timestamp after end");
+            revert("Timestamp after end");
         }
-        
-        uint256 netTotalAllocation = getNetValueWithPlatformFee(totalAllocation);
-        UD60x18 netTotalAllocationUd = sixDecimalsToUd(netTotalAllocation);//ud(totalAllocation * BASE_18X6_DECIMALS_DIFF);
+
+        uint256 netTotalAllocation = getNetValueWithPlatformFee(
+            totalAllocation
+        );
+        UD60x18 netTotalAllocationUd = sixDecimalsToUd(netTotalAllocation); //ud(totalAllocation * BASE_18X6_DECIMALS_DIFF);
         UD60x18 totalUd = netTotalAllocationUd.div(getPriceUd(timestamp));
         total = udToSixDecimals(totalUd);
     }
 
-    function daysDiff(uint256 startDate, uint256 endDate) internal view virtual returns (uint256 _daysDiff) {
+    function daysDiff(
+        uint256 startDate,
+        uint256 endDate
+    ) internal view virtual returns (uint256 _daysDiff) {
         _daysDiff = (endDate - startDate) / 60 / 60 / 24;
     }
 
@@ -325,16 +424,25 @@ contract FederalPublicTitlePermissioned is Context, Token {
     }
 
     function getEndTimestamp() internal view virtual returns (uint256) {
-        return start() +getDurationTimestamp();
+        return start() + getDurationTimestamp();
     }
 
     /**
      * @dev Internal conversion function (from shares to assets) with support for rounding direction.
      */
-    function _convertToAssets(uint256 shares, uint256 totalInvested, uint256 timestamp, bool netValue, Math.Rounding rounding) internal view virtual returns (uint256) {
-        UD60x18 currentValueUd = sixDecimalsToUd(shares).mul(getPriceUd(timestamp));
+    function _convertToAssets(
+        uint256 shares,
+        uint256 totalInvested,
+        uint256 timestamp,
+        bool netValue,
+        Math.Rounding rounding
+    ) internal view virtual returns (uint256) {
+        // UD60x18 currentValueUd = sixDecimalsToUd(shares).mul(
+        //     getPriceUd(timestamp)
+        // );
+        UD60x18 currentValueUd = sixDecimalsToUd(shares).mul(nominalValue);
         uint256 currentValue = udToSixDecimals(currentValueUd);
-        if (netValue){
+        if (netValue) {
             return getNetValueWithIr(totalInvested, currentValue);
         } else {
             return currentValue;
@@ -344,7 +452,12 @@ contract FederalPublicTitlePermissioned is Context, Token {
     /**
      * @dev Deposit/mint common workflow.
      */
-    function _deposit(address caller, address receiver, uint256 assets, uint256 shares) internal virtual {
+    function _deposit(
+        address caller,
+        address receiver,
+        uint256 assets,
+        uint256 shares
+    ) internal virtual {
         // If _asset is ERC777, `transferFrom` can trigger a reentrancy BEFORE the transfer happens through the
         // `tokensToSend` hook. On the other hand, the `tokenReceived` hook, that is triggered after the transfer,
         // calls the vault, which is assumed not malicious.
@@ -352,9 +465,9 @@ contract FederalPublicTitlePermissioned is Context, Token {
         // Conclusion: we need to do the transfer before we mint so that any reentrancy would happen before the
         // assets are transferred and before the shares are minted, which is a valid state.
         // slither-disable-next-line reentrancy-no-eth
-        
+
         SafeERC20.safeTransferFrom(_asset, caller, address(this), assets);
-        ERC20Burnable(address(_asset)).burn(assets);
+        // ERC20Burnable(address(_asset)).burn(assets);
 
         _checkAndMint(receiver, shares);
         // _mint(receiver, shares);
@@ -393,17 +506,60 @@ contract FederalPublicTitlePermissioned is Context, Token {
         return 0;
     }
 
-    function getReceiverInfoTimestamp(address receiver, uint256 timestamp) public view virtual returns (uint256 shares, uint256 totalInvested, uint256 totalPlatformFee, uint256 currentValue, uint256 currentNetValue, uint256 start_, uint256 duration_) {
+    function getReceiverInfoTimestamp(
+        address receiver,
+        uint256 timestamp
+    )
+    public
+    view
+    virtual
+    returns (
+        uint256 shares,
+        uint256 totalInvested,
+        uint256 totalPlatformFee,
+        uint256 currentValue,
+        uint256 currentNetValue,
+        uint256 start_,
+        uint256 duration_
+    )
+    {
         shares = balanceOf(receiver);
         totalInvested = _totalInvested[receiver];
         totalPlatformFee = _totalPlatformFees[receiver];
-        currentValue = _convertToAssets(balanceOf(receiver), totalInvested, timestamp, false, Math.Rounding.Down);
-        currentNetValue =  _convertToAssets(balanceOf(receiver), totalInvested, timestamp, true, Math.Rounding.Down);//getNetValueWithIr(balance, currentValue);
+        currentValue = _convertToAssets(
+            balanceOf(receiver),
+            totalInvested,
+            timestamp,
+            false,
+            Math.Rounding.Down
+        );
+        currentNetValue = _convertToAssets(
+            balanceOf(receiver),
+            totalInvested,
+            timestamp,
+            false,
+            Math.Rounding.Down
+        ); //getNetValueWithIr(balance, currentValue);
         start_ = start();
         duration_ = duration();
     }
 
-    function getReceiverInfo(address receiver) public view virtual returns (uint256 shares, uint256 totalInvested, uint256 totalPlatformFee, uint256 currentValue, uint256 currentNetValue, uint256 start_, uint256 duration_) {
+    function getReceiverInfo(
+        address receiver
+    )
+    public
+    view
+    virtual
+    returns (
+        uint256 shares,
+        uint256 totalInvested,
+        uint256 totalPlatformFee,
+        uint256 currentValue,
+        uint256 currentNetValue,
+        uint256 start_,
+        uint256 duration_
+    )
+    {
         return getReceiverInfoTimestamp(receiver, block.timestamp);
     }
 
@@ -415,11 +571,15 @@ contract FederalPublicTitlePermissioned is Context, Token {
     //     return nominalValue;
     // }
 
-    function getPrice(uint256 currentTimestamp) public view returns (uint256 result) {
+    function getPrice(
+        uint256 currentTimestamp
+    ) public view returns (uint256 result) {
         result = udToSixDecimals(getPriceUd(currentTimestamp));
     }
 
-    function getPriceUd(uint256 currentTimestamp) internal view virtual returns (UD60x18 result) {
+    function getPriceUd(
+        uint256 currentTimestamp
+    ) internal view virtual returns (UD60x18 result) {
         uint256 _daysDiff = daysDiff(start(), currentTimestamp);
         uint256 remainingDays = 0;
         if (_daysDiff < duration()) {
@@ -435,26 +595,38 @@ contract FederalPublicTitlePermissioned is Context, Token {
         // console.log("price", result.intoUint256());
     }
 
-    function udToSixDecimals(UD60x18 x) internal view virtual returns (uint256) {
+    function udToSixDecimals(
+        UD60x18 x
+    ) internal view virtual returns (uint256) {
         return x.intoUint256() / BASE_18X6_DECIMALS_DIFF;
     }
 
-    function sixDecimalsToUd(uint256 x) internal view virtual returns (UD60x18) {
+    function sixDecimalsToUd(
+        uint256 x
+    ) internal view virtual returns (UD60x18) {
         return ud(x * BASE_18X6_DECIMALS_DIFF);
     }
 
-    function getNetValueWithIr(uint256 totalInvested, uint256 currentValue) internal view virtual returns (uint256) {
+    function getNetValueWithIr(
+        uint256 totalInvested,
+        uint256 currentValue
+    ) internal view virtual returns (uint256) {
         uint256 profit = currentValue - totalInvested;
         UD60x18 profitUd = sixDecimalsToUd(profit);
         UD60x18 currentValueUd = sixDecimalsToUd(currentValue);
-        uint256 netValue = udToSixDecimals(currentValueUd.sub(profitUd.mul(IR_TAX_FEE_UD)));
+        uint256 netValue = udToSixDecimals(
+            currentValueUd.sub(profitUd.mul(IR_TAX_FEE_UD))
+        );
         return netValue;
     }
 
-    function getNetValueWithPlatformFee(uint256 value) internal view virtual returns (uint256) {
+    function getNetValueWithPlatformFee(
+        uint256 value
+    ) internal view virtual returns (uint256) {
         UD60x18 valueUd = sixDecimalsToUd(value);
-        uint256 netValue = udToSixDecimals(valueUd.mul(ONE_UD.sub(PLATFORM_FEE_UD)));
+        uint256 netValue = udToSixDecimals(
+            valueUd.mul(ONE_UD.sub(PLATFORM_FEE_UD))
+        );
         return netValue;
     }
-
 }
