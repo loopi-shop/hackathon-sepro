@@ -194,7 +194,7 @@ const Page = () => {
               <Grid item {...gridItemSize}>
                 <SelectMultiple
                   name="blocklistCountryCode"
-                  label="País"
+                  label="País bloqueados"
                   error={
                     formik.touched.blocklistCountryCode ? formik.errors.blocklistCountryCode : ''
                   }
