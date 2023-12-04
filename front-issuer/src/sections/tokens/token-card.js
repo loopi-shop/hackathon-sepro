@@ -2,20 +2,16 @@ import {
   Avatar,
   Box,
   Button,
-  Card,
   CardActions,
   CardContent,
   CircularProgress,
-  Divider,
   Icon,
-  Link,
   SvgIcon,
   Typography
 } from '@mui/material';
 import { ethers } from 'ethers';
 import { useState } from 'react';
 import { useAuth } from '../../hooks/use-auth';
-import { RoleEnum } from '../../contexts/auth-context';
 import { useSnackbar } from 'notistack';
 import { CardItem } from 'src/components/cards';
 import EllipsisVerticalIcon from '@heroicons/react/24/solid/EllipsisVerticalIcon';
@@ -24,7 +20,7 @@ import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 export const TokenCard = ({ token, account }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [isLoading, setIsLoading] = useState(false);
-  const { user, isAdmin } = useAuth();
+  const { isAdmin } = useAuth();
 
   const mintBRLX = async () => {
     const signer =
@@ -39,13 +35,17 @@ export const TokenCard = ({ token, account }) => {
     const erc20Contract = new ethers.Contract(process.env.NEXT_PUBLIC_BRLX_CONTRACT, [abi], signer);
     setIsLoading(true);
 
-    const transaction = await erc20Contract.mint(account, 1000 * 10 ** 6).catch((err) => {
-      console.error(`mint:`, err);
-      enqueueSnackbar(`Erro ao adicionar BRLX (${process.env.NEXT_PUBLIC_BRLX_CONTRACT})`, {
-        variant: 'error'
+    console.log('Nonce', await signer.getNonce());
+
+    const transaction = await erc20Contract
+      .mint(account, (isAdmin ? 100000 : 1000) * 10 ** 6)
+      .catch((err) => {
+        console.error(`mint:`, err);
+        enqueueSnackbar(`Erro ao adicionar BRLX (${process.env.NEXT_PUBLIC_BRLX_CONTRACT})`, {
+          variant: 'error'
+        });
+        return null;
       });
-      return null;
-    });
     setIsLoading(false);
     if (transaction) {
       await transaction.wait(5);
