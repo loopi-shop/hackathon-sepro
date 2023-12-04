@@ -14,6 +14,7 @@ import 'simplebar-react/dist/simplebar.min.css';
 import { SnackbarProvider } from 'notistack';
 import { Message } from 'src/components/message';
 import '@govbr-ds/core/dist/core.min.css';
+import 'src/styles/govbr-ds-override.css';
 
 const clientSideEmotionCache = createEmotionCache();
 

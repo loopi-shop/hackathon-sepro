@@ -45,7 +45,7 @@ const tableHeaders = [
   {
     key: 'totalSupply',
     description: 'Total Emitido',
-    roles: [RoleEnum.COMMON, RoleEnum.ADMIN],
+    roles: [RoleEnum.ADMIN],
     format: ({ rowData, value }) => {
       return isLoadingValue(value)
         ? 'Carregando...'
@@ -96,13 +96,9 @@ export const TPFTable = (props) => {
     embedded = false
   } = props;
 
-  const { hasRole, user } = useAuth();
+  const { hasRole, user, isAdmin } = useAuth();
   const { redeem, broadcast } = useTPF();
   const { enqueueSnackbar } = useSnackbar();
-
-  const isAdmin = useMemo(() => {
-    return hasRole([RoleEnum.ADMIN]);
-  }, [user]);
 
   const headers = useMemo(() => {
     return tableHeaders.filter((value) => hasRole(value.roles));

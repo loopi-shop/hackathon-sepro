@@ -24,8 +24,11 @@ import { addDays, format } from 'date-fns';
 import BigNumber from 'bignumber.js';
 import { NumericFormat } from 'react-number-format';
 import { useSnackbar } from 'notistack';
-import { MetamaskButton } from 'src/components/metamask-button';
+import { MetaMaskButton } from 'src/components/metamask-button';
+import { AddressButton } from 'src/components/address-button';
+import { shortenAddress } from 'src/utils/shorten-address';
 import Link from 'next/link';
+import { getContractLink } from 'src/utils/token-link';
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="left" ref={ref} {...props} />;
@@ -242,7 +245,7 @@ export const TPFBuy = (props) => {
               <strong>Endereço do contrato</strong>
               <br />
               <Link
-                href={`${NEXT_PUBLIC_SCAN_URL}${tpf.contractAddress}`}
+                href={getContractLink(tpf.contractAddress)}
                 target="_blank"
                 title={tpf.contractAddress}
                 style={{ color: '#0076D6', textDecoration: 'none' }}
@@ -279,7 +282,11 @@ export const TPFBuy = (props) => {
         <hr style={{ height: 2, margin: '24px 0' }} />
         <form noValidate onSubmit={formik.handleSubmit} style={{ margin: '16px' }}>
           <Stack spacing={1}>
-            <MetamaskButton connect={connect} connected={connected} account={account} />
+            {connected ? (
+              <AddressButton>{shortenAddress(account, 16, 15)}</AddressButton>
+            ) : (
+              <MetaMaskButton onClick={connect} />
+            )}
             <b>Quanto deseja comprar?</b>
             <p>
               <b style={{ fontWeight: 600, fontSize: 14 }}>Valor</b>
