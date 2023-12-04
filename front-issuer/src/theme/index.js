@@ -5,12 +5,7 @@ import { createShadows } from './create-shadows';
 import { createTypography } from './create-typography';
 
 export function createTheme() {
-  const palette = createPalette();
-  const components = createComponents({ palette });
-  const shadows = createShadows();
-  const typography = createTypography();
-
-  return createMuiTheme({
+  const base = {
     breakpoints: {
       values: {
         xs: 0,
@@ -20,12 +15,24 @@ export function createTheme() {
         xl: 1440
       }
     },
-    components,
-    palette,
-    shadows,
     shape: {
       borderRadius: 8
     },
-    typography
+  };
+  const baseTheme = createMuiTheme(base);
+
+  const palette = createPalette();
+  const components = createComponents({ palette });
+  const shadows = createShadows();
+  const typography = createTypography(baseTheme);
+
+  const theme = createMuiTheme({
+    ...base,
+    components,
+    palette,
+    shadows,
+    typography,
   });
+
+  return theme;
 }

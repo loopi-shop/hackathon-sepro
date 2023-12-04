@@ -2,12 +2,13 @@ import ChartBarIcon from '@heroicons/react/24/solid/ChartBarIcon';
 import CogIcon from '@heroicons/react/24/solid/CogIcon';
 import UsersIcon from '@heroicons/react/24/solid/UsersIcon';
 import TableCellsIcon from '@heroicons/react/24/solid/TableCellsIcon';
+import PlusCircleIcon from '@heroicons/react/24/solid/PlusCircleIcon';
 import { SvgIcon } from '@mui/material';
-import { RoleEnum } from "../../contexts/auth-context";
+import { RoleEnum } from '../../contexts/auth-context';
 
 export const items = [
   {
-    title: 'Overview',
+    title: 'Início',
     path: '/',
     icon: (
       <SvgIcon fontSize="small">
@@ -16,8 +17,8 @@ export const items = [
     )
   },
   {
-    title: 'Customers',
-    path: '/customers',
+    title: 'Clientes',
+    path: '/clientes',
     roles: [RoleEnum.ADMIN],
     icon: (
       <SvgIcon fontSize="small">
@@ -27,7 +28,7 @@ export const items = [
   },
   {
     title: 'Títulos',
-    path: '/tpf',
+    path: '/titulo',
     icon: (
       <SvgIcon fontSize="small">
         <TableCellsIcon />
@@ -35,8 +36,28 @@ export const items = [
     )
   },
   {
-    title: 'Tokens',
-    path: '/tokens',
+    title: 'Registrar Título',
+    path: '/titulo/criar',
+    roles: [RoleEnum.ADMIN],
+    icon: (
+      <SvgIcon fontSize="small">
+        <PlusCircleIcon />
+      </SvgIcon>
+    )
+  },
+  {
+    title: 'Minha carteira',
+    path: '/carteira',
+    icon: (
+      <SvgIcon fontSize="small">
+        <CogIcon />
+      </SvgIcon>
+    )
+  },
+  {
+    title: 'Mercado secundário',
+    path: '/mercado-secundario',
+    roles: [RoleEnum.COMMON],
     icon: (
       <SvgIcon fontSize="small">
         <CogIcon />

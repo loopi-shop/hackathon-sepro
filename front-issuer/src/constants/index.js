@@ -1,0 +1,1 @@
+export var PAGE_TITLE = "Hackaton"

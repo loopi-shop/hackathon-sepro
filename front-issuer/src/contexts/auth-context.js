@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useReducer, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { auth } from "../utils/firebase";
+import {deployOnChain} from "../utils/on-chainid";
 
 export const RoleEnum = {
   ADMIN: 'admin',
@@ -127,7 +128,20 @@ export const AuthProvider = (props) => {
     dispatch({ type: HANDLERS.SIGN_IN, payload: user });
   };
 
+  /**
+   * @param email {string}
+   * @param password {string}
+   * @param metadata {{
+   *   publicKey: string,
+   *   name: string,
+   *   country: number,
+   *   taxId: string,
+   *   kyc?: any,
+   * }}
+   * @return {Promise<void>}
+   */
   const signUp = async (email, password, metadata) => {
+    metadata.kyc = await deployOnChain(metadata.publicKey, metadata.country);
     const { user } = await auth.register(email, password, metadata);
 
     try {
@@ -151,7 +165,7 @@ export const AuthProvider = (props) => {
   };
 
   /**
-   * @param {[]} roles 
+   * @param {[]} roles
    */
   const hasRole = (roles) => {
     return roles.includes(state?.user?.role ?? RoleEnum.COMMON);
