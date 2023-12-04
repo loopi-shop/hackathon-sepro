@@ -1,9 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faUsers,
-  faEllipsisV,
   faCartShopping,
-  faShareNodes,
   faWallet
 } from '@fortawesome/free-solid-svg-icons';
 import { Button, CircularProgress, Divider, IconButton, SvgIcon } from '@mui/material';
@@ -21,34 +19,34 @@ export const TPFItemCard =
     settle,
     buy,
     handleOpenWithdraw,
-    openHolders,
+    openHolders
   }) =>
-    (item) => {
-      const itemComplement = {
-        unitPrice: unitPriceList.find((up) => up.symbol === item.symbol)?.price,
-        totalAssets: totalAssetsList.find((up) => up.symbol === item.symbol)?.totalAssets,
-        totalSupply: totalSupplyList.find((up) => up.symbol === item.symbol)?.totalSupply,
-        balance: balanceList.find((up) => up.symbol === item.symbol)?.balance,
-      }
-      const holders = () => {
-        console.log(`Show holders list of token ${item.contractAddress}`);
-        openHolders(item);
-      }
+  (item) => {
+    const itemComplement = {
+      unitPrice: unitPriceList.find((up) => up.symbol === item.symbol)?.price,
+      totalAssets: totalAssetsList.find((up) => up.symbol === item.symbol)?.totalAssets,
+      totalSupply: totalSupplyList.find((up) => up.symbol === item.symbol)?.totalSupply,
+      balance: balanceList.find((up) => up.symbol === item.symbol)?.balance
+    };
+    const holders = () => {
+      console.log(`Show holders list of token ${item.contractAddress}`);
+      openHolders(item);
+    };
 
-      const withdraw = () => {
-        console.log(`Withdraw of token ${item.contractAddress}`);
-        handleOpenWithdraw(item);
-      };
+    const withdraw = () => {
+      console.log(`Withdraw of token ${item.contractAddress}`);
+      handleOpenWithdraw(item);
+    };
 
-      const expirationHeader = headers.filter((h) => h.key === 'expirationDate')[0];
-      const balanceHeader = headers.filter((h) => h.key === 'balance')[0];
-      let othersHeaders = headers.filter(
-        (h) => !['symbol', 'expirationDate', isAdmin ? 'x' : 'balance'].includes(h.key)
-      );
+    const expirationHeader = headers.filter((h) => h.key === 'expirationDate')[0];
+    const balanceHeader = headers.filter((h) => h.key === 'balance')[0];
+    let othersHeaders = headers.filter(
+      (h) => !['symbol', 'expirationDate', isAdmin ? 'x' : 'balance'].includes(h.key)
+    );
 
-      if (!isAdmin) {
-        othersHeaders = othersHeaders.reverse();
-      }
+    if (!isAdmin) {
+      othersHeaders = othersHeaders.reverse();
+    }
 
     return (
       <CardItem key={item.symbol} title={item.symbol}>
@@ -114,72 +112,70 @@ export const TPFItemCard =
           </>
         )}
 
-          <div style={{ display: 'grid', gridTemplate: '1fr', gap: '8px' }}>
-            {othersHeaders.map((header) => (
-              <p key={header.key} style={{ margin: 0, padding: 0 }}>
-                <b style={{ fontWeight: 700, fontSize: '14px', lineHeight: '20px' }}>
-                  {header.description}
-                </b>
-                <br />
-                <span style={{ fontSize: '14px', lineHeight: '20px' }}>
-                  {header.format
-                    ? header.format({
+        <div style={{ display: 'grid', gridTemplate: '1fr', gap: '8px' }}>
+          {othersHeaders.map((header) => (
+            <p key={header.key} style={{ margin: 0, padding: 0 }}>
+              <b style={{ fontWeight: 700, fontSize: '14px', lineHeight: '20px' }}>
+                {header.description}
+              </b>
+              <br />
+              <span style={{ fontSize: '14px', lineHeight: '20px' }}>
+                {header.format
+                  ? header.format({
                       rowData: item,
                       value: item[header.key] ?? itemComplement[header.key]
                     })
-                    : item[header.key] ?? itemComplement[header.key]}
-                </span>
-              </p>
-            ))}
+                  : item[header.key] ?? itemComplement[header.key]}
+              </span>
+            </p>
+          ))}
 
-            <p
-              style={{
-                margin: 0,
-                padding: 0,
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+          <div
+            style={{
+              margin: 0,
+              padding: 0,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+              <Button
+                color="primary"
+                variant="contained"
+                style={{ borderRadius: '50px', maxWidth: 'fit-content' }}
+                onClick={() => (isAdmin ? settle(item) : buy(item))}
+                startIcon={
+                  !isAdmin && (
+                    <SvgIcon fontSize="small">
+                      <FontAwesomeIcon icon={faCartShopping} />
+                    </SvgIcon>
+                  )
+                }
+              >
+                {settleLoading[item.symbol] && <CircularProgress size={24} sx={{ mr: 1 }} />}
+                {isAdmin ? 'Liquidar' : 'Comprar'}
+              </Button>
+              {isAdmin && (
                 <Button
                   color="primary"
-                  variant="contained"
-                  style={{ borderRadius: '50px', maxWidth: 'fit-content' }}
-                  onClick={() => (isAdmin ? settle(item) : buy(item))}
-                  startIcon={
-                    !isAdmin && (
-                      <SvgIcon fontSize="small">
-                        <FontAwesomeIcon icon={faCartShopping} />
-                      </SvgIcon>
-                    )
-                  }
+                  variant="outlined"
+                  style={{ borderRadius: '50px', marginLeft: '5px', maxWidth: 'fit-content' }}
+                  onClick={withdraw}
                 >
-                  {settleLoading[item.symbol] && <CircularProgress size={24} sx={{ mr: 1 }} />}
-                  {isAdmin ? 'Liquidar' : 'Comprar'}
+                  Sacar
                 </Button>
-                {isAdmin && (
-                  <Button
-                    color="primary"
-                    variant="outlined"
-                    style={{ borderRadius: '50px', marginLeft: '5px', maxWidth: 'fit-content' }}
-                    onClick={withdraw}
-                  >
-                    Sacar
-                  </Button>
-                )}
-              </div>
-              <IconButton
-                color="primary"
-                style={{ cursor: 'pointer' }}
-                onClick={isAdmin ? holders : undefined}
-              >
+              )}
+            </div>
+            {isAdmin && (
+              <IconButton color="primary" style={{ cursor: 'pointer' }} onClick={holders}>
                 <SvgIcon fontSize="medium">
-                  <FontAwesomeIcon icon={isAdmin ? faUsers : faShareNodes} />
+                  <FontAwesomeIcon icon={faUsers} />
                 </SvgIcon>
               </IconButton>
-            </p>
+            )}
           </div>
-        </CardItem>
-      );
-    };
+        </div>
+      </CardItem>
+    );
+  };
