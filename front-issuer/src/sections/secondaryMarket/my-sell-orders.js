@@ -75,17 +75,19 @@ export function MySellOrders() {
           <Table>
             <TableHead>
               <TableRow>
-                {headers.map((head) => (
-                  <TableCell>{head.title}</TableCell>
+                {headers.map((head, index) => (
+                  <TableCell key={index}>{head.title}</TableCell>
                 ))}
                 <TableCell>Ações</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {orders.map((order, index) => (
-                <TableRow index={index}>
-                  {headers.map((head) => (
-                    <TableCell sx={{ fontSize: '14px' }}>{order[head.key]}</TableCell>
+                <TableRow index={index} key={index}>
+                  {headers.map((head, insideIndex) => (
+                    <TableCell sx={{ fontSize: '14px' }} key={insideIndex}>
+                      {order[head.key]}
+                    </TableCell>
                   ))}
                   <TableCell>
                     <IconButton
