@@ -13,7 +13,8 @@ import {
 import { Box } from '@mui/system';
 import { Input } from 'src/components/input';
 import { Scrollbar } from 'src/components/scrollbar';
-import { useBuyOrders } from 'src/hooks/use-buy-orders';
+import { useBuyOrders } from 'src/hooks/secondary-market/use-buy-orders';
+import { formatBRLX } from 'src/utils/format';
 
 const headers = [
   {
@@ -30,7 +31,8 @@ const headers = [
   },
   {
     key: 'unitPrice',
-    title: 'Preço unitário (BRLX)'
+    title: 'Preço unitário (BRLX)',
+    format: formatBRLX
   },
   {
     key: 'quantity',
@@ -38,11 +40,13 @@ const headers = [
   },
   {
     key: 'totalPrice',
-    title: 'Valor do lote (BRLX)'
+    title: 'Valor do lote (BRLX)',
+    format: formatBRLX
   },
   {
     key: 'sellPrice',
-    title: 'Preço de venda (BRLX)'
+    title: 'Preço de venda (BRLX)',
+    format: formatBRLX
   }
 ];
 
@@ -66,7 +70,6 @@ export function MyBuyOrders() {
           {searchOpen ? (
             <Input
               autoFocus
-              ref={searchRef}
               style={{ display: 'inline-block' }}
               iconClass="fas fa-search"
               value={search}
@@ -92,17 +95,19 @@ export function MyBuyOrders() {
           <Table>
             <TableHead>
               <TableRow>
-                {headers.map((head) => (
-                  <TableCell>{head.title}</TableCell>
+                {headers.map((head, index) => (
+                  <TableCell key={index}>{head.title}</TableCell>
                 ))}
                 <TableCell>Ações</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {orders.map((order, index) => (
-                <TableRow index={index}>
-                  {headers.map((head) => (
-                    <TableCell sx={{ fontSize: '14px' }}>{order[head.key]}</TableCell>
+                <TableRow index={index} key={index}>
+                  {headers.map((head, insideIndex) => (
+                    <TableCell sx={{ fontSize: '14px' }} key={insideIndex}>
+                      {head.format ? head.format(order[head.key]) : order[head.key]}
+                    </TableCell>
                   ))}
                   <TableCell>
                     <IconButton
