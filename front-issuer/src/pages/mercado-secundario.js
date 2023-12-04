@@ -7,6 +7,7 @@ import { MySellOrders } from 'src/sections/secondaryMarket/my-sell-orders';
 import { MyBuyOrders } from 'src/sections/secondaryMarket/my-buy-orders';
 import { useState } from 'react';
 import { SellOrder } from 'src/sections/secondaryMarket/sell-order';
+import { SecondaryMarketProvider } from 'src/contexts/secondary-martket-context';
 
 const now = new Date();
 
@@ -48,9 +49,9 @@ const Page = () => {
               Vender ativo
             </Button>
           </Box>
-          <Box sx={{height: 20}} />
+          <Box sx={{ height: 20 }} />
           <MyBuyOrders />
-          <Box sx={{height: 40}} />
+          <Box sx={{ height: 40 }} />
           <MySellOrders />
         </Container>
       </Box>
@@ -60,8 +61,10 @@ const Page = () => {
 
 Page.getLayout = (page) => (
   <DashboardLayout>
-    <PageTitle>Mercado secundário</PageTitle>
-    {page}
+    <SecondaryMarketProvider>
+      <PageTitle>Mercado secundário</PageTitle>
+      {page}
+    </SecondaryMarketProvider>
   </DashboardLayout>
 );
 
