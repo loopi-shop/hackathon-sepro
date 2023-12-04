@@ -30,7 +30,7 @@ export const TPFPage = ({ embedded }) => {
   const [totalAssetsList, setTotalAssetsList] = useState([]);
   const [totalSupplyList, setTotalSupplyList] = useState([]);
   const [balanceList, setBalanceList] = useState([]);
-  const { list, tpfs, getPrice, getTotalAssets, getTotalSupply, balanceOf } = useTPF();
+  const { list, tpfs, getPrice, getTotalAssets, getTotalSupply, balanceOf, balanceOfAsset } = useTPF();
   const tpfsPaginated = useTPFs(page, rowsPerPage, tpfs?.data ?? []);
   const tpfIds = useTPFIds(tpfsPaginated);
   const tpfsSelection = useSelection(tpfIds);
@@ -144,20 +144,20 @@ export const TPFPage = ({ embedded }) => {
           tpfChunk.map((tpf) =>
             isAdmin
               ? balanceOfAsset({
-                  contractAddress: tpf.contractAddress,
-                  accountAddress: user.publicKey,
-                  assetAddress: tpf.asset
-                }).then((balance) => ({
-                  symbol: tpf.symbol,
-                  balance
-                }))
+                contractAddress: tpf.contractAddress,
+                accountAddress: user.publicKey,
+                assetAddress: tpf.asset
+              }).then((balance) => ({
+                symbol: tpf.symbol,
+                balance
+              }))
               : balanceOf({
-                  contractAddress: tpf.contractAddress,
-                  accountAddress: user.publicKey
-                }).then((balance) => ({
-                  symbol: tpf.symbol,
-                  balance
-                }))
+                contractAddress: tpf.contractAddress,
+                accountAddress: user.publicKey
+              }).then((balance) => ({
+                symbol: tpf.symbol,
+                balance
+              }))
           )
         );
         tempBalance = balanceSettled.reduce((acc, cur) => {

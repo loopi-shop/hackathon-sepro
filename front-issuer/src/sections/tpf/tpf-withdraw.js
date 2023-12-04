@@ -27,6 +27,7 @@ import { AddressButton } from 'src/components/address-button';
 import { shortenAddress } from 'src/utils/shorten-address';
 import Link from 'next/link';
 import { getContractLink } from 'src/utils/token-link';
+import { useAuth } from 'src/hooks/use-auth';
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="left" ref={ref} {...props} />;
@@ -40,6 +41,7 @@ export const TPFWithdraw = (props) => {
   const { open, handleClose, tpf = {} } = props;
   const [balance, setBalance] = useState(0);
   const [loadingBalance, setLoadingBalance] = useState(false);
+  const { user } = useAuth();
 
   const min = useMemo(() => {
     if (!tpf?.decimals) return 1;
@@ -71,8 +73,8 @@ export const TPFWithdraw = (props) => {
       const tx = await withdraw({
         contractAddress: tpf.contractAddress,
         amount,
-        destinationAddress: process.env.NEXT_PUBLIC_ADM_PRIVATE_KEY,
-        from: process.env.NEXT_PUBLIC_ADM_PRIVATE_KEY,
+        destinationAddress: user.publicKey,
+        from: user.publicKey,
       }).catch((err) => {
         console.error(`failed to generate payload tx`, tx, err);
         enqueueSnackbar(`Falha ao gerar os dados da transação`, {
@@ -101,10 +103,11 @@ export const TPFWithdraw = (props) => {
   });
 
   useEffect(() => {
-    if (tpf?.asset && account) {
+    if (tpf?.asset && tpf.contractAddress && account) {
       setLoadingBalance(true)
+      console.log('load balance', tpf.asset, tpf.contractAddress, account, user.publicKey);
       balanceOfAsset({
-        accountAddress: process.env.NEXT_PUBLIC_ADM_PRIVATE_KEY,
+        accountAddress: user.publicKey,
         assetAddress: tpf.asset,
         contractAddress: tpf.contractAddress,
       }).then((currentBalance) => {
