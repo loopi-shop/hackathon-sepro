@@ -18,6 +18,7 @@ import {
 import { Scrollbar } from 'src/components/scrollbar';
 import { faEdit, faEye, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { TPFPagination } from '../tpf/tpf-pagination';
 
 export const CustomersTable = (props) => {
   const {
@@ -40,7 +41,7 @@ export const CustomersTable = (props) => {
   return (
     <>
       <Scrollbar>
-        <Box sx={{ minWidth: 800 }}>
+        <Box sx={{ minWidth: 800, mb: 4 }}>
           <Table>
             <TableHead>
               <TableRow>
@@ -115,14 +116,11 @@ export const CustomersTable = (props) => {
           </Table>
         </Box>
       </Scrollbar>
-      <TablePagination
-        component="div"
-        count={count}
-        onPageChange={onPageChange}
-        onRowsPerPageChange={onRowsPerPageChange}
+      <TPFPagination
         page={page}
         rowsPerPage={rowsPerPage}
-        rowsPerPageOptions={[5, 10, 25]}
+        count={count}
+        onPageChange={onPageChange}
       />
     </>
   );

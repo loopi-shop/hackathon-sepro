@@ -10,14 +10,20 @@ import usersRepository from '../repositories/users.repository';
 import { PageTitle } from 'src/components/page-title';
 import { normalizeString } from 'src/utils/format';
 
-const useCustomers = (data, page, rowsPerPage, search) => {
+const useCustomersFiltered = (data, search) => {
   return useMemo(() => {
     const dataFiltered =
       search.length > 0
         ? data.filter((d) => normalizeString(d.name).includes(normalizeString(search)))
         : data;
-    return applyPagination(dataFiltered, page, rowsPerPage);
-  }, [data, page, rowsPerPage, search]);
+    return dataFiltered;
+  }, [data, search]);
+};
+
+const useCustomers = (data, page, rowsPerPage) => {
+  return useMemo(() => {
+    return applyPagination(data, page, rowsPerPage);
+  }, [data, page, rowsPerPage]);
 };
 
 const useCustomerIds = (customers) => {
@@ -41,7 +47,8 @@ const Page = () => {
     });
   }, []);
 
-  const customersPaginated = useCustomers(customers, page, rowsPerPage, search);
+  const customersFiltered = useCustomersFiltered(customers, search);
+  const customersPaginated = useCustomers(customers, page, rowsPerPage);
   const customersIds = useCustomerIds(customers);
   const customersSelection = useSelection(customersIds);
 
@@ -102,7 +109,7 @@ const Page = () => {
         </Stack>
         <CustomersSearch search={search} setSearch={setSearch} />
         <CustomersTable
-          count={customers.length}
+          count={customersFiltered.length}
           items={customersPaginated}
           onDeselectAll={customersSelection.handleDeselectAll}
           onDeselectOne={customersSelection.handleDeselectOne}
