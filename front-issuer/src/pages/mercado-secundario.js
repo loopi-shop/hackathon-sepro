@@ -28,14 +28,15 @@ const Page = () => {
             sx={{
               display: 'flex',
               justifyContent: 'space-between',
-              alignItems: 'center'
+              alignItems: 'center',
+              mb: 5
             }}
           >
-            <Typography variant="h1">Mercado secundário</Typography>
+            <Typography variant="h3">Mercado secundário</Typography>
 
             <Button
               onClick={() => setOpen(true)}
-              style={{ borderRadius: '50px', padding: '8px 24px' }}
+              style={{ borderRadius: '50px', padding: '8px 24px', textTransform: 'uppercase' }}
               variant="contained"
               color="primary"
               startIcon={
@@ -47,7 +48,9 @@ const Page = () => {
               Vender ativo
             </Button>
           </Box>
+          <Box sx={{height: 20}} />
           <MyBuyOrders />
+          <Box sx={{height: 40}} />
           <MySellOrders />
         </Container>
       </Box>
