@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { normalizeString } from 'src/utils/format';
 
 export function useBuyOrders() {
   const [orders, setOrders] = useState([]);
@@ -34,7 +35,7 @@ export function useBuyOrders() {
   };
 
   return {
-    orders: orders.filter((order) => order.name.includes(search)),
+    orders: orders.filter((order) => normalizeString(order.name).includes(normalizeString(search))),
     removeOrder,
     search,
     setSearch,
