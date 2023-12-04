@@ -170,6 +170,10 @@ export const TPFPage = ({ embedded }) => {
   };
 
   useEffect(() => {
+    list();
+  }, []);
+
+  useEffect(() => {
     loadUnitPriceList();
     loadTotalAssetsList();
     loadTotalSupplyList();
