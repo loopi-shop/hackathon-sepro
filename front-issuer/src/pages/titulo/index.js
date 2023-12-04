@@ -142,13 +142,22 @@ export const TPFPage = ({ embedded }) => {
         const tpfChunk = chunks[index];
         const balanceSettled = await Promise.allSettled(
           tpfChunk.map((tpf) =>
-            balanceOf({
-              contractAddress: tpf.asset,
-              accountAddress: user.publicKey
-            }).then((balance) => ({
-              symbol: tpf.symbol,
-              balance
-            }))
+            isAdmin
+              ? balanceOfAsset({
+                  contractAddress: tpf.contractAddress,
+                  accountAddress: user.publicKey,
+                  assetAddress: tpf.asset
+                }).then((balance) => ({
+                  symbol: tpf.symbol,
+                  balance
+                }))
+              : balanceOf({
+                  contractAddress: tpf.contractAddress,
+                  accountAddress: user.publicKey
+                }).then((balance) => ({
+                  symbol: tpf.symbol,
+                  balance
+                }))
           )
         );
         tempBalance = balanceSettled.reduce((acc, cur) => {
