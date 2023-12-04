@@ -1,7 +1,6 @@
 import { faEllipsisVertical, faSearch, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  Card,
   IconButton,
   SvgIcon,
   Table,
@@ -12,11 +11,9 @@ import {
   Typography
 } from '@mui/material';
 import { Box } from '@mui/system';
-import { useRef } from 'react';
 import { Input } from 'src/components/input';
 import { Scrollbar } from 'src/components/scrollbar';
 import { useBuyOrders } from 'src/hooks/use-buy-orders';
-import { useOutsideClick } from 'src/hooks/use-outside-click';
 
 const headers = [
   {
@@ -50,9 +47,7 @@ const headers = [
 ];
 
 export function MyBuyOrders() {
-  const searchRef = useRef(null);
   const { orders, removeOrder, search, setSearch, searchOpen, setSearchOpen } = useBuyOrders();
-  useOutsideClick(searchRef, () => setSearchOpen(false));
 
   return (
     <Box sx={{ mb: 5 }}>
@@ -70,11 +65,13 @@ export function MyBuyOrders() {
         <Box>
           {searchOpen ? (
             <Input
+              autoFocus
+              ref={searchRef}
               style={{ display: 'inline-block' }}
               iconClass="fas fa-search"
-              ref={searchRef}
               value={search}
               onChange={(ev) => setSearch(ev.currentTarget.value)}
+              onBlur={() => setSearchOpen(false)}
             ></Input>
           ) : (
             <IconButton onClick={() => setSearchOpen(true)}>
