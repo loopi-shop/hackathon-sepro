@@ -67,7 +67,6 @@ export const Select = ({
             onChange={(event) => setSearchTerm(event.target.value)}
             onClick={() => setListVisible(true)}
             onFocus={() => setListVisible(true)}
-            onBlur={() => setListVisible(false)}
           />
         </div>
         <button
@@ -193,7 +192,6 @@ export const SelectMultiple = ({
             onChange={(event) => setSearchTerm(event.target.value)}
             onClick={() => setListVisible(true)}
             onFocus={() => setListVisible(true)}
-            onBlur={() => setListVisible(false)}
           />
         </div>
         <button
