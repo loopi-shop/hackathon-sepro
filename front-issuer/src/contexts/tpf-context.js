@@ -334,8 +334,7 @@ export const TPFProvider = (props) => {
   const transfer = async ({ contractAddress, quantity, signer, to }) => {
     try {
 
-      const abi = 'function transfer(address, uint256)';
-      const erc20Contract = new ethers.Contract(contractAddress, [abi], signer);
+      const erc20Contract = new ethers.Contract(contractAddress, TPF_ABI, signer);
       const transaction = await erc20Contract.transfer(to, quantity);
       const result = await transaction.wait(1);
 
