@@ -14,6 +14,7 @@ import { Box } from '@mui/system';
 import { Input } from 'src/components/input';
 import { Scrollbar } from 'src/components/scrollbar';
 import { useBuyOrders } from 'src/hooks/use-buy-orders';
+import { useBuyOrders } from 'src/hooks/secondary-market/use-buy-orders';
 
 const headers = [
   {
