@@ -70,13 +70,19 @@ export const TPFWithdraw = (props) => {
     onSubmit: async (values) => {
       setIsLoadingSubmit(true);
       const amount = parseInt(new BigNumber(values.amount).shiftedBy(tpf.decimals).toNumber());
+      console.info('started withdraw generate payload', {
+        contractAddress: tpf.contractAddress,
+        amount,
+        destinationAddress: user.publicKey,
+        from: user.publicKey,
+      });
       const tx = await withdraw({
         contractAddress: tpf.contractAddress,
         amount,
         destinationAddress: user.publicKey,
         from: user.publicKey,
       }).catch((err) => {
-        console.error(`failed to generate payload tx`, tx, err);
+        console.error(`failed to generate payload tx`, err);
         enqueueSnackbar(`Falha ao gerar os dados da transação`, {
           variant: 'error',
           autoHideDuration: 10000,
@@ -85,6 +91,7 @@ export const TPFWithdraw = (props) => {
         throw err;
       });
 
+      console.info('start broadcast tx:', tx);
       const { txHash } = await broadcast(tx).catch((err) => {
         console.error(`failed to broadcast tx`, tx, err);
         enqueueSnackbar(`Falha ao enviar transação`, {
