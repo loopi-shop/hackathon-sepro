@@ -42,7 +42,7 @@ export const TPFBuy = (props) => {
     validationSchema: Yup.object({
       amount: Yup.number()
         .min(0, `Informe algum valor`)
-        .required('Infomre a quantidade que deseja comprar')
+        .required('Informe a quantidade que deseja comprar')
     }),
     onSubmit: async (values) => {
       setIsLoadingSubmit(true);
