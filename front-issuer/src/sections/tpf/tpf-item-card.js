@@ -21,17 +21,19 @@ export const TPFItemCard =
     settle,
     buy,
     handleOpenWithdraw,
+    openHolders,
   }) =>
     (item) => {
       const itemComplement = {
-        unitPrice: unitPriceList.find((up) => up.symbol === item.symbol)?.price,
-        totalAssets: totalAssetsList.find((up) => up.symbol === item.symbol)?.totalAssets,
-        totalSupply: totalSupplyList.find((up) => up.symbol === item.symbol)?.totalSupply,
-        balance: balanceList.find((up) => up.symbol === item.symbol)?.balance
-      };
+        unitPrice: totalAssetsList.find((up) => up.symbol === item.symbol)?.totalAssets,
+        totalAssets: totalSupplyList.find((up) => up.symbol === item.symbol)?.totalSupply,
+        totalSupply: balanceList.find((up) => up.symbol === item.symbol)?.balance,
+        balance: unitPriceList.find((up) => up.symbol === item.symbol)?.price,
+      }
       const holders = () => {
         console.log(`Show holders list of token ${item.contractAddress}`);
-      };
+        openHolders(item);
+      }
 
       const withdraw = () => {
         console.log(`Withdraw of token ${item.contractAddress}`);

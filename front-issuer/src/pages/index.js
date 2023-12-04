@@ -11,35 +11,37 @@ const Page = () => {
   const { isAdmin } = useAuth();
 
   return (
-    <>
-      <PageTitle>Início</PageTitle>
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          py: 8
-        }}
-      >
-        <Container maxWidth="xl">
-          <Typography variant="h1">Início</Typography>
-          <Container
-            maxWidth="xl"
-            sx={{
-              p: 0,
-              m: 0,
-              display: 'flex',
-              flexDirection: isAdmin ? 'column-reverse' : 'column'
-            }}
-          >
-            <WalletPage embedded />
-            <TPFPage embedded />
-          </Container>
+    <Box
+      component="main"
+      sx={{
+        flexGrow: 1,
+        py: 8
+      }}
+    >
+      <Container maxWidth="xl">
+        <Typography variant="h1">Início</Typography>
+        <Container
+          maxWidth="xl"
+          sx={{
+            p: 0,
+            m: 0,
+            display: 'flex',
+            flexDirection: isAdmin ? 'column-reverse' : 'column'
+          }}
+        >
+          <WalletPage embedded />
+          <TPFPage embedded />
         </Container>
-      </Box>
-    </>
+      </Container>
+    </Box>
   );
 };
 
-Page.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
+Page.getLayout = (page) => (
+  <DashboardLayout>
+    <PageTitle>Início</PageTitle>
+    {page}
+  </DashboardLayout>
+);
 
 export default Page;

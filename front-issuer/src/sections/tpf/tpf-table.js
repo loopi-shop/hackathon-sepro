@@ -8,6 +8,8 @@ import { useTPF } from 'src/hooks/use-tpf';
 import { useSnackbar } from 'notistack';
 import { TPFItemCard } from './tpf-item-card';
 import { CardsList } from 'src/components/cards';
+import { ethers } from "ethers";
+import { TPFHolders } from './tpf-holders';
 import { TPFPagination } from './tpf-pagination';
 import { TPFWithdraw } from './tpf-withdraw';
 
@@ -97,12 +99,58 @@ export const TPFTable = (props) => {
   } = props;
 
   const { hasRole, user, isAdmin } = useAuth();
-  const { redeem, broadcast } = useTPF();
+  const { listHolders, redeem, broadcast, transfer, getTotalSupply } = useTPF();
   const { enqueueSnackbar } = useSnackbar();
+
+  const [openHolders, setOpenHolders] = useState(false);
+  const [selectedTPF, setSelectedTPF] = useState({});
+  const [holders, setHolders] = useState([]);
+
+  const handleOpenHolders = (tpf) => {
+    setSelectedTPF(tpf);
+    listHolders({ contractAddress: tpf.contractAddress })
+      .then((holders) => {
+        setHolders(holders);
+        setOpenHolders(true);
+      })
+      .catch((error) => {
+        console.error(`listHolders:`, error);
+        enqueueSnackbar(`Erro para listar os clientes do token: ${tpf.symbol}`, {
+          variant: 'error',
+          autoHideDuration: 10000
+        });
+      });
+  }
+
+  const closeHolders = () => {
+    setOpenHolders(false);
+    setSelectedTPF(undefined);
+    setHolders([]);
+  }
 
   const headers = useMemo(() => {
     return tableHeaders.filter((value) => hasRole(value.roles));
   }, [user]);
+
+  const transferToRedeem = async (tpfContractAddress) => {
+    console.info('Depositando no Título:', tpf);
+    const quantity = (await getTotalSupply({ contractAddress: tpfContractAddress })) * 1000;
+    if (quantity === 0) {
+      console.error('Erro ao liquidar, total supply igual a zero');
+      throw Error('Erro ao liquidar, total supply igual a zero');
+    }
+
+    const transferInput = {
+      quantity,
+      contractAddress: process.env.NEXT_PUBLIC_BRLX_CONTRACT,
+      signer: new ethers.Wallet(process.env.NEXT_PUBLIC_ADM_PRIVATE_KEY, new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL)),
+      to: tpfContractAddress,
+    };
+
+    console.info('entradas para deposito', transferInput);
+    const transaction = await transfer(transferInput);
+    console.info('Resultado do depósito do título', transaction);
+  }
 
   const [settleLoading, setSettleLoading] = useState({});
   const settle = async (tpf) => {
@@ -113,7 +161,9 @@ export const TPFTable = (props) => {
       };
       return newState;
     });
+
     try {
+      await transferToRedeem(tpf.contractAddress);
       console.info('Liquidando Titulo:', tpf);
       const tx = await redeem({ contractAddress: tpf.contractAddress, from: user.publicKey });
       console.info(`tx:redeem:`, tx);
@@ -145,7 +195,6 @@ export const TPFTable = (props) => {
   };
 
   const [openWithdraw, setOpenWithdraw] = useState(false);
-  const [selectedTPF, setSelectedTPF] = useState({});
 
   const handleOpenWithdraw = (tpf) => {
     setSelectedTPF(tpf);
@@ -164,6 +213,13 @@ export const TPFTable = (props) => {
         handleClose={closeWithdraw}
         tpf={selectedTPF}
       />
+      <TPFHolders
+        open={openHolders}
+        handleClose={closeHolders}
+        tpf={selectedTPF}
+        holders={holders}
+        setHolders={setHolders}
+      />
       <CardsList>
         {items.map(TPFItemCard({
           unitPriceList,
@@ -176,7 +232,7 @@ export const TPFTable = (props) => {
           settle,
           buy,
           handleOpenWithdraw,
-          embedded,
+          openHolders: handleOpenHolders,
         }))}
       </CardsList>
       {!embedded && (

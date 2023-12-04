@@ -1,21 +1,14 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
 import PropTypes from 'prop-types';
-import ChevronUpDownIcon from '@heroicons/react/24/solid/ChevronUpDownIcon';
-import {
-  Box,
-  Divider,
-  Drawer,
-  Stack,
-  SvgIcon,
-  Typography,
-  useMediaQuery
-} from '@mui/material';
-import { Logo } from 'src/components/logo';
+import { Box, Divider, Drawer, Stack, useMediaQuery } from '@mui/material';
 import { Scrollbar } from 'src/components/scrollbar';
 import { items } from './config';
 import { SideNavItem } from './side-nav-item';
-import {useAuth} from "../../hooks/use-auth";
+import { useAuth } from '../../hooks/use-auth';
+import { SideNavBottom } from './side-nav-bottom';
 
 export const SideNav = (props) => {
   const { open, onClose } = props;
@@ -25,7 +18,7 @@ export const SideNav = (props) => {
 
   // Only returns items filtered by user role
   const filteredItems = items.filter((item) => {
-      return !item.roles || (user?.role && item.roles.includes(user?.role));
+    return !item.roles || (user?.role && item.roles.includes(user?.role));
   });
 
   const content = (
@@ -47,59 +40,25 @@ export const SideNav = (props) => {
           height: '100%'
         }}
       >
-        <Box sx={{ p: 3 }}>
-          <Box
-            component={NextLink}
-            href="/"
-            sx={{
-              display: 'inline-flex',
-              height: 32,
-              width: 32
-            }}
-          >
-            <Logo />
+        <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Box component={NextLink} href="/" sx={{ display: 'inline-flex' }}>
+            <img src="/assets/logos/loopi-logo-side-nav.png" />
           </Box>
-          <Box
-            sx={{
-              alignItems: 'center',
-              backgroundColor: 'rgba(255, 255, 255, 0.04)',
-              borderRadius: 1,
-              cursor: 'pointer',
-              display: 'flex',
-              justifyContent: 'space-between',
-              mt: 2,
-              p: '12px'
-            }}
+          <button
+            className="br-button small circle"
+            type="button"
+            aria-label="Close"
+            onClick={onClose}
           >
-            <div>
-              <Typography
-                color="inherit"
-                variant="subtitle1"
-              >
-                Devias
-              </Typography>
-              <Typography
-                color="neutral.400"
-                variant="body2"
-              >
-                Production
-              </Typography>
-            </div>
-            <SvgIcon
-              fontSize="small"
-              sx={{ color: 'neutral.500' }}
-            >
-              <ChevronUpDownIcon />
-            </SvgIcon>
-          </Box>
+            <FontAwesomeIcon icon={faTimes} size="lg" />
+          </button>
         </Box>
-        <Divider sx={{ borderColor: 'neutral.700' }} />
-        <Box
+        <Divider sx={{ borderColor: '#ccc' }} />
+        <Stack
           component="nav"
           sx={{
             flexGrow: 1,
-            px: 2,
-            py: 3
+            justifyContent: 'space-between'
           }}
         >
           <Stack
@@ -112,7 +71,7 @@ export const SideNav = (props) => {
             }}
           >
             {filteredItems.map((item) => {
-              const active = item.path ? (pathname === item.path) : false;
+              const active = item.path ? pathname === item.path : false;
 
               return (
                 <SideNavItem
@@ -127,29 +86,11 @@ export const SideNav = (props) => {
               );
             })}
           </Stack>
-        </Box>
+          <SideNavBottom />
+        </Stack>
       </Box>
     </Scrollbar>
   );
-
-  if (lgUp) {
-    return (
-      <Drawer
-        anchor="left"
-        open
-        PaperProps={{
-          sx: {
-            backgroundColor: 'neutral.800',
-            color: 'common.white',
-            width: 280
-          }
-        }}
-        variant="permanent"
-      >
-        {content}
-      </Drawer>
-    );
-  }
 
   return (
     <Drawer
@@ -158,13 +99,13 @@ export const SideNav = (props) => {
       open={open}
       PaperProps={{
         sx: {
-          backgroundColor: 'neutral.800',
-          color: 'common.white',
+          backgroundColor: 'white', //'neutral.800',
+          color: '#1351B4',
           width: 280
         }
       }}
       sx={{ zIndex: (theme) => theme.zIndex.appBar + 100 }}
-      variant="temporary"
+      variant={lgUp ? 'persistent' : 'temporary'}
     >
       {content}
     </Drawer>

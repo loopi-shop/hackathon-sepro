@@ -278,12 +278,12 @@ export function createComponents(config) {
           [`& .${tableCellClasses.root}`]: {
             borderBottom: 'none',
             backgroundColor: palette.neutral[50],
-            color: palette.neutral[700],
-            fontSize: 12,
+            color: palette.primary.main,
+            fontSize: 14,
             fontWeight: 600,
             lineHeight: 1,
             letterSpacing: 0.5,
-            textTransform: 'uppercase'
+            textTransform: 'none'
           },
           [`& .${tableCellClasses.paddingCheckbox}`]: {
             paddingTop: 4,

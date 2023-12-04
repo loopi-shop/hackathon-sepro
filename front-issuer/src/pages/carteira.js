@@ -26,7 +26,7 @@ export const WalletPage = ({ embedded }) => {
         setIsLoading(false);
       });
     }
-  });
+  }, [account, isLoading, isAdmin, user]);
 
   /* Load balances */
   useEffect(() => {
@@ -61,7 +61,7 @@ export const WalletPage = ({ embedded }) => {
         console.error(err);
         throw err;
       });
-  });
+  }, [account, tokens, isLoading]);
 
   return (
     <Box

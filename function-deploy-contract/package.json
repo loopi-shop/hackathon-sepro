@@ -1,0 +1,17 @@
+{
+  "name": "function-deploy-contract",
+  "version": "1.0.0",
+  "description": "",
+  "main": "functions/src/index.ts",
+  "dependencies": {
+    "firebase": "^10.7.0",
+    "firebase-admin": "^11.11.1",
+    "firebase-functions": "^4.5.0"
+  },
+  "scripts": {
+    "deploy": "firebase deploy --only functions",
+    "serve": "npm --prefix functions run serve"
+  },
+  "author": "",
+  "license": "ISC"
+}
