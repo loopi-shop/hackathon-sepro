@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { styled } from '@mui/material/styles';
-import { Stack } from '@mui/material';
+import { Stack, useMediaQuery } from '@mui/material';
 import { withAuthGuard } from 'src/hocs/with-auth-guard';
 import { SideNav } from './side-nav';
 import { items } from './config';
@@ -11,12 +11,23 @@ import { DashboardHeader } from './header';
 
 const SIDE_NAV_WIDTH = 280;
 
-const LayoutRoot = styled('div')(({ theme }) => ({
+const LayoutRoot = styled('div')(({ theme, ...props }) => ({
   display: 'flex',
   flex: '1 1 auto',
   maxWidth: '100%',
-  [theme.breakpoints.up('lg')]: {
-    paddingLeft: SIDE_NAV_WIDTH
+  marginLeft: props.openNav ? SIDE_NAV_WIDTH : 0,
+  transition: theme.transitions.create(['margin-left'], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen
+  }),
+  ...(props.openNav && {
+    transition: theme.transitions.create(['margin-left'], {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen
+    })
+  }),
+  [theme.breakpoints.down('lg')]: {
+    marginLeft: 0
   }
 }));
 
@@ -33,13 +44,14 @@ export const Layout = withAuthGuard((props) => {
   const router = useRouter();
   const [openNav, setOpenNav] = useState(false);
   const { user } = useAuth();
+  const idDownLg = useMediaQuery((theme) => theme.breakpoints.down('lg'));
   const pageConfig = items.find((item) => item.path === pathname);
 
   const handlePathnameChange = useCallback(() => {
-    if (openNav) {
+    if (openNav && idDownLg) {
       setOpenNav(false);
     }
-  }, [openNav]);
+  }, [openNav, idDownLg]);
 
   useEffect(
     () => {
@@ -65,10 +77,12 @@ export const Layout = withAuthGuard((props) => {
     return <></>;
   }
 
+  console.log({ openNav });
+
   return (
     <>
       <SideNav onClose={() => setOpenNav(false)} open={openNav} />
-      <LayoutRoot>
+      <LayoutRoot openNav={openNav}>
         <Stack style={{ width: '100%' }}>
           <DashboardHeader onMenuClick={() => setOpenNav((value) => !value)} />
           <LayoutContainer>{children}</LayoutContainer>
