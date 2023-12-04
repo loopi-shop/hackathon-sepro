@@ -50,74 +50,69 @@ export const TPFItemCard =
         othersHeaders = othersHeaders.reverse();
       }
 
-      return (
-        <CardItem key={item.symbol} title={item.symbol}>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: '12px 0 8px'
-            }}
-          >
-            <div>
-              <h2
-                style={{
-                  fontWeight: 700,
-                  fontSize: '20px',
-                  lineHeight: '28px',
-                  margin: 0,
-                  padding: 0
-                }}
-              >
-                {item.name}
-              </h2>
-              <p style={{ margin: 0, padding: 0, fontSize: '12px', lineHeight: '16px' }}>
-                Vencimento {expirationHeader?.format({ rowData: item }) ?? 'não informado'}
-              </p>
-            </div>
-            <IconButton style={{ width: '32px', height: '32px' }} color="primary">
-              <SvgIcon fontSize="medium" style={{ width: '24px', height: '24px' }}>
-                <FontAwesomeIcon icon={faEllipsisV} />
-              </SvgIcon>
-            </IconButton>
+    return (
+      <CardItem key={item.symbol} title={item.symbol}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '12px 0 8px'
+          }}
+        >
+          <div>
+            <h2
+              style={{
+                fontWeight: 700,
+                fontSize: '20px',
+                lineHeight: '28px',
+                margin: 0,
+                padding: 0
+              }}
+            >
+              {item.name}
+            </h2>
+            <p style={{ margin: 0, padding: 0, fontSize: '12px', lineHeight: '16px' }}>
+              Vencimento {expirationHeader?.format({ rowData: item }) ?? 'não informado'}
+            </p>
           </div>
-          {!isAdmin && (
-            <>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '0 0 8px',
-                  gap: '9px'
-                }}
-              >
-                <IconButton style={{ width: '20px', height: '20px' }} color="inherit">
-                  <SvgIcon fontSize="medium" style={{ width: '20px', height: '20px' }}>
-                    <FontAwesomeIcon icon={faWallet} />
-                  </SvgIcon>
-                </IconButton>
-                <div>
-                  <h2
-                    style={{
-                      fontWeight: 700,
-                      fontSize: '14px',
-                      lineHeight: '20px',
-                      margin: 0,
-                      padding: 0,
-                      textTransform: 'uppercase'
-                    }}
-                  >
-                    Meu Saldo
-                  </h2>
-                  <p style={{ margin: 0, padding: 0, fontSize: '14px', lineHeight: '20px' }}>
-                    {balanceHeader?.format({ rowData: item, value: itemComplement['balance'] })}
-                  </p>
-                </div>
+        </div>
+        {!isAdmin && (
+          <>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: '0 0 8px',
+                gap: '9px'
+              }}
+            >
+              <IconButton style={{ width: '20px', height: '20px' }} color="inherit">
+                <SvgIcon fontSize="medium" style={{ width: '20px', height: '20px' }}>
+                  <FontAwesomeIcon icon={faWallet} />
+                </SvgIcon>
+              </IconButton>
+              <div>
+                <h2
+                  style={{
+                    fontWeight: 700,
+                    fontSize: '14px',
+                    lineHeight: '20px',
+                    margin: 0,
+                    padding: 0,
+                    textTransform: 'uppercase'
+                  }}
+                >
+                  Meu Saldo
+                </h2>
+                <p style={{ margin: 0, padding: 0, fontSize: '14px', lineHeight: '20px' }}>
+                  {balanceHeader?.format({ rowData: item, value: itemComplement['balance'] })}
+                </p>
               </div>
-              <Divider sx={{ mb: 1 }} />
-            </>
-          )}
+            </div>
+            <Divider sx={{ mb: 1 }} />
+          </>
+        )}
 
           <div style={{ display: 'grid', gridTemplate: '1fr', gap: '8px' }}>
             {othersHeaders.map((header) => (
