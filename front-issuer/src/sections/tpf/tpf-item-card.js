@@ -25,10 +25,10 @@ export const TPFItemCard =
   }) =>
     (item) => {
       const itemComplement = {
-        unitPrice: totalAssetsList.find((up) => up.symbol === item.symbol)?.totalAssets,
-        totalAssets: totalSupplyList.find((up) => up.symbol === item.symbol)?.totalSupply,
-        totalSupply: balanceList.find((up) => up.symbol === item.symbol)?.balance,
-        balance: unitPriceList.find((up) => up.symbol === item.symbol)?.price,
+        unitPrice: unitPriceList.find((up) => up.symbol === item.symbol)?.price,
+        totalAssets: totalAssetsList.find((up) => up.symbol === item.symbol)?.totalAssets,
+        totalSupply: totalSupplyList.find((up) => up.symbol === item.symbol)?.totalSupply,
+        balance: balanceList.find((up) => up.symbol === item.symbol)?.balance,
       }
       const holders = () => {
         console.log(`Show holders list of token ${item.contractAddress}`);
