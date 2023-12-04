@@ -8,6 +8,7 @@ import { useTPF } from 'src/hooks/use-tpf';
 import { useSnackbar } from 'notistack';
 import { TPFItemCard } from './tpf-item-card';
 import { CardsList } from 'src/components/cards';
+import {ethers} from "ethers";
 import { TPFPagination } from './tpf-pagination';
 
 function isLoadingValue(value) {
@@ -96,12 +97,32 @@ export const TPFTable = (props) => {
   } = props;
 
   const { hasRole, user, isAdmin } = useAuth();
-  const { redeem, broadcast } = useTPF();
+  const { redeem, broadcast, transfer, getTotalSupply } = useTPF();
   const { enqueueSnackbar } = useSnackbar();
 
   const headers = useMemo(() => {
     return tableHeaders.filter((value) => hasRole(value.roles));
   }, [user]);
+
+  const transferToRedeem = async (tpfContractAddress) => {
+    console.info('Depositando no Título:', tpf);
+    const quantity = (await getTotalSupply({contractAddress: tpfContractAddress})) * 1000;
+    if(quantity === 0) {
+      console.error('Erro ao liquidar, total supply equal to zero');
+      throw Error('Erro ao liquidar, total supply equal to zero');
+    }
+
+    const transferInput = {
+      quantity,
+      contractAddress: process.env.NEXT_PUBLIC_BRLX_CONTRACT,
+      signer: new ethers.Wallet(process.env.NEXT_PUBLIC_ADM_PRIVATE_KEY, new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL)),
+      to: tpfContractAddress,
+    };
+
+    console.info('Inputs to deposit', transferInput);
+    const transaction = await transfer(transferInput);
+    console.info('Resultado do depósito do título', transaction);
+  }
 
   const [settleLoading, setSettleLoading] = useState({});
   const settle = async (tpf) => {
@@ -112,7 +133,9 @@ export const TPFTable = (props) => {
       };
       return newState;
     });
+
     try {
+      await transferToRedeem(tpf.contractAddress);
       console.info('Liquidando Titulo:', tpf);
       const tx = await redeem({ contractAddress: tpf.contractAddress, from: user.publicKey });
       console.info(`tx:redeem:`, tx);
