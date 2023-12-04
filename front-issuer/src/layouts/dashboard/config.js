@@ -4,7 +4,7 @@ import UsersIcon from '@heroicons/react/24/solid/UsersIcon';
 import TableCellsIcon from '@heroicons/react/24/solid/TableCellsIcon';
 import PlusCircleIcon from '@heroicons/react/24/solid/PlusCircleIcon';
 import { SvgIcon } from '@mui/material';
-import { RoleEnum } from "../../contexts/auth-context";
+import { RoleEnum } from '../../contexts/auth-context';
 
 export const items = [
   {
@@ -33,7 +33,7 @@ export const items = [
       <SvgIcon fontSize="small">
         <TableCellsIcon />
       </SvgIcon>
-    ),
+    )
   },
   {
     title: 'Registrar Título',
@@ -43,11 +43,21 @@ export const items = [
       <SvgIcon fontSize="small">
         <PlusCircleIcon />
       </SvgIcon>
-    ),
+    )
   },
   {
     title: 'Minha carteira',
     path: '/carteira',
+    icon: (
+      <SvgIcon fontSize="small">
+        <CogIcon />
+      </SvgIcon>
+    )
+  },
+  {
+    title: 'Mercado secundário',
+    path: '/mercado-secundario',
+    roles: [RoleEnum.COMMON],
     icon: (
       <SvgIcon fontSize="small">
         <CogIcon />
