@@ -1,5 +1,5 @@
 import XMarkIcon from '@heroicons/react/24/solid/XMarkIcon';
-import { forwardRef, useEffect, useState } from 'react';
+import { forwardRef, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
   Box,
@@ -37,17 +37,23 @@ const CustomPaper = forwardRef(function CustomPaper(props, ref) {
 
 export const TPFWithdraw = (props) => {
   const { open, handleClose, tpf = {} } = props;
-  const balance = 0;
-  const min = 0.000001;
+  const [balance, setBalance] = useState(0);
+  const [loadingBalance, setLoadingBalance] = useState(false);
+
+  const min = useMemo(() => {
+    if (!tpf?.decimals) return 1;
+    return new BigNumber(1).shiftedBy(-tpf.decimals).toNumber();
+  }, [tpf]);
 
   const { enqueueSnackbar } = useSnackbar();
 
   const { sdk, connected, account } = useSDK();
   const { balanceOfAsset, withdraw } = useTPF();
+
   const [isLoadingSubmit, setIsLoadingSubmit] = useState(false);
   const formik = useFormik({
     initialValues: {
-      amount: 1000
+      amount: ''
     },
     validationSchema: Yup.object({
       amount: Yup.number()
@@ -63,8 +69,19 @@ export const TPFWithdraw = (props) => {
   });
 
   useEffect(() => {
-    if (tpf?.minimumValue) formik.setValues({ amount: tpf.minimumValue });
-  }, [tpf]);
+    if (tpf?.asset && account) {
+      setLoadingBalance(true)
+      balanceOfAsset({
+        accountAddress: account,
+        assetAddress: tpf.asset,
+        contractAddress: tpf.contractAddress,
+      }).then((currentBalance) => {
+        setBalance(currentBalance);
+      }).finally(() => {
+        setLoadingBalance(false);
+      })
+    }
+  }, [tpf, account]);
 
   const connect = async () => {
     try {
@@ -130,12 +147,12 @@ export const TPFWithdraw = (props) => {
               <strong>Endereço do contrato</strong>
               <br />
               <Link
-                href={`https://polygonscan.com/address/${tpf.contractAddress}`}
+                href={`${process.env.NEXT_PUBLIC_SCAN_URL}${tpf.contractAddress}`}
                 target="_blank"
                 title={tpf.contractAddress}
                 style={{ color: '#0076D6', textDecoration: 'none' }}
               >
-                {tpf.contractAddress.substring(0, 22)}...
+                {tpf.contractAddress?.substring(0, 22)}...
               </Link>
             </p>
           </div>
@@ -149,6 +166,13 @@ export const TPFWithdraw = (props) => {
               <strong>Rentabilidade</strong>
               <br />
               <span>{(tpf.yield / 100).toFixed(2)}% a.a</span>
+            </p>
+          </div>
+          <div style={{ border: '1px solid #F8DFE2', padding: '16px' }}>
+            <p>
+              <strong>Saldo Disponível</strong>
+              <br />
+              <span>{loadingBalance ? 'Carregando...' : balance}</span>
             </p>
           </div>
         </DialogContentText>
@@ -166,7 +190,7 @@ export const TPFWithdraw = (props) => {
                 hiddenLabel
                 name="amount"
                 onBlur={formik.handleBlur}
-                onChange={handleChangeAmount}
+                onChange={formik.handleChange}
                 value={formik.values.amount}
                 decimalScale={tpf.decimals}
                 fixedDecimalScale

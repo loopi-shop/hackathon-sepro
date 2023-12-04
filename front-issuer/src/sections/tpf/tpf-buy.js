@@ -242,7 +242,7 @@ export const TPFBuy = (props) => {
               <strong>Endereço do contrato</strong>
               <br />
               <Link
-                href={`https://polygonscan.com/address/${tpf.contractAddress}`}
+                href={`${NEXT_PUBLIC_SCAN_URL}${tpf.contractAddress}`}
                 target="_blank"
                 title={tpf.contractAddress}
                 style={{ color: '#0076D6', textDecoration: 'none' }}
