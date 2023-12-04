@@ -76,13 +76,17 @@ const Page = () => {
           autoHideDuration: 10000
         });
 
-        formik.setFieldValue('blocklistCountryCode', formik.initialValues.blocklistCountryCode);
-        formik.setFieldValue('startDate', formik.initialValues.startDate);
-        formik.setFieldValue('name', '');
-        formik.setFieldValue('symbol', '');
-        formik.setFieldValue('expirationDate', '');
-        formik.setFieldValue('yieldPercent', '');
-        formik.setFieldValue('maxAssets', '');
+        formik.setFieldValue(
+          'blocklistCountryCode',
+          formik.initialValues.blocklistCountryCode,
+          false
+        );
+        formik.setFieldValue('startDate', formik.initialValues.startDate, false);
+        formik.setFieldValue('name', '', false);
+        formik.setFieldValue('symbol', '', false);
+        formik.setFieldValue('expirationDate', '', false);
+        formik.setFieldValue('yieldPercent', '', false);
+        formik.setFieldValue('maxAssets', '', false);
       } catch (error) {
         console.error(`error on create`, error);
         enqueueSnackbar(`Erro para criar o título`, {
