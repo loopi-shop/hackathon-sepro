@@ -25,6 +25,7 @@ import Link from 'next/link';
 import { getContractLink } from 'src/utils/token-link';
 import { CustomDialog } from 'src/components/dialog';
 import { formatBRLX } from 'src/utils/format';
+import { BRLX_DECIMALS } from 'src/constants';
 
 export const TPFBuy = (props) => {
   const { open, handleClose, tpf = {} } = props;
@@ -257,7 +258,7 @@ export const TPFBuy = (props) => {
             )}
             <b>Quanto deseja comprar?</b>
             <p>
-              <b style={{ fontWeight: 600, fontSize: 14 }}>Valor</b>
+              <b style={{ fontWeight: 600, fontSize: 14 }}>Valor (BRLX)</b>
               <NumericFormat
                 error={!!(formik.touched.amount && formik.errors.amount)}
                 fullWidth
@@ -267,7 +268,7 @@ export const TPFBuy = (props) => {
                 onBlur={formik.handleBlur}
                 onChange={handleChangeAmount}
                 value={formik.values.amount}
-                decimalScale={tpf.decimals}
+                decimalScale={BRLX_DECIMALS}
                 fixedDecimalScale
                 customInput={TextField}
               />
@@ -280,7 +281,8 @@ export const TPFBuy = (props) => {
             {isLoadingSubmit ? (
               <>
                 <DialogContentText sx={{ mt: 1 }} textAlign="center">
-                  <strong>Você irá receber:</strong> {lastSimulatedValue.toFormat(tpf.decimals)}
+                  <strong>Você irá receber:</strong> {lastSimulatedValue.toFormat(tpf.decimals)} (
+                  {tpf.symbol})
                 </DialogContentText>
                 <Box sx={{ display: 'flex', mt: 3, justifyContent: 'center' }}>
                   <CircularProgress size={24} value={submitProgress} sx={{ mr: 1 }} /> Carregando...
@@ -307,7 +309,7 @@ export const TPFBuy = (props) => {
                 </Button>
                 {simulated && lastSimulatedValue && (
                   <p>
-                    <b style={{ fontWeight: 600, fontSize: 14 }}>Você irá receber</b>{' '}
+                    <b style={{ fontWeight: 600, fontSize: 14 }}>Você irá receber ({tpf.symbol})</b>
                     <NumericFormat
                       fullWidth
                       hiddenLabel
