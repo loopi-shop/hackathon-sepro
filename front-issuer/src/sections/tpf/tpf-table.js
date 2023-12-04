@@ -78,7 +78,7 @@ const tableHeaders = [
     format: ({ rowData, value }) => {
       return isLoadingValue(value)
         ? 'Carregando...'
-        : formatBRLX(value / 10 ** rowData.decimals);
+        : (value / 10 ** rowData.decimals).toFixed(rowData.decimals);
     }
   }
 ];

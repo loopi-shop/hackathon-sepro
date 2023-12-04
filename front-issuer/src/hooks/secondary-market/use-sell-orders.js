@@ -1,38 +1,17 @@
 import { useEffect, useState } from 'react';
+import secondaryMarket from "../../utils/secondary-market";
+import {useAuth} from "../use-auth";
 
 export function useSellOrders() {
   const [orders, setOrders] = useState([]);
+  const { user } = useAuth();
 
   useEffect(() => {
-    setOrders([
-      {
-        name: 'Symbol01',
-        expirationDate: '30/11/2023',
-        yield: '20',
-        unitPrice: '1200',
-        quantity: 2,
-        totalPrice: '2400',
-        sellPrice: '2350'
-      },
-      {
-        name: 'Symbol02',
-        expirationDate: '30/11/2023',
-        yield: '20',
-        unitPrice: '1200',
-        quantity: 2,
-        totalPrice: '2400',
-        sellPrice: '2350'
-      },
-      {
-        name: 'Symbol03',
-        expirationDate: '30/11/2023',
-        yield: '20',
-        unitPrice: '1200',
-        quantity: 2,
-        totalPrice: '2400',
-        sellPrice: '2350'
-      }
-    ]);
+    secondaryMarket.listOrders().then(completeList => {
+      const list = completeList.filter(order => order.seller !== user.publicKey);
+
+      setOrders(list);
+    });
   }, []);
 
   const createOrder = (order) => {
