@@ -9,7 +9,6 @@ export function CustomDialog({ title, open, handleClose, children }) {
       open={open}
       onClose={handleClose}
       PaperComponent={CustomPaper}
-      maxWidth
     >
       <div style={{ fontSize: '20px', fontWeight: 600 }}>
         {title}

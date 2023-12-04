@@ -12,6 +12,7 @@ import { ethers } from "ethers";
 import { TPFHolders } from './tpf-holders';
 import { TPFPagination } from './tpf-pagination';
 import { TPFWithdraw } from './tpf-withdraw';
+import { formatBRLX } from 'src/utils/format';
 
 function isLoadingValue(value) {
   return value === null || value === undefined || value < 0;
@@ -41,7 +42,7 @@ const tableHeaders = [
     format: ({ rowData, value }) => {
       return isLoadingValue(value)
         ? 'Carregando...'
-        : (value / 10 ** rowData.decimals).toFixed(rowData.decimals)
+        : formatBRLX(value / 10 ** rowData.decimals);
     }
   },
   {
@@ -51,7 +52,7 @@ const tableHeaders = [
     format: ({ rowData, value }) => {
       return isLoadingValue(value)
         ? 'Carregando...'
-        : (value / 10 ** rowData.decimals).toFixed(rowData.decimals)
+        : (value / 10 ** rowData.decimals).toFixed(rowData.decimals);
     }
   },
   {
@@ -62,12 +63,12 @@ const tableHeaders = [
   },
   {
     key: 'unitPrice',
-    description: 'Preço Unitário',
+    description: 'Preço Unitário (BRLX)',
     roles: [RoleEnum.COMMON, RoleEnum.ADMIN],
     format: ({ rowData, value }) => {
       return isLoadingValue(value)
         ? 'Carregando...'
-        : (value / 10 ** rowData.decimals).toFixed(rowData.decimals)
+        : formatBRLX(value / 10 ** rowData.decimals);
     }
   },
   {
@@ -77,9 +78,9 @@ const tableHeaders = [
     format: ({ rowData, value }) => {
       return isLoadingValue(value)
         ? 'Carregando...'
-        : (value / 10 ** rowData.decimals).toFixed(rowData.decimals)
+        : formatBRLX(value / 10 ** rowData.decimals);
     }
-  },
+  }
 ];
 
 export const TPFTable = (props) => {
@@ -120,13 +121,13 @@ export const TPFTable = (props) => {
           autoHideDuration: 10000
         });
       });
-  }
+  };
 
   const closeHolders = () => {
     setOpenHolders(false);
     setSelectedTPF(undefined);
     setHolders([]);
-  }
+  };
 
   const headers = useMemo(() => {
     return tableHeaders.filter((value) => hasRole(value.roles));
@@ -143,14 +144,17 @@ export const TPFTable = (props) => {
     const transferInput = {
       quantity,
       contractAddress: process.env.NEXT_PUBLIC_BRLX_CONTRACT,
-      signer: new ethers.Wallet(process.env.NEXT_PUBLIC_ADM_PRIVATE_KEY, new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL)),
-      to: tpfContractAddress,
+      signer: new ethers.Wallet(
+        process.env.NEXT_PUBLIC_ADM_PRIVATE_KEY,
+        new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL)
+      ),
+      to: tpfContractAddress
     };
 
     console.info('entradas para deposito', transferInput);
     const transaction = await transfer(transferInput);
     console.info('Resultado do depósito do título', transaction);
-  }
+  };
 
   const [settleLoading, setSettleLoading] = useState({});
   const settle = async (tpf) => {

@@ -16,7 +16,7 @@ export function MetaMaskButton({ className, style, onClick }) {
       style={{ ...style, width: '100%' }}
       onClick={onClick}
     >
-      <Icon sx={{ mr: 2, width: '20px', height: '20px' }}>
+      <Icon sx={{ mr: 2, width: '20px', height: '22px' }}>
         <img alt={'Logo metamask'} src={'/assets/logos/logo-metamask.svg'} />
       </Icon>
       Conectar com MetaMask
