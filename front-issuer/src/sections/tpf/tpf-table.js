@@ -8,6 +8,7 @@ import { useTPF } from 'src/hooks/use-tpf';
 import { useSnackbar } from 'notistack';
 import { TPFItemCard } from './tpf-item-card';
 import { CardsList } from 'src/components/cards';
+import { TPFHolders } from './tpf-holders';
 import { TPFPagination } from './tpf-pagination';
 
 function isLoadingValue(value) {
@@ -87,7 +88,7 @@ export const TPFTable = (props) => {
     totalAssetsList = [],
     totalSupplyList = [],
     balanceList = [],
-    onPageChange = (event, value) => {},
+    onPageChange = (event, value) => { },
     onRowsPerPageChange,
     page = 0,
     rowsPerPage = 6,
@@ -96,8 +97,34 @@ export const TPFTable = (props) => {
   } = props;
 
   const { hasRole, user, isAdmin } = useAuth();
-  const { redeem, broadcast } = useTPF();
+  const { broadcast, listHolders, redeem } = useTPF();
   const { enqueueSnackbar } = useSnackbar();
+
+  const [openHolders, setOpenHolders] = useState(false);
+  const [selectedTPF, setSelectedTPF] = useState(undefined);
+  const [holders, setHolders] = useState([]);
+
+  const handleOpenHolders = (tpf) => {
+    setSelectedTPF(tpf);
+    listHolders({ contractAddress: tpf.contractAddress })
+      .then((holders) => {
+        setHolders(holders);
+        setOpenHolders(true);
+      })
+      .catch((error) => {
+        console.error(`listHolders:`, error);
+        enqueueSnackbar(`Erro para listar os clientes do token: ${tpf.symbol}`, {
+          variant: 'error',
+          autoHideDuration: 10000
+        });
+      });
+  }
+
+  const closeHolders = () => {
+    setOpenHolders(false);
+    setSelectedTPF(undefined);
+    setHolders([]);
+  }
 
   const headers = useMemo(() => {
     return tableHeaders.filter((value) => hasRole(value.roles));
@@ -145,8 +172,15 @@ export const TPFTable = (props) => {
 
   return (
     <>
+      <TPFHolders
+        open={openHolders}
+        handleClose={closeHolders}
+        tpf={selectedTPF}
+        holders={holders}
+        setHolders={setHolders}
+      />
       <CardsList>
-        {items.map(TPFItemCard(unitPriceList, totalAssetsList, totalSupplyList, balanceList, headers, settleLoading, isAdmin, settle, buy))}
+        {items.map(TPFItemCard(unitPriceList, totalAssetsList, totalSupplyList, balanceList, headers, settleLoading, isAdmin, settle, buy, handleOpenHolders))}
       </CardsList>
       {!embedded && (
         <TPFPagination

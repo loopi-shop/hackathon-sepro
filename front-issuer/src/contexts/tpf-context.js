@@ -1,11 +1,11 @@
-import { createContext, useContext, useEffect, useReducer, useRef } from 'react';
+import {createContext, useContext, useEffect, useReducer, useRef} from 'react';
 import PropTypes from 'prop-types';
 import investmentsRepository from 'src/repositories/investments.repository';
-import { useAuth } from 'src/hooks/use-auth';
-import { Interface, JsonRpcProvider, Wallet } from 'ethers';
+import {useAuth} from 'src/hooks/use-auth';
+import {Contract, Interface, JsonRpcProvider, Wallet} from 'ethers';
 import BigNumber from 'bignumber.js';
 import axios from 'axios';
-import TPF_ABI from './tpf-abi.json';
+import TPF_ABI from '../abis/tpf-abi.json';
 
 /**
  * @typedef TPF_API
@@ -75,9 +75,16 @@ const reducer = (state, action) => (
 
 export const TPFContext = createContext({
   ...initialState,
+  /**
+   * @returns {Promise<import("src/repositories/investments.repository").TPF[]>}
+   */
   list: async () => { },
   /**
-   * @param {Omit<import("src/repositories/investments.repository").TPF, "id">} tpf 
+   * @returns {Promise<{ publicKey: string, isFrozen: boolean }[]>}
+   */
+  listHolders: async ({ contractAddress }) => { },
+  /**
+   * @param {Omit<import("src/repositories/investments.repository").TPF, "id">} tpf
    * @returns {Promise<import("src/repositories/investments.repository").TPF>}
    */
   create: async (tpf) => { },
@@ -121,6 +128,10 @@ export const TPFContext = createContext({
    * @returns {Promise<{ txHash: string }>}
    */
   broadcast: async ({ tx }) => { },
+  /**
+   @returns {Promise<{ data: string, to: string, nonce: number, value: string }>}
+   */
+  setFrozen: async ({ contractAddress, frozen, walletAddress }) => { },
 });
 
 export const TPFProvider = (props) => {
@@ -218,6 +229,20 @@ export const TPFProvider = (props) => {
       isLoading: false,
       payload: investments
     });
+  }
+
+  const listHolders = async ({ contractAddress }) => {
+    const contract = new Contract(contractAddress, TPF_ABI, providerRef.current);
+    let holders = await contract.holders();
+
+    return Promise.all(holders.map(async (holder) => {
+      const isFrozen = await contract.isFrozen(holder);
+
+      return {
+        publicKey: holder,
+        isFrozen,
+      };
+    }));
   }
 
   const approve = async ({ amount, from, contractAddress, asset }) => {
@@ -345,6 +370,15 @@ export const TPFProvider = (props) => {
     }
   }
 
+  const setFrozen = async ({ contractAddress, frozen, walletAddress }) => {
+    const data = TPFContractInterface.encodeFunctionData('setAddressFrozen', [walletAddress, frozen]);
+    return {
+      to: contractAddress,
+      data,
+      value: '0',
+    };
+  }
+
   useEffect(
     () => {
       if (isAuthenticated) list();
@@ -357,6 +391,7 @@ export const TPFProvider = (props) => {
       value={{
         ...state,
         list,
+        listHolders,
         create: createWithDefaults,
         invest,
         getPrice,
@@ -368,6 +403,7 @@ export const TPFProvider = (props) => {
         balanceOf,
         getTotalAssets,
         getTotalSupply,
+        setFrozen,
       }}
     >
       {children}
