@@ -8,11 +8,16 @@ import { CustomersSearch } from 'src/sections/customer/customers-search';
 import { applyPagination } from 'src/utils/apply-pagination';
 import usersRepository from '../repositories/users.repository';
 import { PageTitle } from 'src/components/page-title';
+import { normalizeString } from 'src/utils/format';
 
-const useCustomers = (data, page, rowsPerPage) => {
+const useCustomers = (data, page, rowsPerPage, search) => {
   return useMemo(() => {
-    return applyPagination(data, page, rowsPerPage);
-  }, [data, page, rowsPerPage]);
+    const dataFiltered =
+      search.length > 0
+        ? data.filter((d) => normalizeString(d.name).includes(normalizeString(search)))
+        : data;
+    return applyPagination(dataFiltered, page, rowsPerPage);
+  }, [data, page, rowsPerPage, search]);
 };
 
 const useCustomerIds = (customers) => {
@@ -22,6 +27,7 @@ const useCustomerIds = (customers) => {
 };
 
 const Page = () => {
+  const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [isLoading, setIsLoading] = useState(false);
@@ -35,7 +41,7 @@ const Page = () => {
     });
   }, []);
 
-  const customersPaginated = useCustomers(customers, page, rowsPerPage);
+  const customersPaginated = useCustomers(customers, page, rowsPerPage, search);
   const customersIds = useCustomerIds(customers);
   const customersSelection = useSelection(customersIds);
 
@@ -94,7 +100,7 @@ const Page = () => {
             </Stack>
           </Stack>
         </Stack>
-        <CustomersSearch />
+        <CustomersSearch search={search} setSearch={setSearch} />
         <CustomersTable
           count={customers.length}
           items={customersPaginated}

@@ -5,9 +5,8 @@ import { Box } from '@mui/system';
 import { useState } from 'react';
 import { Input } from 'src/components/input';
 
-export const CustomersSearch = () => {
+export const CustomersSearch = ({ search, setSearch }) => {
   const [searchOpen, setSearchOpen] = useState();
-  const [search, setSearch] = useState();
 
   return (
     <Box
@@ -19,7 +18,7 @@ export const CustomersSearch = () => {
       }}
     >
       <Typography variant="h6" sx={{ textTransform: 'none', pl: '16px' }}>
-        Clientes Ativos
+        Clientes Ativos {search ? `(${search})` : ''}
       </Typography>
       <Box>
         {searchOpen ? (
