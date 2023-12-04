@@ -1,5 +1,6 @@
 import { useState, useRef, useMemo } from 'react';
 import { useOutsideClick } from 'src/hooks/use-outside-click';
+import { normalizeString } from 'src/utils/format';
 
 /**
  * Select component
@@ -247,13 +248,4 @@ export const SelectMultiple = ({
       </div>
     </div>
   );
-};
-
-// Utils
-
-const normalizeString = (str) => {
-  return str
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase();
 };

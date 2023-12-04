@@ -4,7 +4,9 @@ import {
   Box,
   Card,
   Checkbox,
+  IconButton,
   Stack,
+  SvgIcon,
   Table,
   TableBody,
   TableCell,
@@ -14,6 +16,9 @@ import {
   Typography
 } from '@mui/material';
 import { Scrollbar } from 'src/components/scrollbar';
+import { faEdit, faEye, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { TPFPagination } from '../tpf/tpf-pagination';
 
 export const CustomersTable = (props) => {
   const {
@@ -30,13 +35,13 @@ export const CustomersTable = (props) => {
     selected = []
   } = props;
 
-  const selectedSome = (selected.length > 0) && (selected.length < items.length);
-  const selectedAll = (items.length > 0) && (selected.length === items.length);
+  const selectedSome = selected.length > 0 && selected.length < items.length;
+  const selectedAll = items.length > 0 && selected.length === items.length;
 
   return (
-    <Card>
+    <>
       <Scrollbar>
-        <Box sx={{ minWidth: 800 }}>
+        <Box sx={{ minWidth: 800, mb: 4 }}>
           <Table>
             <TableHead>
               <TableRow>
@@ -53,18 +58,11 @@ export const CustomersTable = (props) => {
                     }}
                   />
                 </TableCell>
-                <TableCell>
-                  Name
-                </TableCell>
-                <TableCell>
-                  Public Key
-                </TableCell>
-                <TableCell>
-                  Country
-                </TableCell>
-                <TableCell>
-                  Signed Up
-                </TableCell>
+                <TableCell>Nome</TableCell>
+                <TableCell>Chave pública</TableCell>
+                <TableCell>País</TableCell>
+                <TableCell>Logado pela última vez</TableCell>
+                <TableCell>Ações</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -73,11 +71,7 @@ export const CustomersTable = (props) => {
                 const createdAt = format(Number(customer.lastLoginAt ?? Date.now()), 'dd/MM/yyyy');
 
                 return (
-                  <TableRow
-                    hover
-                    key={customer.id}
-                    selected={isSelected}
-                  >
+                  <TableRow hover key={customer.id} selected={isSelected}>
                     <TableCell padding="checkbox">
                       <Checkbox
                         checked={isSelected}
@@ -91,24 +85,29 @@ export const CustomersTable = (props) => {
                       />
                     </TableCell>
                     <TableCell>
-                      <Stack
-                        alignItems="center"
-                        direction="row"
-                        spacing={2}
-                      >
-                        <Typography variant="subtitle2">
-                          {customer.name}
-                        </Typography>
+                      <Stack alignItems="center" direction="row" spacing={2}>
+                        <Typography variant="subtitle2">{customer.name}</Typography>
                       </Stack>
                     </TableCell>
+                    <TableCell>{customer.publicKey}</TableCell>
+                    <TableCell>{customer.country}</TableCell>
+                    <TableCell>{createdAt}</TableCell>
                     <TableCell>
-                      {customer.publicKey}
-                    </TableCell>
-                    <TableCell>
-                      {customer.country}
-                    </TableCell>
-                    <TableCell>
-                      {createdAt}
+                      <IconButton>
+                        <SvgIcon fontSize="small" color="primary">
+                          <FontAwesomeIcon icon={faEye} />
+                        </SvgIcon>
+                      </IconButton>
+                      <IconButton>
+                        <SvgIcon fontSize="small" color="primary">
+                          <FontAwesomeIcon icon={faEdit} />
+                        </SvgIcon>
+                      </IconButton>
+                      <IconButton>
+                        <SvgIcon fontSize="small" color="primary">
+                          <FontAwesomeIcon icon={faTrash} />
+                        </SvgIcon>
+                      </IconButton>
                     </TableCell>
                   </TableRow>
                 );
@@ -117,16 +116,13 @@ export const CustomersTable = (props) => {
           </Table>
         </Box>
       </Scrollbar>
-      <TablePagination
-        component="div"
-        count={count}
-        onPageChange={onPageChange}
-        onRowsPerPageChange={onRowsPerPageChange}
+      <TPFPagination
         page={page}
         rowsPerPage={rowsPerPage}
-        rowsPerPageOptions={[5, 10, 25]}
+        count={count}
+        onPageChange={onPageChange}
       />
-    </Card>
+    </>
   );
 };
 
