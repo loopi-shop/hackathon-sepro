@@ -1,67 +1,72 @@
-import ChartBarIcon from '@heroicons/react/24/solid/ChartBarIcon';
-import CogIcon from '@heroicons/react/24/solid/CogIcon';
-import UsersIcon from '@heroicons/react/24/solid/UsersIcon';
-import TableCellsIcon from '@heroicons/react/24/solid/TableCellsIcon';
-import PlusCircleIcon from '@heroicons/react/24/solid/PlusCircleIcon';
-import { SvgIcon } from '@mui/material';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faHome,
+  faChartLine,
+  faWallet,
+  faAddressBook,
+  faPlusSquare,
+  faStore
+} from '@fortawesome/free-solid-svg-icons';
+import {
+  faDiscord,
+  faTelegram,
+  faXTwitter,
+  faInstagram,
+  faLinkedin,
+  faYoutube
+} from '@fortawesome/free-brands-svg-icons';
 import { RoleEnum } from '../../contexts/auth-context';
 
 export const items = [
   {
     title: 'Início',
     path: '/',
-    icon: (
-      <SvgIcon fontSize="small">
-        <ChartBarIcon />
-      </SvgIcon>
-    )
+    icon: <FontAwesomeIcon icon={faHome} />
   },
   {
     title: 'Clientes',
     path: '/clientes',
     roles: [RoleEnum.ADMIN],
-    icon: (
-      <SvgIcon fontSize="small">
-        <UsersIcon />
-      </SvgIcon>
-    )
+    icon: <FontAwesomeIcon icon={faAddressBook} />
   },
   {
     title: 'Títulos',
     path: '/titulo',
-    icon: (
-      <SvgIcon fontSize="small">
-        <TableCellsIcon />
-      </SvgIcon>
-    )
+    icon: <FontAwesomeIcon icon={faChartLine} />
   },
   {
-    title: 'Registrar Título',
+    title: 'Cadastrar Título',
     path: '/titulo/criar',
     roles: [RoleEnum.ADMIN],
-    icon: (
-      <SvgIcon fontSize="small">
-        <PlusCircleIcon />
-      </SvgIcon>
-    )
+    icon: <FontAwesomeIcon icon={faPlusSquare} />
   },
   {
     title: 'Minha carteira',
     path: '/carteira',
-    icon: (
-      <SvgIcon fontSize="small">
-        <CogIcon />
-      </SvgIcon>
-    )
+    icon: <FontAwesomeIcon icon={faWallet} />
   },
   {
     title: 'Mercado secundário',
     path: '/mercado-secundario',
     roles: [RoleEnum.COMMON],
-    icon: (
-      <SvgIcon fontSize="small">
-        <CogIcon />
-      </SvgIcon>
-    )
+    icon: <FontAwesomeIcon icon={faStore} />
+  }
+];
+
+export const social = [
+  { href: 'https://discord.gg/loopipay', icon: <FontAwesomeIcon icon={faDiscord} size="lg" /> },
+  { href: 'https://t.me/loopipay', icon: <FontAwesomeIcon icon={faTelegram} size="lg" /> },
+  { href: 'https://twitter.com/loopipay', icon: <FontAwesomeIcon icon={faXTwitter} size="lg" /> },
+  {
+    href: 'https://instagram.com/loopipay',
+    icon: <FontAwesomeIcon icon={faInstagram} size="lg" />
+  },
+  {
+    href: 'https://www.youtube.com/channel/UCoTiWle-Oht_4LDfSYeapSg',
+    icon: <FontAwesomeIcon icon={faYoutube} size="lg" />
+  },
+  {
+    href: 'https://www.linkedin.com/company/loopiapp',
+    icon: <FontAwesomeIcon icon={faLinkedin} size="lg" />
   }
 ];
