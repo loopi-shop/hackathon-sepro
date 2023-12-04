@@ -1,23 +1,20 @@
-import Head from 'next/head';
-import {
-  Box,
-  Button,
-  Container,
-  Grid,
-  Stack,
-  TextField,
-  Typography,
-  InputAdornment
-} from '@mui/material';
+import { Box, Container, Grid, Stack, Typography } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { NumericFormat } from 'react-number-format';
 import { addDays, format, differenceInDays } from 'date-fns';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import { CountryISOSelect } from 'src/components/country-iso-select';
 import { useTPF } from 'src/hooks/use-tpf';
 import { useSnackbar } from 'notistack';
 import { PageTitle } from 'src/components/page-title';
+import { Input } from 'src/components/input';
+import { SelectMultiple } from 'src/components/select';
+import COUNTRY_LIST from 'src/components/country-list.json';
+
+const COUNTRIES = COUNTRY_LIST.map((country) => ({
+  id: country.code,
+  value: country.name
+}));
 
 const Page = () => {
   const { create, tpf } = useTPF();
@@ -25,8 +22,13 @@ const Page = () => {
 
   const formik = useFormik({
     initialValues: {
-      blocklistCountryCode: [''],
-      startDate: format(new Date(), 'yyyy-MM-dd')
+      name: '',
+      symbol: '',
+      startDate: format(new Date(), 'yyyy-MM-dd'),
+      expirationDate: format(new Date(), 'yyyy-MM-dd'),
+      yieldPercent: '',
+      maxAssets: '',
+      blocklistCountryCode: []
     },
     validationSchema: Yup.object({
       blocklistCountryCode: Yup.array(Yup.string()),
@@ -113,118 +115,92 @@ const Page = () => {
               <Typography variant="h4">Cadastro de Título Público LTN</Typography>
             </Stack>
           </Stack>
-          <form noValidate onSubmit={formik.handleSubmit}>
+          <form noValidate onSubmit={formik.handleSubmit} style={{ marginTop: '40px' }}>
             <Grid container spacing={2}>
               <Grid item {...gridItemSize}>
-                <TextField
-                  error={!!(formik.touched.name && formik.errors.name)}
-                  helperText={formik.touched.name && formik.errors.name}
+                <Input
                   name="name"
                   label="Nome"
-                  InputProps={{
-                    startAdornment: <InputAdornment position="start">LTN</InputAdornment>
-                  }}
-                  inputProps={{
-                    style: { textTransform: 'uppercase' }
-                  }}
-                  fullWidth
-                  value={formik.values.name}
-                  onChange={formik.handleChange}
+                  placeholder="LTN"
+                  error={formik.touched.name ? formik.errors.name : ''}
                   onBlur={formik.handleBlur}
+                  onChange={formik.handleChange}
+                  value={formik.values.name}
+                  style={{ textTransform: 'uppercase' }}
                 />
               </Grid>
               <Grid item {...gridItemSize}>
-                <TextField
-                  error={!!(formik.touched.symbol && formik.errors.symbol)}
-                  helperText={formik.touched.symbol && formik.errors.symbol}
+                <Input
                   name="symbol"
                   label="Símbolo"
-                  fullWidth
+                  placeholder="LTN"
+                  error={formik.touched.symbol ? formik.errors.symbol : ''}
+                  onBlur={formik.handleBlur}
+                  onChange={formik.handleChange}
                   value={formik.values.symbol}
-                  InputProps={{
-                    startAdornment: <InputAdornment position="start">LTN</InputAdornment>
-                  }}
-                  inputProps={{
-                    style: { textTransform: 'uppercase' }
-                  }}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
+                  style={{ textTransform: 'uppercase' }}
                 />
               </Grid>
               <Grid item {...gridItemSize}>
-                <TextField
-                  error={!!(formik.touched.startDate && formik.errors.startDate)}
-                  helperText={formik.touched.startDate && formik.errors.startDate}
+                <Input
                   name="startDate"
-                  label="Data de Inicio"
-                  fullWidth
                   type="date"
-                  value={formik.values.startDate}
-                  onChange={formik.handleChange}
+                  label="Data de início"
+                  error={formik.touched.startDate ? formik.errors.startDate : ''}
                   onBlur={formik.handleBlur}
-                  InputLabelProps={{ shrink: true }}
+                  onChange={formik.handleChange}
+                  value={formik.values.startDate}
                 />
               </Grid>
               <Grid item {...gridItemSize}>
-                <TextField
-                  error={!!(formik.touched.expirationDate && formik.errors.expirationDate)}
-                  helperText={formik.touched.expirationDate && formik.errors.expirationDate}
+                <Input
                   name="expirationDate"
-                  label="Data de Vencimento"
-                  fullWidth
                   type="date"
-                  value={formik.values.expirationDate}
-                  onChange={formik.handleChange}
+                  label="Data de Vencimento"
+                  error={formik.touched.expirationDate ? formik.errors.expirationDate : ''}
                   onBlur={formik.handleBlur}
-                  InputLabelProps={{ shrink: true }}
+                  onChange={formik.handleChange}
+                  value={formik.values.expirationDate}
                 />
               </Grid>
               <Grid item {...gridItemSize}>
                 <NumericFormat
-                  error={!!(formik.touched.yieldPercent && formik.errors.yieldPercent)}
-                  helperText={formik.touched.yieldPercent && formik.errors.yieldPercent}
-                  fullWidth
-                  label="Rentabilidade ao ano (%)"
                   name="yieldPercent"
+                  label="Rentabilidade ao ano (%)"
+                  error={formik.touched.yieldPercent ? formik.errors.yieldPercent : ''}
                   onBlur={formik.handleBlur}
                   onChange={formik.handleChange}
                   value={formik.values.yieldPercent}
                   decimalScale={2}
                   fixedDecimalScale
-                  customInput={TextField}
+                  customInput={Input}
                   valueIsNumericString={false}
                 />
               </Grid>
               <Grid item {...gridItemSize}>
                 <NumericFormat
-                  error={!!(formik.touched.maxAssets && formik.errors.maxAssets)}
-                  helperText={formik.touched.maxAssets && formik.errors.maxAssets}
-                  fullWidth
-                  label="Emissão Máxima"
                   name="maxAssets"
+                  label="Emissão Máxima"
+                  error={formik.touched.maxAssets ? formik.errors.maxAssets : ''}
                   onBlur={formik.handleBlur}
                   onChange={formik.handleChange}
                   value={formik.values.maxAssets}
                   decimalScale={6}
                   fixedDecimalScale
-                  customInput={TextField}
+                  customInput={Input}
                   valueIsNumericString={false}
                 />
               </Grid>
               <Grid item {...gridItemSize}>
-                <CountryISOSelect
-                  error={
-                    !!(formik.touched.blocklistCountryCode && formik.errors.blocklistCountryCode)
-                  }
-                  helperText={
-                    formik.touched.blocklistCountryCode && formik.errors.blocklistCountryCode
-                  }
+                <SelectMultiple
                   name="blocklistCountryCode"
-                  label="Blocklist País"
-                  fullWidth
-                  multiple
-                  value={formik.values.blocklistCountryCode}
-                  onChange={formik.handleChange}
+                  label="País"
+                  error={
+                    formik.touched.blocklistCountryCode ? formik.errors.blocklistCountryCode : ''
+                  }
+                  initialSelectedOptionIds={formik.initialValues.blocklistCountryCode}
+                  options={COUNTRIES}
+                  onOptionSelected={(ids) => formik.setFieldValue('blocklistCountryCode', ids)}
                   onBlur={formik.handleBlur}
                 />
               </Grid>
@@ -236,15 +212,18 @@ const Page = () => {
             </Grid>
             <Grid container sx={{ mt: 1 }} spacing={2} direction="row" justifyContent="flex-end">
               <Grid item {...gridItemSize}>
-                <Button
-                  disabled={tpf.isLoading}
-                  fullWidth
-                  size="large"
+                <button
+                  disabled={formik.isSubmitting}
+                  className="br-button primary"
                   type="submit"
-                  variant="contained"
+                  style={{ width: '100%', marginTop: '12px' }}
                 >
-                  Registrar
-                </Button>
+                  {tpf.isLoading ? (
+                    <div className="br-loading br-secondary" style={{ marginRight: '8px' }}></div>
+                  ) : (
+                    'Registrar'
+                  )}
+                </button>
               </Grid>
             </Grid>
           </form>
