@@ -140,26 +140,38 @@ export const TPFItemCard =
                 alignItems: 'center'
               }}
             >
-              <Button
-                color="primary"
-                variant="contained"
-                style={{ borderRadius: '50px', maxWidth: 'fit-content' }}
-                onClick={() => (isAdmin ? settle(item) : buy(item))}
-                startIcon={
-                  !isAdmin && (
-                    <SvgIcon fontSize="small">
-                      <FontAwesomeIcon icon={faCartShopping} />
-                    </SvgIcon>
-                  )
-                }
-              >
-                {settleLoading[item.symbol] && <CircularProgress size={24} sx={{ mr: 1 }} />}
-                {isAdmin ? 'Liquidar' : 'Comprar'}
-              </Button>
+              <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+                <Button
+                  color="primary"
+                  variant="contained"
+                  style={{ borderRadius: '50px', maxWidth: 'fit-content' }}
+                  onClick={() => (isAdmin ? settle(item) : buy(item))}
+                  startIcon={
+                    !isAdmin && (
+                      <SvgIcon fontSize="small">
+                        <FontAwesomeIcon icon={faCartShopping} />
+                      </SvgIcon>
+                    )
+                  }
+                >
+                  {settleLoading[item.symbol] && <CircularProgress size={24} sx={{ mr: 1 }} />}
+                  {isAdmin ? 'Liquidar' : 'Comprar'}
+                </Button>
+                {isAdmin && (
+                  <Button
+                    color="primary"
+                    variant="outlined"
+                    style={{ borderRadius: '50px', marginLeft: '5px', maxWidth: 'fit-content' }}
+                    onClick={withdraw}
+                  >
+                    Sacar
+                  </Button>
+                )}
+              </div>
               <IconButton
                 color="primary"
                 style={{ cursor: 'pointer' }}
-                onClick={isAdmin ? holders : withdraw}
+                onClick={isAdmin ? holders : undefined}
               >
                 <SvgIcon fontSize="medium">
                   <FontAwesomeIcon icon={isAdmin ? faUsers : faShareNodes} />

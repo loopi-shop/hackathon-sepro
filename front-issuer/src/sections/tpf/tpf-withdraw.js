@@ -2,7 +2,6 @@ import XMarkIcon from '@heroicons/react/24/solid/XMarkIcon';
 import { forwardRef, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Box,
   Button,
   TextField,
   Stack,
@@ -12,7 +11,6 @@ import {
   Slide,
   Icon,
   Typography,
-  CircularProgress,
   Paper,
   SvgIcon
 } from '@mui/material';
@@ -24,8 +22,11 @@ import { addDays, format } from 'date-fns';
 import BigNumber from 'bignumber.js';
 import { NumericFormat } from 'react-number-format';
 import { useSnackbar } from 'notistack';
-import { MetamaskButton } from 'src/components/metamask-button';
+import { MetaMaskButton } from 'src/components/metamask-button';
+import { AddressButton } from 'src/components/address-button';
+import { shortenAddress } from 'src/utils/shorten-address';
 import Link from 'next/link';
+import { getContractLink } from 'src/utils/token-link';
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="left" ref={ref} {...props} />;
@@ -48,7 +49,7 @@ export const TPFWithdraw = (props) => {
   const { enqueueSnackbar } = useSnackbar();
 
   const { sdk, connected, account } = useSDK();
-  const { balanceOfAsset, withdraw } = useTPF();
+  const { balanceOfAsset, withdraw, broadcast } = useTPF();
 
   const [isLoadingSubmit, setIsLoadingSubmit] = useState(false);
   const formik = useFormik({
@@ -58,12 +59,43 @@ export const TPFWithdraw = (props) => {
     validationSchema: Yup.object({
       amount: Yup.number()
         .min(min, 'Valor informado deve ser maior que ${min}')
-        .max(balance, 'Valor informado deve ser menor ou igual ${max}')
+        .max(balance, ({ max }) => {
+          if (balance === 0) return `Valor informado deve ser ${max}`;
+          return `Valor informado deve ser menor ou igual ${max}`;
+        })
         .required('Valor deve ser informado')
     }),
     onSubmit: async (values) => {
       setIsLoadingSubmit(true);
       const amount = parseInt(new BigNumber(values.amount).shiftedBy(tpf.decimals).toNumber());
+      const tx = await withdraw({
+        contractAddress: tpf.contractAddress,
+        amount,
+        destinationAddress: process.env.NEXT_PUBLIC_ADM_PRIVATE_KEY,
+        from: process.env.NEXT_PUBLIC_ADM_PRIVATE_KEY,
+      }).catch((err) => {
+        console.error(`failed to generate payload tx`, tx, err);
+        enqueueSnackbar(`Falha ao gerar os dados da transação`, {
+          variant: 'error',
+          autoHideDuration: 10000,
+        });
+        setIsLoadingSubmit(false);
+        throw err;
+      });
+
+      const { txHash } = await broadcast(tx).catch((err) => {
+        console.error(`failed to broadcast tx`, tx, err);
+        enqueueSnackbar(`Falha ao enviar transação`, {
+          variant: 'error',
+          autoHideDuration: 10000,
+        });
+        setIsLoadingSubmit(false);
+        throw err;
+      });
+      enqueueSnackbar(`Transação enviada com sucesso: ${txHash}`, {
+        variant: 'success',
+        autoHideDuration: 10000,
+      });
       setIsLoadingSubmit(false);
     }
   });
@@ -72,7 +104,7 @@ export const TPFWithdraw = (props) => {
     if (tpf?.asset && account) {
       setLoadingBalance(true)
       balanceOfAsset({
-        accountAddress: account,
+        accountAddress: process.env.NEXT_PUBLIC_ADM_PRIVATE_KEY,
         assetAddress: tpf.asset,
         contractAddress: tpf.contractAddress,
       }).then((currentBalance) => {
@@ -102,6 +134,16 @@ export const TPFWithdraw = (props) => {
       return format(expirationDate, 'dd/MM/yyyy');
     }
   };
+
+  const yieldPercent = useMemo(() => {
+    if (!tpf?.yield) return '0.00';
+    return (tpf.yield / 100).toFixed(2)
+  }, [tpf]);
+
+  const balancePreview = useMemo(() => {
+    if (!tpf?.decimals || balance === 0) return '0.00';
+    return new BigNumber(balance).shiftedBy(-tpf.decimals).toFormat(tpf.decimals)
+  }, [balance, tpf])
 
   return (
     <Dialog
@@ -147,7 +189,7 @@ export const TPFWithdraw = (props) => {
               <strong>Endereço do contrato</strong>
               <br />
               <Link
-                href={`${process.env.NEXT_PUBLIC_SCAN_URL}${tpf.contractAddress}`}
+                href={getContractLink(tpf.contractAddress)}
                 target="_blank"
                 title={tpf.contractAddress}
                 style={{ color: '#0076D6', textDecoration: 'none' }}
@@ -165,21 +207,25 @@ export const TPFWithdraw = (props) => {
             <p>
               <strong>Rentabilidade</strong>
               <br />
-              <span>{(tpf.yield / 100).toFixed(2)}% a.a</span>
+              <span>{yieldPercent}% a.a</span>
             </p>
           </div>
           <div style={{ border: '1px solid #F8DFE2', padding: '16px' }}>
             <p>
               <strong>Saldo Disponível</strong>
               <br />
-              <span>{loadingBalance ? 'Carregando...' : balance}</span>
+              <span>{loadingBalance ? 'Carregando...' : balancePreview}</span>
             </p>
           </div>
         </DialogContentText>
         <hr style={{ height: 2, margin: '24px 0' }} />
         <form noValidate onSubmit={formik.handleSubmit} style={{ margin: '16px' }}>
           <Stack spacing={1}>
-            <MetamaskButton connect={connect} connected={connected} account={account} />
+            {connected && account ? (
+              <AddressButton>{shortenAddress(account, 16, 15)}</AddressButton>
+            ) : (
+              <MetaMaskButton onClick={connect} />
+            )}
             <b>Quanto deseja sacar?</b>
             <p>
               <b style={{ fontWeight: 600, fontSize: 14 }}>Valor</b>
@@ -202,6 +248,16 @@ export const TPFWithdraw = (props) => {
                 {formik.errors.submit}
               </Typography>
             )}
+            <Button
+              disabled={!connected || !account || isLoadingSubmit || loadingBalance}
+              fullWidth
+              size="large"
+              type="submit"
+              variant="contained"
+              style={{ borderRadius: '50px' }}
+            >
+              Sacar
+            </Button>
           </Stack>
         </form>
       </DialogContent>

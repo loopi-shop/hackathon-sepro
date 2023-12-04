@@ -145,7 +145,7 @@ export const TPFTable = (props) => {
   };
 
   const [openWithdraw, setOpenWithdraw] = useState(false);
-  const [selectedTPF, setSelectedTPF] = useState(undefined);
+  const [selectedTPF, setSelectedTPF] = useState({});
 
   const handleOpenWithdraw = (tpf) => {
     setSelectedTPF(tpf);
@@ -154,7 +154,7 @@ export const TPFTable = (props) => {
 
   const closeWithdraw = () => {
     setOpenWithdraw(false);
-    setSelectedTPF(undefined);
+    setSelectedTPF({});
   }
 
   return (
@@ -176,6 +176,7 @@ export const TPFTable = (props) => {
           settle,
           buy,
           handleOpenWithdraw,
+          embedded,
         }))}
       </CardsList>
       {!embedded && (
