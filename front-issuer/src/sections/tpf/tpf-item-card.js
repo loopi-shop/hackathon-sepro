@@ -42,9 +42,13 @@ export const TPFItemCard =
 
       const expirationHeader = headers.filter((h) => h.key === 'expirationDate')[0];
       const balanceHeader = headers.filter((h) => h.key === 'balance')[0];
-      const othersHeaders = headers.filter(
+      let othersHeaders = headers.filter(
         (h) => !['symbol', 'expirationDate', isAdmin ? 'x' : 'balance'].includes(h.key)
       );
+
+      if (!isAdmin) {
+        othersHeaders = othersHeaders.reverse();
+      }
 
       return (
         <CardItem key={item.symbol} title={item.symbol}>

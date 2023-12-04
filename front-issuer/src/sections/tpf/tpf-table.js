@@ -36,6 +36,16 @@ const tableHeaders = [
     }
   },
   {
+    key: 'unitPrice',
+    description: 'Preço Unitário (BRLX)',
+    roles: [RoleEnum.COMMON, RoleEnum.ADMIN],
+    format: ({ rowData, value }) => {
+      return isLoadingValue(value)
+        ? 'Carregando...'
+        : formatBRLX(value / 10 ** rowData.decimals);
+    }
+  },
+  {
     key: 'totalAssets',
     description: 'Total Arrecadado (BRLX)',
     roles: [RoleEnum.ADMIN],
@@ -46,6 +56,12 @@ const tableHeaders = [
     }
   },
   {
+    key: 'yield',
+    description: 'Rentabilidade (%)',
+    roles: [RoleEnum.COMMON, RoleEnum.ADMIN],
+    format: ({ value }) => `${(value / 100).toFixed(2)}% a.a.`
+  },
+  {
     key: 'totalSupply',
     description: 'Total Emitido',
     roles: [RoleEnum.ADMIN],
@@ -53,22 +69,6 @@ const tableHeaders = [
       return isLoadingValue(value)
         ? 'Carregando...'
         : (value / 10 ** rowData.decimals).toFixed(rowData.decimals);
-    }
-  },
-  {
-    key: 'yield',
-    description: 'Rentabilidade (%)',
-    roles: [RoleEnum.COMMON, RoleEnum.ADMIN],
-    format: ({ value }) => `${(value / 100).toFixed(2)}% a.a.`
-  },
-  {
-    key: 'unitPrice',
-    description: 'Preço Unitário (BRLX)',
-    roles: [RoleEnum.COMMON, RoleEnum.ADMIN],
-    format: ({ rowData, value }) => {
-      return isLoadingValue(value)
-        ? 'Carregando...'
-        : formatBRLX(value / 10 ** rowData.decimals);
     }
   },
   {

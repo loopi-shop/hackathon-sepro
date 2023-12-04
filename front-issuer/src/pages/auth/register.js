@@ -109,7 +109,7 @@ const Page = () => {
                 name="name"
                 label="Nome"
                 error={formik.touched.name ? formik.errors.name : ''}
-                iconclassName="fas fa-user"
+                iconClass="fas fa-user"
                 onBlur={formik.handleBlur}
                 onChange={formik.handleChange}
                 value={formik.values.name}

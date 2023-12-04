@@ -41,7 +41,7 @@ export const SideNav = (props) => {
         }}
       >
         <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Box component={NextLink} href="/" sx={{ display: 'inline-flex' }}>
+          <Box component={NextLink} href="/" sx={{ display: 'inline-flex', height: '24px' }}>
             <img src="/assets/logos/loopi-logo-side-nav.png" />
           </Box>
           <button
