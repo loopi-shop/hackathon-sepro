@@ -10,13 +10,28 @@ import { forwardRef } from 'react';
  * @param {string} [props.className] - Class name (optional)
  * @param {string} [props.iconClass] - Class for the icon (optional)
  * @param {string} [props.placeholder] - Placeholder text (optional)
- * @param {React.CSSProperties} [props.style] - Style (optional)
+ * @param {React.CSSProperties} [props.containerStyle] - The container style (optional)
+ * * @param {React.CSSProperties} [props.style] - Style (optional)
  * @returns {React.Component} An input component
  */
 export const Input = forwardRef(
-  ({ label, id, size, error, className, iconClass, placeholder, style, ...otherProps }, ref) => {
+  (
+    {
+      label,
+      id,
+      size,
+      error,
+      className,
+      iconClass,
+      placeholder,
+      containerStyle,
+      style,
+      ...otherProps
+    },
+    ref
+  ) => {
     return (
-      <div className={className} style={style}>
+      <div className={className} style={containerStyle}>
         <div className={`br-input ${size ? size : ''}`}>
           <label htmlFor={id}>{label}</label>
           <div className="input-group">
@@ -31,6 +46,7 @@ export const Input = forwardRef(
               id={id}
               type="text"
               placeholder={placeholder}
+              style={style}
               {...otherProps}
             />
             {error && (
