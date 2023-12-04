@@ -2,7 +2,7 @@ import {createContext, useContext, useEffect, useReducer, useRef} from 'react';
 import PropTypes from 'prop-types';
 import investmentsRepository from 'src/repositories/investments.repository';
 import {useAuth} from 'src/hooks/use-auth';
-import {Contract, Interface, JsonRpcProvider, Wallet} from 'ethers';
+import {ethers, Contract, Interface, JsonRpcProvider, Wallet} from 'ethers';
 import BigNumber from 'bignumber.js';
 import axios from 'axios';
 import TPF_ABI from '../abis/tpf-abi.json';
@@ -121,6 +121,10 @@ export const TPFContext = createContext({
    */
   redeem: async ({ contractAddress, from }) => { },
   /**
+   * @return {Promise<{ result: any, transaction: any }>}
+   */
+  transfer: async ({ contractAddress, quantity, signer, to }) => { },
+  /**
    * @returns {Promise<number>}
    */
   simulate: async ({ amount, contractAddress, timestamp }) => { },
@@ -141,7 +145,7 @@ export const TPFProvider = (props) => {
   const providerRef = useRef(new JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL, Number(process.env.NEXT_PUBLIC_CHAIN_ID)));
 
   /**
-   * @param {TPF_API} tpf 
+   * @param {TPF_API} tpf
    * @returns {Promise<{ defaultCompliance: string, tokenImplementation: string }>}
    */
   const register = async (tpf) => {
@@ -151,7 +155,7 @@ export const TPFProvider = (props) => {
   }
 
   /**
-   * @param {Omit<import("src/repositories/investments.repository").TPF, "id">} tpf 
+   * @param {Omit<import("src/repositories/investments.repository").TPF, "id">} tpf
    */
   const createWithDefaults = async (tpf) => {
     dispatch({
@@ -184,7 +188,7 @@ export const TPFProvider = (props) => {
       }
       const outputCreatedContract = await register(payloadAPI);
       /**
-       * @type {Omit<import("src/repositories/investments.repository").TPF, "id">} 
+       * @type {Omit<import("src/repositories/investments.repository").TPF, "id">}
        */
       const tpfFilled = {
         asset: payloadAPI.stableToken,
@@ -352,6 +356,28 @@ export const TPFProvider = (props) => {
     }
   }
 
+  const transfer = async ({ contractAddress, quantity, signer, to }) => {
+    try {
+
+      const erc20Contract = new ethers.Contract(contractAddress, TPF_ABI, signer);
+      const transaction = await erc20Contract.transfer(to, quantity);
+      const result = await transaction.wait(1);
+
+      if (result.status === 1) {
+        return { result, transaction };
+      }
+
+      console.info('Transaction Result', result);
+      throw Error('Transfer tokens failed');
+    } catch (e) {
+      console.info('Input for transfer');
+      console.info('Internal data');
+
+      console.error(e);
+      throw e;
+    }
+  }
+
   const simulate = async ({ amount, contractAddress, timestamp }) => {
     const data = TPFContractInterface.encodeFunctionData("previewDeposit", [amount, parseInt(timestamp)]);
     const response = await providerRef.current.call({
@@ -398,6 +424,7 @@ export const TPFProvider = (props) => {
         approve,
         waitTransaction,
         redeem,
+        transfer,
         simulate,
         broadcast,
         balanceOf,
