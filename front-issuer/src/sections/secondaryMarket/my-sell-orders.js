@@ -14,7 +14,6 @@ import { Box } from '@mui/system';
 import { Scrollbar } from 'src/components/scrollbar';
 import { useSellOrders } from 'src/hooks/secondary-market/use-sell-orders';
 import { formatBRLX } from 'src/utils/format';
-import {ethers} from "ethers";
 
 const headers = [
   {
