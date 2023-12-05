@@ -92,7 +92,7 @@ class SecondaryMarket {
 
       return {
         internalId: internalId.toString(),
-        name: 'Symbol01',
+        name: investment.name,
         expirationDate: getExpirationDate(investment),
         yield: investment.yield,
         quantity,
