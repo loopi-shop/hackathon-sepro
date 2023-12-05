@@ -41,7 +41,7 @@ const headers = [
 ];
 
 export function MyBuyOrders() {
-  const { orders, removeOrder, search, setSearch, searchOpen, setSearchOpen } = useBuyOrders();
+  const { orders, cancelOrder, search, setSearch, searchOpen, setSearchOpen } = useBuyOrders();
 
   return (
     <Box sx={{ mb: 5 }}>
@@ -102,7 +102,7 @@ export function MyBuyOrders() {
                   <TableCell>
                     <IconButton
                       color={'primary'}
-                      onClick={() => removeOrder(order)}
+                      onClick={() => cancelOrder(order)}
                       title="Remover"
                     >
                       <SvgIcon fontSize="small">
