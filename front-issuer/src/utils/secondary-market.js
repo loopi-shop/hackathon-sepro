@@ -42,7 +42,7 @@ class SecondaryMarket {
   }
 
   /**
-   * @return {Promise<{internalId: string, quantity: string, isCanceled: boolean, isSold: boolean, yield: number, name: string, sellPrice: string, seller: string, expirationDate: string}[]>}
+   * @return {Promise<{internalId: string, quantity: string, isCanceled: boolean, isSold: boolean, yield: number, name: string, sellPrice: string, seller: string, expirationDate: string, contractAddress: string}[]>}
    */
   async listOrders() {
     const contract = this.getContract();
@@ -65,6 +65,7 @@ class SecondaryMarket {
      *   sellPrice: string,
      *   seller: string,
      *   expirationDate: string,
+     *   contractAddress: string,
      * }[]}
      */
     const list = await Promise.all((await Promise.all(listPromise)).map(async (order) => {
@@ -99,6 +100,7 @@ class SecondaryMarket {
         isSold,
         isCanceled,
         seller,
+        contractAddress: token,
       }
     }));
 
@@ -106,15 +108,7 @@ class SecondaryMarket {
     return list.filter(order => order !== undefined);
   }
 
-  createOrder() {
-
-  }
-
   cancelOrder() {
-
-  }
-
-  acceptOrder() {
 
   }
 }

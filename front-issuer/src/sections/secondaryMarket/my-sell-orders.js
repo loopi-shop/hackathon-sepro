@@ -14,6 +14,7 @@ import { Box } from '@mui/system';
 import { Scrollbar } from 'src/components/scrollbar';
 import { useSellOrders } from 'src/hooks/secondary-market/use-sell-orders';
 import { formatBRLX } from 'src/utils/format';
+import {ethers} from "ethers";
 
 const headers = [
   {
@@ -40,7 +41,7 @@ const headers = [
 ];
 
 export function MySellOrders() {
-  const { orders, createOrder } = useSellOrders();
+  const { orders, buyOrder } = useSellOrders();
 
   return (
     <Box sx={{ mb: 5 }}>
@@ -85,7 +86,7 @@ export function MySellOrders() {
                   <TableCell>
                     <IconButton
                       color={'primary'}
-                      onClick={() => createOrder(order)}
+                      onClick={() => buyOrder(order)}
                       title="Comprar"
                     >
                       <SvgIcon fontSize="small">
